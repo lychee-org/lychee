@@ -1,4 +1,4 @@
-export interface LichessUser {
+export type LichessUser = {
   id: string;
   username: string;
   perfs: {
@@ -64,4 +64,26 @@ export interface LichessUser {
   following: boolean;
   blocking: boolean;
   followsYou: boolean;
+}
+
+export type Puzzle = {
+  _id: string
+  gameId: string
+  fen: string
+  themes: string[]
+  glicko: Glicko
+  plays: number
+  vote: number
+  line: string
+  generator: number
+  cp: number
+  vd: number
+  vu: number
+  users: string[]
+}
+
+export type Glicko = {
+  r: number
+  d: number
+  v: number
 }
