@@ -265,8 +265,9 @@ export default function Puzzle() {
       <button
         style={buttonStyle}
         onClick={() => {
-          game.reset();
+          game.load(puzzle.fen);
           setFen(game.fen());
+          setLinePos(0);
           setOptionSquares({});
           setRightClickedSquares({});
         }}
@@ -278,6 +279,7 @@ export default function Puzzle() {
         onClick={() => {
           game.undo();
           setFen(game.fen());
+          setLinePos(prev => prev - 1);
           setOptionSquares({});
           setRightClickedSquares({});
         }}
