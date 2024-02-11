@@ -1,10 +1,9 @@
 'use client';
 
 import { Chess, Square } from 'chess.js';
-import { get } from 'http';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { Piece, PromotionPieceOption } from 'react-chessboard/dist/chessboard/types';
+import { CustomSquareStyles, Piece } from 'react-chessboard/dist/chessboard/types';
 
 const buttonStyle = {
   cursor: "pointer",
@@ -30,11 +29,89 @@ const boardWrapper = {
   margin: "3rem auto",
 };
 
-export default function App() {
-  const game = useMemo(() => new Chess(), []);
+const puzzle = {
+  "_id": "01tg7",
+  "gameId": "TaHSAsYD",
+  "fen": "8/1bnr2pk/4pq1p/p1p1Rp2/P1B2P2/1PP3Q1/3r1BPP/4R1K1 w - - 1 44",
+  "themes": [
+    "middlegame",
+    "short",
+    "fork",
+    "advantage"
+  ],
+  "glicko": {
+    "r": 1545.9399131970683,
+    "d": 76.3329653428455,
+    "v": 0.0899168528207159
+  },
+  "plays": 12153,
+  "vote": 0.9266055226325989,
+  "line": "f2c5 d2g2 g3g2 b7g2",
+  "generator": 14,
+  "cp": 468,
+  "vd": 8,
+  "vu": 210,
+  "users": [
+    "reda",
+    "cted"
+  ]
+}
+
+export default function Puzzle() {
+  const game = useMemo(() => new Chess(puzzle.fen), []);
   const [fen, setFen] = useState(game.fen());
-  const [rightClickedSquares, setRightClickedSquares] = useState<{ [key: string]: { backgroundColor?: string } | undefined }>({});
-  const [optionSquares, setOptionSquares] = useState({});
+  const [rightClickedSquares, setRightClickedSquares] = useState<CustomSquareStyles>({});
+  const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
+
+  const line = puzzle.line.split(' ');
+  const side = puzzle.fen.split(' ')[1] === 'w' ? 'b' : 'w';
+
+  const [linePos, setLinePos] = useState(0);
+
+  // move bot after user
+  useEffect(() => {
+    if (linePos % 2 === 0) {
+      const timeout = setTimeout(botMove, 300);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [linePos])
+
+  function botMove() {
+    // verify last move by user was correct according to line.
+    // if it was incorrect then undo the move
+    if (linePos > 0 && game.history({ verbose: true }).pop()?.lan !== line[linePos - 1]) {
+      game.undo();
+      setFen(game.fen());
+      setLinePos(prev => prev - 1);
+      return;
+    }
+
+    // if it was correct bot move the next move in the line
+    if (linePos < line.length) {
+      game.move(line[linePos]);
+      setFen(game.fen());
+      setLinePos(prev => prev + 1);
+    } else {
+      console.log('puzzle solved');
+    }
+  }
+
+  function lastMoveHighlight() {
+    const moves = game.history({ verbose: true });
+    const lastMove = moves[moves.length - 1];
+    if (lastMove) {
+      return {
+        [lastMove.from]: {
+          background: "rgba(0, 255, 0, 0.4)",
+        },
+        [lastMove.to]: {
+          background: "rgba(0, 255, 0, 0.4)",
+        },
+      };
+    }
+  }
 
   function onDrop(sourceSquare: Square, targetSquare: Square, piece: Piece) {
     try {
@@ -44,7 +121,8 @@ export default function App() {
         promotion: piece[1].toLowerCase() ?? "q",
       });
       setFen(game.fen());
-      setTimeout(makeRandomMove, 300); // timeout to delay move
+      setOptionSquares({});
+      setLinePos(prev => prev + 1);
       return true;
     } catch {
       return false;
@@ -52,7 +130,7 @@ export default function App() {
   }
 
   function getMoveOptions(square: Square) {
-    if (!game.get(square) || game.get(square).color !== "w") {
+    if (!game.get(square) || game.get(square).color !== side) {
       setOptionSquares({});
       return false;
     }
@@ -85,18 +163,6 @@ export default function App() {
     getMoveOptions(sourceSquare);
   }
 
-  function makeRandomMove() {
-    const possibleMoves = game.moves();
-
-    // exit if the game is over
-    if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0)
-      return;
-
-    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    game.move(possibleMoves[randomIndex]);
-    setFen(game.fen());
-  }
-
   function onSquareClick(square: Square) {
     setRightClickedSquares({});
     getMoveOptions(square);
@@ -104,15 +170,16 @@ export default function App() {
 
   function onSquareRightClick(square: Square) {
     const colour = "rgba(0, 0, 255, 0.4)";
-    const test = rightClickedSquares[square];
-    setRightClickedSquares({
-      ...rightClickedSquares,
-      [square]:
-        test &&
-          test.backgroundColor === colour
-          ? undefined
-          : { backgroundColor: colour },
-    });
+
+    if (square in rightClickedSquares) {
+      delete rightClickedSquares[square];
+      setRightClickedSquares({ ...rightClickedSquares });
+    } else {
+      setRightClickedSquares({
+        ...rightClickedSquares,
+        [square]: { backgroundColor: colour },
+      });
+    }
   }
 
   function onPromotionCheck(sourceSquare: Square, targetSquare: Square, piece: Piece) {
@@ -142,10 +209,10 @@ export default function App() {
   return (
     <div style={boardWrapper}>
       <Chessboard
-        id="ClickToMove"
         animationDuration={200}
+        boardOrientation={side === "w" ? "white" : "black"}
         position={fen}
-        isDraggablePiece={({ piece }) => piece[0] === "w"}
+        isDraggablePiece={({ piece }) => piece[0] === side}
         onPieceDragBegin={onPieceDragBegin}
         onPieceDrop={onDrop}
         onSquareClick={onSquareClick}
@@ -157,6 +224,7 @@ export default function App() {
         }}
         customSquareStyles={{
           ...optionSquares,
+          ...lastMoveHighlight(),
           ...rightClickedSquares,
         }}
       />
