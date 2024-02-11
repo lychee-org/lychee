@@ -3,7 +3,7 @@
 import { Chess, Square } from 'chess.js';
 import { useEffect, useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { CustomSquareStyles, Piece } from 'react-chessboard/dist/chessboard/types';
+import { CustomPieces, CustomSquareStyles, Piece } from 'react-chessboard/dist/chessboard/types';
 
 const buttonStyle = {
   cursor: "pointer",
@@ -67,6 +67,38 @@ export default function Puzzle() {
   const side = puzzle.fen.split(' ')[1] === 'w' ? 'b' : 'w';
 
   const [linePos, setLinePos] = useState(0);
+
+  const pieces: Piece[] = [
+    "wP",
+    "wN",
+    "wB",
+    "wR",
+    "wQ",
+    "wK",
+    "bP",
+    "bN",
+    "bB",
+    "bR",
+    "bQ",
+    "bK",
+  ];
+
+  const customPieces = useMemo(() => {
+    const pieceComponents: CustomPieces = {};
+    pieces.forEach((piece) => {
+      pieceComponents[piece] = ({ squareWidth }: { squareWidth: number }) => (
+        <div
+          style={{
+            width: squareWidth,
+            height: squareWidth,
+            backgroundImage: `url(https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${piece.toLowerCase()}.png)`,
+            backgroundSize: "100%",
+          }}
+        />
+      );
+    });
+    return pieceComponents;
+  }, []);
 
   // move bot after user
   useEffect(() => {
@@ -160,6 +192,7 @@ export default function Puzzle() {
   }
 
   function onPieceDragBegin(_: Piece, sourceSquare: Square) {
+    setRightClickedSquares({});
     getMoveOptions(sourceSquare);
   }
 
@@ -227,6 +260,7 @@ export default function Puzzle() {
           ...lastMoveHighlight(),
           ...rightClickedSquares,
         }}
+        customPieces={customPieces}
       />
       <button
         style={buttonStyle}
