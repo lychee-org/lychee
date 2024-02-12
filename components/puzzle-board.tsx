@@ -279,7 +279,7 @@ export default function PuzzleBoard({
       <button style={buttonStyle} onClick={loadPuzzle}>
         {solved ? 'Next Puzzle' : 'Reset Puzzle'}
       </button>
-      <button
+      {/* TODO: <button
         style={buttonStyle}
         onClick={() => {
           game.undo();
@@ -290,7 +290,7 @@ export default function PuzzleBoard({
         }}
       >
         undo
-      </button>
+      </button> */}
     </div>
   );
 }
