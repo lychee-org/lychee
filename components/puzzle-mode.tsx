@@ -9,16 +9,17 @@ type Props = {
 };
 
 const PuzzleMode: React.FC<Props> = ({ puzzles }) => {
-  const [solved, setSolved] = useState<number>(0);
-
+  const [solved, setSolved] = useState<number>(0); // state??
+  
   return (
     solved == puzzles.length ? 
-    'All Done!' : // TODO(sm3421): Handle this better.
+    'All Done!' :
     <PuzzleBoard
       puzzle={puzzles[solved]}
       callback={() => {
         console.log("Puzzle Solved!")
         setSolved(previous => previous + 1)
+        // console.log(puzzles[solved])
       }}
     />
   );

@@ -47,9 +47,8 @@ export default function PuzzleBoard({
   const [rightClickedSquares, setRightClickedSquares] =
     useState<CustomSquareStyles>({});
   const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
-
-  const line = puzzle.Moves.split(' ');
-  const side = puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w';
+  const [line, setLine] = useState(puzzle.Moves.split(' '));
+  const [side, setSide] = useState(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
 
   const [linePos, setLinePos] = useState(0);
 
@@ -98,10 +97,14 @@ export default function PuzzleBoard({
   const loadPuzzle = () => {
     game.load(puzzle.FEN);
     setFen(game.fen());
-    setLinePos(0);
     setOptionSquares({});
     setRightClickedSquares({});
     setSolved(false);
+    setLine(puzzle.Moves.split(' '));
+    setSide(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
+    setLinePos(0);
+    console.log(fen)
+    console.log(line)
   };
 
   const [solved, setSolved] = useState<boolean>(false);
@@ -125,6 +128,7 @@ export default function PuzzleBoard({
       setFen(game.fen());
       setLinePos((prev) => prev + 1);
     } else {
+      // loadPuzzle();
       setSolved(true);
       callback();
     }
