@@ -30,7 +30,6 @@ const boardWrapper = {
   margin: "3rem auto",
 };
 
-// set its props to be the puzzle object
 export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   const game = useMemo(() => new Chess(puzzle.fen), []);
   const [fen, setFen] = useState(game.fen());
