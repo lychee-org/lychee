@@ -47,6 +47,8 @@ export default function PuzzleBoard({
   const [rightClickedSquares, setRightClickedSquares] =
     useState<CustomSquareStyles>({});
   const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
+
+  // TODO(sm3421).
   const [line, setLine] = useState(puzzle.Moves.split(' '));
   const [side, setSide] = useState(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
 
@@ -128,7 +130,8 @@ export default function PuzzleBoard({
       setFen(game.fen());
       setLinePos((prev) => prev + 1);
     } else {
-      // loadPuzzle();
+      // This is weird and hacky and also causes puzzle skips.
+      // TODO: fix this.
       setSolved(true);
       callback();
     }
@@ -183,7 +186,7 @@ export default function PuzzleBoard({
       newSquares[move.to] = {
         background:
           game.get(move.to) &&
-          game.get(move.to).color !== game.get(square).color
+            game.get(move.to).color !== game.get(square).color
             ? 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)'
             : 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
         borderRadius: '50%',
