@@ -75,7 +75,7 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
 
   // move bot after user
   useEffect(() => {
-    if (linePos % 2 === 0) {
+    if (linePos % 2 === 0 && verifyPlayerMove()) {
       const timeout = setTimeout(botMove, 300);
       return () => {
         clearTimeout(timeout);
@@ -83,16 +83,22 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
     }
   }, [linePos])
 
-  function botMove() {
+  function verifyPlayerMove() {
+    // callback only executed if the move was correct
     // verify last move by user was correct according to line.
     // if it was incorrect then undo the move
     if (linePos > 0 && game.history({ verbose: true }).pop()?.lan !== line[linePos - 1]) {
-      game.undo();
-      setFen(game.fen());
-      setLinePos(prev => prev - 1);
-      return;
+        setTimeout(() => {
+          game.undo();
+          setFen(game.fen());
+          setLinePos(prev => prev - 1);
+        }, 70);
+        return false;
     }
+    return true;
+  }
 
+  function botMove() {
     // if it was correct bot move the next move in the line
     if (linePos < line.length) {
       game.move(line[linePos]);
