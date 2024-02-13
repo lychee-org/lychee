@@ -1,7 +1,7 @@
 'use client';
 
 import { Puzzle } from '@/types/lichess-api';
-import { Chess, Square } from 'chess.js';
+import { Chess, Square, Piece as ChessjsPiece } from 'chess.js';
 import { useEffect, useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { CustomPieces, CustomSquareStyles, Piece } from 'react-chessboard/dist/chessboard/types';
@@ -30,11 +30,14 @@ const boardWrapper = {
   margin: "3rem auto",
 };
 
+const chessjs_piece_convert = (piece: ChessjsPiece) => (piece.color + piece.type.toUpperCase()) as Piece;
+
 export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   const game = useMemo(() => new Chess(puzzle.fen), []);
   const [fen, setFen] = useState(game.fen());
   const [rightClickedSquares, setRightClickedSquares] = useState<CustomSquareStyles>({});
   const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
+  const [moveFrom, setMoveFrom] = useState<Square | null>(null);
 
   const line = puzzle.line.split(' ');
   const side = puzzle.fen.split(' ')[1] === 'w' ? 'b' : 'w';
@@ -75,30 +78,36 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
 
   // move bot after user
   useEffect(() => {
-    if (linePos % 2 === 0 && verifyPlayerMove()) {
-      const timeout = setTimeout(botMove, 300);
-      return () => {
-        clearTimeout(timeout);
-      };
+    if (linePos === 0) {
+      const timeout = setTimeout(botMove, 500);
+      return () => clearTimeout(timeout);
+    } else if (linePos % 2 === 0) {
+      return verifyPlayerMove(() => {
+        const timeout = setTimeout(botMove, 300);
+        return () => clearTimeout(timeout);
+      });
     }
   }, [linePos])
 
-  function verifyPlayerMove() {
+  function verifyPlayerMove(successCallback?: () => (() => void)) {
     // callback only executed if the move was correct
     // verify last move by user was correct according to line.
     // if it was incorrect then undo the move
+    console.log('verifyPlayerMove');
     if (linePos > 0 && game.history({ verbose: true }).pop()?.lan !== line[linePos - 1]) {
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
           game.undo();
           setFen(game.fen());
           setLinePos(prev => prev - 1);
-        }, 70);
-        return false;
+        }, 300);
+        return ()=>{ clearTimeout(timeout) };
     }
-    return true;
+    if (successCallback) successCallback();
+    return ()=>{};
   }
 
   function botMove() {
+    console.log('botMove');
     // if it was correct bot move the next move in the line
     if (linePos < line.length) {
       game.move(line[linePos]);
@@ -176,8 +185,13 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   }
 
   function onSquareClick(square: Square) {
-    setRightClickedSquares({});
-    getMoveOptions(square);
+    if (moveFrom && onDrop(moveFrom, square, chessjs_piece_convert(game.get(moveFrom)))) {
+      setMoveFrom(null);
+    } else {
+      setRightClickedSquares({});
+      getMoveOptions(square);
+      if (game.get(square) && game.get(square).color === side) setMoveFrom(square);
+    }
   }
 
   function onSquareRightClick(square: Square) {
