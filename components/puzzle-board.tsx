@@ -37,6 +37,7 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   const [fen, setFen] = useState(game.fen());
   const [rightClickedSquares, setRightClickedSquares] = useState<CustomSquareStyles>({});
   const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
+  const [interactedSquare, setInteractedSquare] = useState<CustomSquareStyles>({});
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
   const removePremoveRef = createRef<ClearPremoves>();
   let output: ReactNode | null = null;
@@ -60,6 +61,10 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
     "bQ",
     "bK",
   ];
+
+  const hoveredSquareStyle: Record<string, string|number> = {
+    background: "rgba(255, 255, 0, 0.4)",
+  };
 
   const customPieces = useMemo(() => {
     const pieceComponents: CustomPieces = {};
@@ -113,7 +118,6 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
     // callback only executed if the move was correct
     // verify last move by user was correct according to line.
     // if it was incorrect then undo the move
-    console.log('verifyPlayerMove');
     if (linePos > 0 && game.history({ verbose: true }).pop()?.lan !== line[linePos - 1]) {
         const timeout = setTimeout(() => {
           game.undo();
@@ -162,6 +166,8 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
       setFen(game.fen());
       setOptionSquares({});
       setLinePos(prev => prev + 1);
+      setMoveFrom(null);
+      setInteractedSquare({});
       return true;
     } catch {
       return false;
@@ -199,17 +205,56 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   }
 
   function onPieceDragBegin(_: Piece, sourceSquare: Square) {
+    setMoveFrom(sourceSquare);
     setRightClickedSquares({});
     getMoveOptions(sourceSquare);
   }
 
+  function onPieceDragEnd() {
+    setInteractedSquare({});
+  }
+
+  function onDragOverSquare(square: Square) {
+    if (square === moveFrom) {
+      setInteractedSquare({});
+      return;
+    }
+    let possible_squares = moveFrom ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to) : [];
+    if (possible_squares.includes(square)) {
+      setInteractedSquare({ [square]: hoveredSquareStyle });
+    } else {
+      setInteractedSquare({});
+    }
+  }
+
   function onSquareClick(square: Square) {
-    if (moveFrom && onDrop(moveFrom, square, chessjs_piece_convert(game.get(moveFrom)))) {
+    setRightClickedSquares({});
+    if (moveFrom && square === moveFrom) {
+      setMoveFrom(null);
+      setOptionSquares({});
+    } else if (moveFrom && onDrop(moveFrom, square, chessjs_piece_convert(game.get(moveFrom)))) {
       setMoveFrom(null);
     } else {
-      setRightClickedSquares({});
       getMoveOptions(square);
-      if (game.get(square) && game.get(square).color === side) setMoveFrom(square);
+      if (game.get(square) && game.get(square).color === side && square !== moveFrom) setMoveFrom(square);
+      else setMoveFrom(null);
+    }
+  }
+
+  function onMouseOutSquare(square: Square) {
+    setInteractedSquare({});
+  }
+
+  function onMouseOverSquare(square: Square) {
+    if (square === moveFrom) {
+      setInteractedSquare({});
+      return;
+    }
+    let possible_squares = moveFrom ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to) : [];
+    if (possible_squares.includes(square)) {
+      setInteractedSquare({ [square]: hoveredSquareStyle });
+    } else {
+      setInteractedSquare({});
     }
   }
 
@@ -263,6 +308,10 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
         onSquareClick={onSquareClick}
         onSquareRightClick={onSquareRightClick}
         onPromotionCheck={onPromotionCheck}
+        onPieceDragEnd={onPieceDragEnd}
+        onDragOverSquare={onDragOverSquare}
+        onMouseOverSquare={onMouseOverSquare}
+        onMouseOutSquare={onMouseOutSquare}
         customBoardStyle={{
           borderRadius: "4px",
           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
@@ -271,7 +320,9 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
           ...optionSquares,
           ...lastMoveHighlight(),
           ...rightClickedSquares,
+          ...interactedSquare
         }}
+        customDropSquareStyle={{}}
         customPieces={customPieces}
         ref={removePremoveRef}
       />
