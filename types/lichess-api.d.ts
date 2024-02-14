@@ -67,19 +67,16 @@ export type LichessUser = {
 }
 
 export type Puzzle = {
-  _id: string
-  gameId: string
-  fen: string
-  themes: string[]
-  glicko: Glicko
-  plays: number
-  vote: number
-  line: string
-  generator: number
-  cp: number
-  vd: number
-  vu: number
-  users: string[]
+  PuzzleId: string;
+  FEN: string;
+  Moves: string;
+  Rating: number;
+  RatingDeviation: number;
+  Popularity: number;
+  NbPlays: number;
+  Themes: string;
+  GameUrl: string;
+  OpeningTags: string;
 }
 
 export type Glicko = {
