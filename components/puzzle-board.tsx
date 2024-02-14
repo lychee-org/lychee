@@ -5,6 +5,8 @@ import { Chess, Square, Piece as ChessjsPiece } from 'chess.js';
 import { ReactNode, createRef, useEffect, useMemo, useState } from 'react';
 import { Chessboard, ClearPremoves } from 'react-chessboard';
 import { CustomPieces, CustomSquareStyles, Piece } from 'react-chessboard/dist/chessboard/types';
+import ControlBar from './controlbar/control-bar';
+import { set } from 'mongoose';
 
 const buttonStyle = {
   cursor: "pointer",
@@ -41,6 +43,10 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
   const removePremoveRef = createRef<ClearPremoves>();
   let output: ReactNode | null = null;
+  // some stuff for the control bar
+  const [moveViewerMove, setMoveViewerMove] = useState(0);
+  const [fens, setFens] = useState([game.fen()]);
+  const [displayText, setDisplayText] = useState('');
 
   const line = puzzle.line.split(' ');
   const side = puzzle.fen.split(' ')[1] === 'w' ? 'b' : 'w';
@@ -97,10 +103,23 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
     let timeout = setTimeout(() => {
       game.move(line[linePos]);
       setFen(game.fen());
-      setLinePos(prev => prev + 1);
+      setFens(prev=>[...prev, game.fen()]);
+      setLinePos(1);
+      setMoveViewerMove(1);
     }, 300);
     return () => clearTimeout(timeout);
   }
+
+  useEffect(() => {
+    if (moveViewerMove !== linePos) {
+      setFen(fens[moveViewerMove]);
+      setOptionSquares({});
+      setInteractedSquare({});
+      setMoveFrom(null);
+    } else {
+      setFen(game.fen());
+    }
+  })
 
   // move bot after user
   useEffect(() => {
@@ -119,13 +138,16 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
     // verify last move by user was correct according to line.
     // if it was incorrect then undo the move
     if (linePos > 0 && game.history({ verbose: true }).pop()?.lan !== line[linePos - 1]) {
+        setDisplayText('Incorrect move');
         const timeout = setTimeout(() => {
           game.undo();
           setFen(game.fen());
           setLinePos(prev => prev - 1);
+          setMoveViewerMove(prev => prev - 1);
         }, 300);
         return ()=>{ clearTimeout(timeout) };
     }
+    setFens(prev=>[...prev, game.fen()]);
     if (successCallback) successCallback();
     return ()=>{};
   }
@@ -135,15 +157,17 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
     if (linePos < line.length) {
       game.move(line[linePos]);
       setFen(game.fen());
+      setFens(prev=>[...prev, game.fen()]);
       setLinePos(prev => prev + 1);
+      setMoveViewerMove(prev=>prev+1);
     } else {
-      console.log('puzzle solved');
+      setDisplayText('Puzzle solved');
     }
   }
 
   function lastMoveHighlight() {
     const moves = game.history({ verbose: true });
-    const lastMove = moves[moves.length - 1];
+    const lastMove = moves[moveViewerMove - 1];
     if (lastMove) {
       return {
         [lastMove.from]: {
@@ -157,6 +181,7 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square, piece: Piece) {
+    if (linePos !== moveViewerMove) return false;
     try {
       game.move({
         from: sourceSquare,
@@ -166,6 +191,7 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
       setFen(game.fen());
       setOptionSquares({});
       setLinePos(prev => prev + 1);
+      setMoveViewerMove(prev => prev + 1);
       setMoveFrom(null);
       setInteractedSquare({});
       return true;
@@ -205,6 +231,7 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   }
 
   function onPieceDragBegin(_: Piece, sourceSquare: Square) {
+    if (linePos !== moveViewerMove) return;
     setMoveFrom(sourceSquare);
     setRightClickedSquares({});
     getMoveOptions(sourceSquare);
@@ -229,6 +256,7 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
 
   function onSquareClick(square: Square) {
     setRightClickedSquares({});
+    if (linePos !== moveViewerMove) return;
     if (moveFrom && square === moveFrom) {
       setMoveFrom(null);
       setOptionSquares({});
@@ -326,7 +354,8 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
         customPieces={customPieces}
         ref={removePremoveRef}
       />
-      <button
+      <ControlBar moves={["...", ...line.slice(0, linePos)]} currentIndex={moveViewerMove} setIndex={setMoveViewerMove} display={displayText} />
+      {/* <button
         style={buttonStyle}
         onClick={() => {
           game.load(puzzle.fen);
@@ -349,7 +378,7 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
         }}
       >
         undo
-      </button>
+      </button> */}
     </div>
   );
   return output;
