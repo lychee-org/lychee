@@ -22,8 +22,6 @@ export async function getPuzzleBatch(user: User, exceptions: Array<string>): Pro
       let {_id: _, ...rest} = p;
       return rest as any as Puzzle;
     }) // TODO(sm3421): lmao
-  console.log("Puzzles");
-  console.log(puzzles.map(p => p.PuzzleId))
   return puzzles;
 }
 
