@@ -20,39 +20,62 @@ const buttonStyle = {
   boxShadow: '0 2px 5px rgba(0, 0, 0, 0.5)',
 };
 
-const inputStyle = {
-  padding: '10px 20px',
-  margin: '10px 0 10px 0',
-  borderRadius: '6px',
-  border: 'none',
-  boxShadow: '0 2px 5px rgba(0, 0, 0, 0.5)',
-};
-
 const boardWrapper = {
   width: `70vw`,
   maxWidth: '70vh',
   margin: '3rem auto',
 };
 
-// set its props to be the puzzle object
-export default function PuzzleBoard({
-  puzzle,
-  callback,
-}: {
-  puzzle: Puzzle;
-  callback: () => void;
-}) {
-  const game = useMemo(() => new Chess(puzzle.FEN), []);
-  const [fen, setFen] = useState(game.fen());
-  const [rightClickedSquares, setRightClickedSquares] =
-    useState<CustomSquareStyles>({});
-  const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
+function useEffectAllDepsChange(fn: any, deps: any) {
+  const [changeTarget, setChangeTarget] = useState(deps);
 
-  // TODO(sm3421).
+  useEffect(() => {
+    setChangeTarget((prev: any[]) => {
+      if (prev.every((dep, i) => dep !== deps[i])) {
+        return deps;
+      }
+
+      return prev;
+    });
+  }, [deps]);
+
+  useEffect(fn, changeTarget);
+}
+
+export default function PuzzleBoard({ puzzles }: { puzzles: Array<Puzzle>; }) {
+  const [solved, setSolved] = useState<number>(0);
+  const [puzzle, setPuzzle] = useState<Puzzle>(puzzles[solved]);
+  const [game, setGame] = useState<Chess>(new Chess(puzzle.FEN));
+  const [fen, setFen] = useState(game.fen());
+  const [rightClickedSquares, setRightClickedSquares] = useState<CustomSquareStyles>({});
+  const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
   const [line, setLine] = useState(puzzle.Moves.split(' '));
   const [side, setSide] = useState(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
-
   const [linePos, setLinePos] = useState(0);
+
+  useEffect(() => { setPuzzle(puzzles[solved]); }, [solved]);
+  useEffect(() => {
+    setGame(new Chess(puzzle.FEN));
+    setFen(puzzle.FEN);
+    setLine(puzzle.Moves.split(' '));
+    setSide(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
+    setRightClickedSquares({});
+    setOptionSquares({});
+  }, [puzzle]);
+  // Wait till all are updated. Otherwise bot will move prematurely.
+  useEffectAllDepsChange(() => { setLinePos(0); }, [game, fen, line, side, rightClickedSquares, optionSquares]);
+
+  // TODO.
+  const reset = () => {
+    setPuzzle(puzzles[solved]);
+    setGame(new Chess(puzzle.FEN));
+    setFen(game.fen());
+    setRightClickedSquares({});
+    setOptionSquares({});
+    setLine(puzzle.Moves.split(' '));
+    setSide(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
+    setLinePos(0);
+  };
 
   const pieces: Piece[] = [
     'wP',
@@ -86,58 +109,27 @@ export default function PuzzleBoard({
     return pieceComponents;
   }, []);
 
-  // move bot after user
-  useEffect(() => {
-    if (linePos % 2 === 0) {
-      const timeout = setTimeout(botMove, 300);
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
-  }, [linePos]);
-
-  const loadPuzzle = () => {
-    game.load(puzzle.FEN);
-    setFen(game.fen());
-    setOptionSquares({});
-    setRightClickedSquares({});
-    setSolved(false);
-    setLine(puzzle.Moves.split(' '));
-    setSide(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
-    setLinePos(0);
-    console.log(fen)
-    console.log(line)
-  };
-
-  const [solved, setSolved] = useState<boolean>(false);
-
-  function botMove() {
+  const botMove = () => {
     // verify last move by user was correct according to line.
     // if it was incorrect then undo the move
-    if (
-      linePos > 0 &&
-      game.history({ verbose: true }).pop()?.lan !== line[linePos - 1]
-    ) {
+    if (linePos > 0 && game.history({ verbose: true }).pop()?.lan !== line[linePos - 1]) {
       game.undo();
       setFen(game.fen());
       setLinePos((prev) => prev - 1);
       return;
     }
-
     // if it was correct bot move the next move in the line
     if (linePos < line.length) {
       game.move(line[linePos]);
       setFen(game.fen());
       setLinePos((prev) => prev + 1);
     } else {
-      // This is weird and hacky and also causes puzzle skips.
-      // TODO: fix this.
-      setSolved(true);
-      callback();
+      console.log("Done!");
+      setSolved(previous => previous + 1);
     }
-  }
+  };
 
-  function lastMoveHighlight() {
+  const lastMoveHighlight = () => {
     const moves = game.history({ verbose: true });
     const lastMove = moves[moves.length - 1];
     if (lastMove) {
@@ -150,9 +142,9 @@ export default function PuzzleBoard({
         },
       };
     }
-  }
+  };
 
-  function onDrop(sourceSquare: Square, targetSquare: Square, piece: Piece) {
+  const onDrop = (sourceSquare: Square, targetSquare: Square, piece: Piece) => {
     try {
       game.move({
         from: sourceSquare,
@@ -166,22 +158,18 @@ export default function PuzzleBoard({
     } catch {
       return false;
     }
-  }
+  };
 
-  function getMoveOptions(square: Square) {
+  const getMoveOptions = (square: Square) => {
     if (!game.get(square) || game.get(square).color !== side) {
       setOptionSquares({});
       return false;
     }
-
     const moves = game.moves({
       square,
       verbose: true,
     });
-
-    const newSquares: {
-      [key: string]: { background: string; borderRadius?: string };
-    } = {};
+    const newSquares: { [key: string]: { background: string; borderRadius?: string }; } = {};
     moves.map((move) => {
       newSquares[move.to] = {
         background:
@@ -198,21 +186,20 @@ export default function PuzzleBoard({
     };
     setOptionSquares(newSquares);
     return true;
-  }
+  };
 
-  function onPieceDragBegin(_: Piece, sourceSquare: Square) {
+  const onPieceDragBegin = (_: Piece, sourceSquare: Square) => {
     setRightClickedSquares({});
     getMoveOptions(sourceSquare);
-  }
+  };
 
-  function onSquareClick(square: Square) {
+  const onSquareClick = (square: Square) => {
     setRightClickedSquares({});
     getMoveOptions(square);
-  }
+  };
 
-  function onSquareRightClick(square: Square) {
+  const onSquareRightClick = (square: Square) => {
     const colour = 'rgba(0, 0, 255, 0.4)';
-
     if (square in rightClickedSquares) {
       delete rightClickedSquares[square];
       setRightClickedSquares({ ...rightClickedSquares });
@@ -222,39 +209,36 @@ export default function PuzzleBoard({
         [square]: { backgroundColor: colour },
       });
     }
-  }
+  };
 
-  function onPromotionCheck(
-    sourceSquare: Square,
-    targetSquare: Square,
-    piece: Piece
-  ) {
+  const onPromotionCheck = (sourceSquare: Square, targetSquare: Square, _: Piece) => {
     const moves = game.moves({
       square: sourceSquare,
       verbose: true,
     });
-    const foundMove = moves.find(
-      (m) => m.from === sourceSquare && m.to === targetSquare
-    );
-    // not a valid move
-    if (!foundMove) {
-      return false;
-    }
-
-    // valid, check if promotion move
-    return (
-      (foundMove.color === 'w' &&
+    const foundMove = moves.find((m) => m.from === sourceSquare && m.to === targetSquare);
+    return !!foundMove &&
+      ((foundMove.color === 'w' &&
         foundMove.piece === 'p' &&
         targetSquare[1] === '8') ||
-      (foundMove.color === 'b' &&
-        foundMove.piece === 'p' &&
-        targetSquare[1] === '1')
-    );
+        (foundMove.color === 'b' &&
+          foundMove.piece === 'p' &&
+          targetSquare[1] === '1'));
   }
+
+  // move bot after user
+  useEffect(() => {
+    if (linePos % 2 === 0) {
+      const timeout = setTimeout(botMove, 300);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [linePos]);
 
   return (
     <div style={boardWrapper}>
-      {solved ? 'Solved!' : ''}
+      Solved = {solved}
       <Chessboard
         animationDuration={200}
         boardOrientation={side === 'w' ? 'white' : 'black'}
@@ -276,21 +260,9 @@ export default function PuzzleBoard({
         }}
         customPieces={customPieces}
       />
-      <button style={buttonStyle} onClick={loadPuzzle}>
-        {solved ? 'Next Puzzle' : 'Reset Puzzle'}
+      <button style={buttonStyle} onClick={reset}>
+        Reset Puzzle
       </button>
-      {/* TODO: <button
-        style={buttonStyle}
-        onClick={() => {
-          game.undo();
-          setFen(game.fen());
-          setLinePos((prev) => prev - 1);
-          setOptionSquares({});
-          setRightClickedSquares({});
-        }}
-      >
-        undo
-      </button> */}
     </div>
   );
 }

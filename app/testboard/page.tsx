@@ -1,8 +1,8 @@
-import PuzzleMode from '@/components/puzzle-mode';
 import { dbConnect } from '@/lib/db';
 import { Puzzle } from '@/types/lichess-api';
 import mongoose from 'mongoose';
 import { validateRequest } from '@/lib/auth';
+import PuzzleBoard from '@/components/puzzle-board';
 
 const RATING_RADIUS = 300
 
@@ -18,9 +18,7 @@ export default async function TestBoard() {
     .toArray())
     .map(p => p as any as Puzzle) // TODO(sm3421): lmao
 
-  // for (let i = 0; i < Math.min(100, puzzles.length); ++i) {
-  //   console.log(puzzles[i].Rating)
-  // }
-
-  return <PuzzleMode puzzles={puzzles} />;
+  console.log(puzzles[0].Moves);
+  console.log(puzzles[1].Moves);
+  return <PuzzleBoard puzzles={puzzles} />;
 }
