@@ -2,8 +2,8 @@
 
 import { Puzzle } from '@/types/lichess-api';
 import { Chess, Square, Piece as ChessjsPiece } from 'chess.js';
-import { useEffect, useMemo, useState } from 'react';
-import { Chessboard } from 'react-chessboard';
+import { ReactNode, createRef, useEffect, useMemo, useState } from 'react';
+import { Chessboard, ClearPremoves } from 'react-chessboard';
 import { CustomPieces, CustomSquareStyles, Piece } from 'react-chessboard/dist/chessboard/types';
 
 const buttonStyle = {
@@ -38,6 +38,8 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   const [rightClickedSquares, setRightClickedSquares] = useState<CustomSquareStyles>({});
   const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
+  const removePremoveRef = createRef<ClearPremoves>();
+  let output: ReactNode | null = null;
 
   const line = puzzle.line.split(' ');
   const side = puzzle.fen.split(' ')[1] === 'w' ? 'b' : 'w';
@@ -76,14 +78,32 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
     return pieceComponents;
   }, []);
 
+  function firstBotMove() {
+    // hack that waits for the removePremoveRef to be defined
+    // this works because the ref is defined after the most
+    // computationally intensive part (diff checking) is done
+    if (removePremoveRef.current === undefined) {
+      // retry until ref is defined
+      let timeout = setTimeout(() => {
+        firstBotMove();
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+    let timeout = setTimeout(() => {
+      game.move(line[linePos]);
+      setFen(game.fen());
+      setLinePos(prev => prev + 1);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }
+
   // move bot after user
   useEffect(() => {
     if (linePos === 0) {
-      const timeout = setTimeout(botMove, 500);
-      return () => clearTimeout(timeout);
+      return firstBotMove();
     } else if (linePos % 2 === 0) {
       return verifyPlayerMove(() => {
-        const timeout = setTimeout(botMove, 300);
+        const timeout = setTimeout(botMove, 400);
         return () => clearTimeout(timeout);
       });
     }
@@ -107,7 +127,6 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
   }
 
   function botMove() {
-    console.log('botMove');
     // if it was correct bot move the next move in the line
     if (linePos < line.length) {
       game.move(line[linePos]);
@@ -232,7 +251,7 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
     )
   }
 
-  return (
+  output = (
     <div style={boardWrapper}>
       <Chessboard
         animationDuration={200}
@@ -254,6 +273,7 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
           ...rightClickedSquares,
         }}
         customPieces={customPieces}
+        ref={removePremoveRef}
       />
       <button
         style={buttonStyle}
@@ -281,5 +301,6 @@ export default function PuzzleBoard({ puzzle }: { puzzle: Puzzle }) {
       </button>
     </div>
   );
+  return output;
 };
 
