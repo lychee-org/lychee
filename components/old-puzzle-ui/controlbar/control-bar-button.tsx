@@ -35,10 +35,13 @@ const ControlButtonBar: React.FC<ControlButtonBarProps> = ({
 }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      console.log(event);
       if (event.key === "ArrowLeft") {
+        console.log("LEFT");
         if (event.shiftKey) firstMove();
         else prevMove();
       } else if (event.key === "ArrowRight") {
+        console.log("RIGHT");
         if (event.shiftKey) lastMove();
         else nextMove();
       }
@@ -49,7 +52,7 @@ const ControlButtonBar: React.FC<ControlButtonBarProps> = ({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [prevMove, nextMove]);
+  }, [prevMove, nextMove, firstMove, lastMove]);
 
   return (
     <div className="control-button-bar">

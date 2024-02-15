@@ -6,34 +6,38 @@ import { Puzzle } from '@/types/lichess-api';
 
 type Props = {
   initialPuzzleBatch: Array<Puzzle>;
+  puzzleSuccessCallback?: (puzzleId: string) => void;
+  puzzleFailCallback?: (puzzleId: string) => void;
 };
 
 const MINIMUM_PUZZLES = 5;
 
+export const PuzzleContext = React.createContext<Puzzle | undefined>(undefined);
+
 const PuzzleMode: React.FC<Props> = ({ initialPuzzleBatch }) => {
   const [puzzleBatch, setPuzzleBatch] = useState(initialPuzzleBatch.slice(1));
   const [nextPuzzle, setNextPuzzle] = useState(initialPuzzleBatch[0]);
-  console.log(puzzleBatch.length);
+
+  const puzzleSubmit = (puzzleId: string, success: boolean) => {
+    fetch(`/api/puzzle/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ puzzleId, success })
+    });
+  }
 
   const getNewPuzzles = () => {
-    const alreadyBatched = [nextPuzzle.PuzzleId, ...puzzleBatch.map(p => p.PuzzleId)].join(',');
-    fetch(`/api/nextpuzzlebatch?exceptions=${alreadyBatched}`)
+    const alreadyBatched = [nextPuzzle.PuzzleId, ...puzzleBatch.map(p => p.PuzzleId)];
+    fetch(`/api/puzzle/nextbatch?exceptions=${alreadyBatched}`)
       .then((res) => res.json())
       .then((res) => res.puzzles as Array<Puzzle>)
       .then((puzzles: Array<Puzzle>) => {
         setPuzzleBatch([...puzzleBatch, ...puzzles])
-        console.log(puzzleBatch.length);
       });
   }
 
   useEffect(() => {
-    if (puzzleBatch.length <= MINIMUM_PUZZLES) {
-      getNewPuzzles();
-    }
+    if (puzzleBatch.length <= MINIMUM_PUZZLES) getNewPuzzles();
   })
-
-
-  const PuzzleContext = React.createContext<Puzzle | undefined>(nextPuzzle);
 
   if (!nextPuzzle) {
     return 'All Done!';
@@ -41,11 +45,11 @@ const PuzzleMode: React.FC<Props> = ({ initialPuzzleBatch }) => {
   return (
     <PuzzleContext.Provider value={nextPuzzle}>
     <PuzzleBoard
-      puzzle={nextPuzzle}
-      callback={() => {
+      nextPuzzleCallback={() => {
         setNextPuzzle(puzzleBatch[0]);
         setPuzzleBatch(puzzleBatch.slice(1));
       }}
+      puzzleSubmitCallback={puzzleSubmit}
     />
     </PuzzleContext.Provider>
   );

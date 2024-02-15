@@ -1,8 +1,8 @@
 'use client';
 
-import { Puzzle } from '@/types/lichess-api';
+import LoadingBoard from "./new-attempt/loading-board"
 import { Chess, Square, Piece as ChessjsPiece } from 'chess.js';
-import { ReactNode, createRef, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, createRef, useEffect, useMemo, useState, useContext } from 'react';
 import { Chessboard, ClearPremoves } from 'react-chessboard';
 import {
   CustomPieces,
@@ -10,7 +10,7 @@ import {
   Piece
 } from 'react-chessboard/dist/chessboard/types';
 import ControlBar from './controlbar/control-bar';
-import { set } from 'mongoose';
+import { PuzzleContext } from "./puzzle-mode";
 
 const buttonStyle = {
   cursor: 'pointer',
@@ -39,12 +39,14 @@ const boardWrapper = {
 const chessjs_piece_convert = (piece: ChessjsPiece) => (piece.color + piece.type.toUpperCase()) as Piece;
 
 interface PuzzleBoardProps {
-  puzzle: Puzzle;
-  callback: () => void;
+  nextPuzzleCallback: () => void;
+  puzzleSubmitCallback?: (puzzleId: string, success: boolean) => void
 }
 
 // set its props to be the puzzle object
-const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, callback}) =>  {
+const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSubmitCallback}) =>  {
+  const puzzle = useContext(PuzzleContext);
+  if (!puzzle) return <LoadingBoard/>
   const game = useMemo(() => new Chess(puzzle.FEN), []);
   const [fen, setFen] = useState(game.fen());
   const [rightClickedSquares, setRightClickedSquares] =
@@ -53,6 +55,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, callback}) =>  {
   const [interactedSquare, setInteractedSquare] = useState<CustomSquareStyles>({});
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
   const removePremoveRef = createRef<ClearPremoves>();
+  const [rendered, setRendered] = useState(false);
   let output: ReactNode | null = null;
   // some stuff for the control bar
   const [moveViewerMove, setMoveViewerMove] = useState(0);
@@ -112,13 +115,17 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, callback}) =>  {
       }, 100);
       return () => clearTimeout(timeout);
     }
+    setRendered(true);
     let timeout = setTimeout(() => {
-      game.move(line[linePos]);
-      setFen(game.fen());
-      setFens(prev=>[...prev, game.fen()]);
-      setLinePos(1);
-      setMoveViewerMove(1);
-    }, 300);
+      setTimeout(() => {
+        console.log(rendered);
+        game.move(line[linePos]);
+        setFen(game.fen());
+        setFens(prev=>[...prev, game.fen()]);
+        setLinePos(1);
+        setMoveViewerMove(1);
+      }, 300);
+    }, 10);
     return () => clearTimeout(timeout);
   }
 
@@ -360,9 +367,10 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, callback}) =>  {
         targetSquare[1] === '1')
     );
   }
-
   return (
     <div style={boardWrapper}>
+      {/* {rendered ? '' : <LoadingBoard/>} */}
+      <div style={{display: rendered ? "block" : "none"}}>
       <Chessboard
         animationDuration={200}
         boardOrientation={side === 'w' ? 'white' : 'black'}
@@ -391,7 +399,8 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, callback}) =>  {
         customPieces={customPieces}
         ref={removePremoveRef}
       />
-      <button style={buttonStyle} onClick={solved ? callback : loadPuzzle}>
+      </div>
+      <button style={buttonStyle} onClick={solved ? nextPuzzleCallback : loadPuzzle}>
         {solved ? 'Next Puzzle' : 'Reset Puzzle'}
       </button>
       <ControlBar moves={["...", ...line.slice(0, linePos)]} currentIndex={moveViewerMove} setIndex={setMoveViewerMove} display={displayText} />
@@ -399,4 +408,4 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, callback}) =>  {
   );
 };
 
-export default PuzzleBoard;
+export default React.memo(PuzzleBoard);
