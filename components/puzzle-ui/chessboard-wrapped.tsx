@@ -6,7 +6,8 @@ import { Chessboard, ClearPremoves } from 'react-chessboard';
 import {
   CustomPieces,
   CustomSquareStyles,
-  Piece
+  Piece,
+  PromotionPieceOption
 } from 'react-chessboard/dist/chessboard/types';
 
 const boardWrapper = {
@@ -73,6 +74,8 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
   const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
   const [interactedSquare, setInteractedSquare] = useState<CustomSquareStyles>({});
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
+  const [showPromotion, setShowPromotion] = useState(false);
+  const [moveTo, setMoveTo] = useState<Square | null>(null);
   const removePremoveRef = createRef<ClearPremoves>();
 
   /** MAKING SURE PARENT COMPONENT KNOWS WHEN INITIAL BOARD IS RENDERED */
@@ -178,6 +181,7 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
 
   function onDragOverSquare(square: Square) {
     if (!interactive) return;
+    setMoveTo(square);
     if (square === moveFrom) {
       setInteractedSquare({});
       return;
@@ -204,6 +208,8 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
     }
   }
 
+  /** PROMOTION SHIT */
+  
   function onPromotionCheck(
     sourceSquare: Square,
     targetSquare: Square,
@@ -233,9 +239,35 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
   }
 
   /** FUNCTIONS THAT CAN ACTUALLY EXECUTE MOVES */
+  function onPromotionPieceSelect(piece?: PromotionPieceOption) {
+    if (piece) {
+      console.log(moveFrom, moveTo);
+      if (!moveFrom) console.log("NO MOVE FROM DEFINED")
+      if (!moveTo) console.log("NO MOVE TO DEFINED");
+      try {
+        game.move({
+          from: moveFrom ?? "",
+          to: moveTo ?? "",
+          promotion: piece[1].toLowerCase()
+        });
+        if (updateGame) updateGame(moveFrom ?? "a1", moveTo ?? "a2", piece[1].toLowerCase() ?? 'q');
+      } catch {
+        console.log("ERROR IN PROMOTION PIECE SELECT");
+        return false;
+      }
+    }
+    setInteractedSquare({});
+    setMoveFrom(null);
+    setMoveTo(null);
+    setShowPromotion(false);
+    setOptionSquares({});
+    return true;
+  }
+
   function onDrop(sourceSquare: Square, targetSquare: Square, piece: Piece) {
     if (!interactive) return false;
     try {
+      console.log("try");
       game.move({
         from: sourceSquare,
         to: targetSquare,
@@ -256,14 +288,33 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
     if (!interactive) return;
     if (moveFrom && square === moveFrom) {
       setMoveFrom(null);
+      setMoveTo(null);
       setOptionSquares({});
-    } else if (moveFrom && onDrop(moveFrom, square, chessjs_piece_convert(game.get(moveFrom)))) { // TODO: update this
-      setMoveFrom(null);
-    } else {
-      getMoveOptions(square);
-      if (game.get(square) && game.get(square).color === turn && square !== moveFrom) setMoveFrom(square);
-      else setMoveFrom(null);
-    }
+    } else if (moveFrom) { // TODO: update this
+      try {
+        const piece = chessjs_piece_convert(game.get(moveFrom));
+        if (onPromotionCheck(moveFrom, square, piece)) {
+          console.log(moveFrom);
+          setMoveTo(square);
+          setShowPromotion(true);
+        } else {
+          game.move({
+            from: moveFrom,
+            to: square,
+            promotion: piece[1].toLowerCase() ?? 'q',
+          });
+          setOptionSquares({});
+          setMoveFrom(null);
+          setMoveTo(null);
+          setInteractedSquare({});
+          if (updateGame) updateGame(moveFrom, square, piece[1].toLowerCase() ?? 'q');
+        }
+        return;
+      } catch { }
+    } 
+    getMoveOptions(square);
+    if (game.get(square) && game.get(square).color === turn && square !== moveFrom) setMoveFrom(square);
+    else setMoveFrom(null);
   }
 
   /** RETURNS MOSTLY A WRAPPED VERSION OF REACT-CHESSBOARD */
@@ -279,10 +330,13 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
         onSquareClick={onSquareClick}
         onSquareRightClick={onSquareRightClick}
         onPromotionCheck={onPromotionCheck}
+        onPromotionPieceSelect={onPromotionPieceSelect}
+        promotionToSquare={moveTo}
         onPieceDragEnd={onPieceDragEnd}
         onDragOverSquare={onDragOverSquare}
         onMouseOverSquare={onMouseOverSquare}
         onMouseOutSquare={onMouseOutSquare}
+        showPromotionDialog={showPromotion}
         customBoardStyle={{
           borderRadius: '4px',
           boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
