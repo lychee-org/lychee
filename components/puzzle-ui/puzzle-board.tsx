@@ -10,6 +10,8 @@ import ControlButtonBar, { PlaybackControllerContext } from './controls/control-
 import MoveViewer, { MoveNavigationContext } from './controls/move-viewer';
 import ResetPuzzleButton, { ResetPuzzleButtonContext } from './controls/reset-puzzle-button';
 import { Puzzle } from '@/types/lichess-api';
+import "./puzzle-board-ui.css";
+import Rating from './controls/rating';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
@@ -141,24 +143,30 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
   const lastMoveToHighlight: Move | undefined = game.history({verbose: true}).find((_, i) => i === playbackPos - 1);
 
   return (
-    <div>
-      <ChessboardWrapped
-        side={side}
-        fen={fen}
-        lastMove={lastMoveToHighlight}
-        interactive={interactive}
-        updateGame={interactive ? playerMoveCallback : (()=>{})}
-        renderedCallback={rendered ? (()=>{return;}) : renderedCallback}
-      />
+    <div className="container">
+      <div className="chessboard">
+        <ChessboardWrapped
+          side={side}
+          fen={fen}
+          lastMove={lastMoveToHighlight}
+          interactive={interactive}
+          updateGame={interactive ? playerMoveCallback : (()=>{})}
+          renderedCallback={rendered ? (()=>{return;}) : renderedCallback}
+        />
+      </div>
+      <div><Rating /></div>
+      <div className="button">
       <ResetPuzzleButtonContext.Provider value={{solved, reloadPuzzle: loadPuzzle}}>
         <ResetPuzzleButton />
       </ResetPuzzleButtonContext.Provider>
-      <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
+      </div>
+
+      {/* <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
         <ControlButtonBar />
       </PlaybackControllerContext.Provider>
       <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
         <MoveViewer/>
-      </MoveNavigationContext.Provider>
+      </MoveNavigationContext.Provider> */}
     </div>
   );
 };

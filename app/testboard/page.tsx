@@ -4,6 +4,7 @@ import React from 'react';
 import { validateRequest } from '@/lib/auth';
 import { getPuzzleBatch } from '../api/puzzle/nextbatch/nextbatch';
 import { getUserInfo } from '../api/user/info/getUserInfo';
+import Rating from '@/components/puzzle-ui/controls/rating';
 
 export default async function TestBoard() {
   await dbConnect()
