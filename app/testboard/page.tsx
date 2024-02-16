@@ -10,7 +10,7 @@ export default async function TestBoard() {
   const { user } = await validateRequest();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  const userInfo = getUserInfo(user);
+  const userInfo = await getUserInfo(user);
 
   const puzzles = await getPuzzleBatch(user, []);
   return <PuzzleMode initialPuzzleBatch={puzzles} userInfo={userInfo} />;
