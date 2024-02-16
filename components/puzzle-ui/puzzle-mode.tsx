@@ -1,7 +1,9 @@
 'use client';
 import { Puzzle } from "@/types/lichess-api";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PuzzleBoard from "./puzzle-board";
+import { UserInfo } from "@/app/api/user/info/route";
+import UserContext from "../auth/usercontext";
 
 const MIN_LOCAL_BATCH_LEN = 5;
 
@@ -34,6 +36,13 @@ export const PuzzleContext = React.createContext({
 })
 
 const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch}) => {
+  /** GET USER CONTEXT */
+  const [user, setUser] = useState<UserInfo | null>(null);
+  useEffect(() => {
+    fetch(`/api/user/info`)
+    .then(res => res.json())
+    .then(res => setUser(res))
+  }, []);
 
   /** PUZZLE CODE */
   const [puzzleBatch, setPuzzleBatch] = useState<Array<Puzzle>>(initialPuzzleBatch);
@@ -65,9 +74,11 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch}) => {
   
   return (
     <div style={wrapperStyle}>
-      <PuzzleContext.Provider value={{submitNextPuzzle, getNextPuzzle}}>
-        <PuzzleBoard puzzle={puzzle}/>
-      </PuzzleContext.Provider>
+      <UserContext.Provider value={user}>
+        <PuzzleContext.Provider value={{submitNextPuzzle, getNextPuzzle}}>
+          <PuzzleBoard puzzle={puzzle}/>
+        </PuzzleContext.Provider>
+      </UserContext.Provider>
     </div>
   )
 }
