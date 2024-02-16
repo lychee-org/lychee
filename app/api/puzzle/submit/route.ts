@@ -13,7 +13,6 @@ export async function POST(req: NextRequest) {
   if (!user) return new Response('Unauthorized', { status: 401 });
   const body = await req.json();
   const { puzzleId, correct } = body;
-  console.log(user);
   // await mongoose.connection.collection('rounds').updateOne(
   //   { userId: user.id },
   //   {
@@ -26,6 +25,5 @@ export async function POST(req: NextRequest) {
   //   },
   //   { upsert: true }
   // )
-  console.log(body);
   return new Response(null, { status: 200 });
 }

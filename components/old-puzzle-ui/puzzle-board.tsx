@@ -1,6 +1,6 @@
 'use client';
 
-import LoadingBoard from "./new-attempt/loading-board"
+import LoadingBoard from "../puzzle-ui/loading-board"
 import { Chess, Square, Piece as ChessjsPiece } from 'chess.js';
 import React, { ReactNode, createRef, useEffect, useMemo, useState, useContext } from 'react';
 import { Chessboard, ClearPremoves } from 'react-chessboard';

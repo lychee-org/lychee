@@ -241,9 +241,6 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
   /** FUNCTIONS THAT CAN ACTUALLY EXECUTE MOVES */
   function onPromotionPieceSelect(piece?: PromotionPieceOption) {
     if (piece) {
-      console.log(moveFrom, moveTo);
-      if (!moveFrom) console.log("NO MOVE FROM DEFINED")
-      if (!moveTo) console.log("NO MOVE TO DEFINED");
       try {
         game.move({
           from: moveFrom ?? "",
@@ -267,7 +264,6 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
   function onDrop(sourceSquare: Square, targetSquare: Square, piece: Piece) {
     if (!interactive) return false;
     try {
-      console.log("try");
       game.move({
         from: sourceSquare,
         to: targetSquare,
@@ -294,7 +290,6 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
       try {
         const piece = chessjs_piece_convert(game.get(moveFrom));
         if (onPromotionCheck(moveFrom, square, piece)) {
-          console.log(moveFrom);
           setMoveTo(square);
           setShowPromotion(true);
         } else {

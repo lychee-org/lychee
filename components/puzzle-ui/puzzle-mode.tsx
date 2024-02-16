@@ -1,6 +1,6 @@
 'use client';
 import { Puzzle } from "@/types/lichess-api";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState } from "react";
 import PuzzleBoard from "./puzzle-board";
 
 const MIN_LOCAL_BATCH_LEN = 5;

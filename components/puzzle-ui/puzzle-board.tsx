@@ -43,7 +43,6 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
 
   /** OVERALL RESET */
   const loadPuzzle = () => {
-    console.log("loading puzzle");
     game.load(puzzle.FEN);
     setSolved(false);
     setFens([puzzle.FEN]);
@@ -108,7 +107,6 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
   // TODO: add events to these, so that other components can pick up
   // player moved incorrectly
   function undoWrongMove() {
-    console.log("wrong move");
     if (submitPuzzle) submitPuzzle(false);
     game.undo();
     setFen(game.fen());
