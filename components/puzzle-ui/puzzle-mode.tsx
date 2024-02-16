@@ -8,7 +8,8 @@ import UserContext from "../auth/usercontext";
 const MIN_LOCAL_BATCH_LEN = 5;
 
 interface PuzzleModeProps {
-  initialPuzzleBatch: Array<Puzzle>
+  initialPuzzleBatch: Array<Puzzle>,
+  userInfo?: UserInfo
 }
 
 export const wrapperStyle = {
@@ -35,13 +36,15 @@ export const PuzzleContext = React.createContext({
   getNextPuzzle: () => {},
 })
 
-const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch}) => {
+const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch, userInfo}) => {
   /** GET USER CONTEXT */
   const [user, setUser] = useState<UserInfo | null>(null);
   useEffect(() => {
-    fetch(`/api/user/info`)
-    .then(res => res.json())
-    .then(res => setUser(res))
+    if (!userInfo)
+      fetch(`/api/user/info`)
+      .then(res => res.json())
+      .then(res => setUser(res))
+    else setUser(userInfo);
   }, []);
 
   /** PUZZLE CODE */
