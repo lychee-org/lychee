@@ -4,13 +4,7 @@ import Rating from '../rating/GlickoV2Rating';
 
 const INT_EPSILON = -0.5;
 
-// Use default Glicko hyperparameters.
-const tau: number = 0.75;
-const ratingPeriodsPerDay: number = 0.21436;
-const calculator: RatingCalculator = new RatingCalculator(
-  tau,
-  ratingPeriodsPerDay
-);
+const ratingCalculator: RatingCalculator = new RatingCalculator();
 
 const glicko = (
   rating: number,
@@ -23,7 +17,7 @@ describe('Testing Glicko rating calculation', () => {
     const r1: Rating = glicko(1500.0, 500.0, 0.09);
     const r2: Rating = glicko(1500.0, 500.0, 0.09);
 
-    calculator.updateRatings(new GameResult(r1, r2));
+    ratingCalculator.updateRatings(new GameResult(r1, r2));
 
     expect(r1.rating).toBeCloseTo(1741, INT_EPSILON);
     expect(r2.rating).toBeCloseTo(1258, INT_EPSILON);
@@ -42,7 +36,7 @@ describe('Testing Glicko rating calculation', () => {
     const r1: Rating = glicko(1500.0, 80, 0.06);
     const r2: Rating = glicko(1500.0, 80, 0.06);
 
-    calculator.updateRatings(new GameResult(r1, r2));
+    ratingCalculator.updateRatings(new GameResult(r1, r2));
 
     expect(r1.rating).toBeCloseTo(1517, INT_EPSILON);
     expect(r2.rating).toBeCloseTo(1482, INT_EPSILON);
@@ -61,7 +55,7 @@ describe('Testing Glicko rating calculation', () => {
     const r1: Rating = glicko(1400, 79, 0.06);
     const r2: Rating = glicko(1550, 110, 0.065);
 
-    calculator.updateRatings(new GameResult(r1, r2));
+    ratingCalculator.updateRatings(new GameResult(r1, r2));
 
     expect(r1.rating).toBeCloseTo(1422, INT_EPSILON);
     expect(r2.rating).toBeCloseTo(1506, INT_EPSILON);
@@ -81,7 +75,7 @@ describe('Testing Glicko rating calculation', () => {
     const r1: Rating = glicko(1200, 60, 0.053);
     const r2: Rating = glicko(1850, 200, 0.062);
 
-    calculator.updateRatings(new GameResult(r1, r2));
+    ratingCalculator.updateRatings(new GameResult(r1, r2));
 
     expect(r1.rating).toBeCloseTo(1216.7, INT_EPSILON);
     expect(r2.rating).toBeCloseTo(1636, INT_EPSILON);
@@ -97,7 +91,7 @@ describe('Testing Glicko rating calculation', () => {
     const r1: Rating = glicko(1200, 60, 0.053);
     const r2: Rating = glicko(1850, 200, 0.062);
 
-    calculator.updateRatings(new GameResult(r2, r1));
+    ratingCalculator.updateRatings(new GameResult(r2, r1));
 
     expect(r1.rating).toBeCloseTo(1199.3, INT_EPSILON);
     expect(r2.rating).toBeCloseTo(1855.4, INT_EPSILON);

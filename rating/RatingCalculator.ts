@@ -1,19 +1,11 @@
 import GameResult from './GameResult';
 import Rating from './GlickoV2Rating';
 
+const CONVERGENCE_TOLERANCE: number = 0.000001;
+const ITERATION_MAX: number = 1000;
+
 export default class RatingCalculator {
-  readonly DEFAULT_DEVIATION: number = 350;
-  readonly CONVERGENCE_TOLERANCE: number = 0.000001;
-  readonly ITERATION_MAX: number = 1000;
-  readonly DAYS_PER_MILLI: number = 1.0 / (1000 * 60 * 60 * 24);
-
-  constructor(
-    private tau: number = 0.75,
-    private ratingPeriodsPerDay: number = 0
-  ) {}
-
-  private readonly ratingPeriodsPerMilli: number =
-    this.ratingPeriodsPerDay * this.DAYS_PER_MILLI;
+  constructor(private tau: number = 0.75) {}
 
   updateRatings(
     result: GameResult,
@@ -56,8 +48,8 @@ export default class RatingCalculator {
 
     let iterations = 0;
     while (
-      Math.abs(B - A) > this.CONVERGENCE_TOLERANCE &&
-      iterations < this.ITERATION_MAX
+      Math.abs(B - A) > CONVERGENCE_TOLERANCE &&
+      iterations < ITERATION_MAX
     ) {
       iterations++;
       const C = A + ((A - B) * fA) / (fB - fA);
@@ -74,10 +66,8 @@ export default class RatingCalculator {
       fB = fC;
     }
 
-    if (iterations === this.ITERATION_MAX) {
-      console.log(`Convergence fail at ${iterations} iterations`);
-      console.log(player.toString());
-      results.forEach((result) => console.log(result.toString()));
+    if (iterations === ITERATION_MAX) {
+      console.log(`Convergence fail at ${iterations} iterations!`);
       throw new Error('Convergence fail');
     }
 
