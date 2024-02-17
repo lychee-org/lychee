@@ -62,17 +62,18 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch, userInfo}) =
 
   // get the next puzzle
   const getNextPuzzle = () => {
+    if (puzzleBatch.length < MIN_LOCAL_BATCH_LEN) {
+      const alreadyBatched = puzzleBatch.map(p=>p.PuzzleId);
+      fetch(`/api/puzzle/nextbatch?exceptions=${alreadyBatched}`)
+        .then((res) => res.json())
+        .then((res) => res.puzzles as Array<Puzzle>)
+        .then((puzzles: Array<Puzzle>) => {
+          console.log(puzzles);
+          setPuzzleBatch([...puzzleBatch, ...puzzles]);
+        });
+    }
     setPuzzle(puzzleBatch[1]);
     setPuzzleBatch(puzzleBatch.slice(1));
-    if (puzzleBatch.length < MIN_LOCAL_BATCH_LEN) {
-      const alreadyBatched = puzzleBatch;
-      fetch(`/api/puzzle/nextbatch?exceptions=${alreadyBatched}`)
-      .then((res) => res.json())
-      .then((res) => res.puzzles as Array<Puzzle>)
-      .then((puzzles: Array<Puzzle>) => {
-        setPuzzleBatch([...puzzleBatch, ...puzzles]);
-      });
-    }
   }
   
   return (

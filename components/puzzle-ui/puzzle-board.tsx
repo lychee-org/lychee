@@ -72,6 +72,28 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
     else setFen(game.fen());
   }, [playbackMode, playbackPos, fens, linePos]);
 
+  /** VIEW SOLUTION / GIVE UP */
+  const viewSolution = () => {
+    if (rendered && !solved) {
+      setWrong(true);
+      setSolved(true);
+
+      // set the line position to the end maintaining the playback position
+      setLinePos(line.length);
+
+      // update the game
+      let newFens: Array<string> = [];
+      line.slice(playbackPos).forEach(move => {
+        game.move(move);
+        newFens.push(game.fen());
+      });
+      setFens([...fens, ...newFens]);
+
+      // move the game forward by 1
+      setPlaybackPos(prev=>prev+1);
+    }
+  }
+
   /** PUZZLE LOGIC **/
   // RENDERED CALLBACK
   const renderedCallback = () => {
@@ -157,17 +179,17 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
       </div>
       <div><Rating /></div>
       <div className="button">
-      <ResetPuzzleButtonContext.Provider value={{solved, reloadPuzzle: loadPuzzle}}>
+      <ResetPuzzleButtonContext.Provider value={{solved, reloadPuzzle: viewSolution}}>
         <ResetPuzzleButton />
       </ResetPuzzleButtonContext.Provider>
       </div>
 
-      {/* <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
+      <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
         <ControlButtonBar />
       </PlaybackControllerContext.Provider>
       <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
         <MoveViewer/>
-      </MoveNavigationContext.Provider> */}
+      </MoveNavigationContext.Provider>
     </div>
   );
 };

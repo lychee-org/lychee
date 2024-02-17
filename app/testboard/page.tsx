@@ -4,7 +4,6 @@ import React from 'react';
 import { validateRequest } from '@/lib/auth';
 import { getPuzzleBatch } from '../api/puzzle/nextbatch/nextbatch';
 import { getUserInfo } from '../api/user/info/getUserInfo';
-import Rating from '@/components/puzzle-ui/controls/rating';
 
 export default async function TestBoard() {
   await dbConnect()
@@ -12,6 +11,7 @@ export default async function TestBoard() {
   if (!user) return new Response('Unauthorized', { status: 401 });
 
   const userInfo = await getUserInfo(user);
+  if (!userInfo) return new Response('Unauthorized', { status: 401 });
 
   const puzzles = await getPuzzleBatch(user, []);
   return <PuzzleMode initialPuzzleBatch={puzzles} userInfo={userInfo} />;
