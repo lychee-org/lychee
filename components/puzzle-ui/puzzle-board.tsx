@@ -32,6 +32,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
   const [rendered, setRendered] = useState(false);
   const [solved, setSolved] = useState<boolean>(false);
   const [playbackPos, setPlaybackPos] = useState(0);
+  const [wrong, setWrong] = useState<boolean>(false);
   
 
   // extra playback state
@@ -51,6 +52,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
     setFen(puzzle.FEN);
     setPlaybackPos(0);
     setLinePos(0);
+    setWrong(false);
   };
 
   useEffect(()=>{
@@ -109,9 +111,10 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
   // TODO: add events to these, so that other components can pick up
   // player moved incorrectly
   function undoWrongMove() {
-    if (submitPuzzle) submitPuzzle(false);
+    if (submitPuzzle && !wrong) submitPuzzle(false);
     game.undo();
     setFen(game.fen());
+    setWrong(true);
     setFens(prev=>prev.slice(0, -1));
     setLinePos(prev => prev - 1);
     setPlaybackPos(prev => prev - 1);
@@ -125,7 +128,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
 
   // player finished puzzle
   function finishedGame() {
-    if (submitPuzzle) submitPuzzle(true);
+    if (submitPuzzle && !wrong) submitPuzzle(true);
     setSolved(true);
   }
   
