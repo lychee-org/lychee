@@ -2,12 +2,18 @@
 import { Puzzle } from "@/types/lichess-api";
 import React, { useState, useMemo, useEffect } from "react";
 import PuzzleBoard from "./puzzle-board";
-import Rating from "@/rating/GlickoV2Rating";
+import { PuzzleWithUserRating } from "@/app/api/puzzle/nextPuzzle/nextFor";
 
-const MIN_LOCAL_BATCH_LEN = 5;
+export type RatingHolder = {
+  rating: number,
+  ratingDeviation: number,
+  volatility: number,
+  numberOfResults: number
+}
 
 interface PuzzleModeProps {
-  initialPuzzleBatch: Array<Puzzle>
+  initialPuzzle: Puzzle,
+  initialRating: RatingHolder
 }
 
 export const wrapperStyle = {
@@ -30,45 +36,41 @@ export const EVENTS = { // grouped by the intended emitter
 }
 
 export const PuzzleContext = React.createContext({
-  submitNextPuzzle: (success: boolean, prv: Rating): Promise<Rating> => { throw new Error() },
+  submitNextPuzzle: (success: boolean, prv: RatingHolder): Promise<RatingHolder> => { throw new Error() },
   getNextPuzzle: () => { },
 })
 
-const PuzzleMode: React.FC<PuzzleModeProps> = ({ initialPuzzleBatch }) => {
-
+const PuzzleMode: React.FC<PuzzleModeProps> = ({ initialPuzzle, initialRating }) => {
   /** PUZZLE CODE */
-  const [puzzleBatch, setPuzzleBatch] = useState<Array<Puzzle>>(initialPuzzleBatch);
-  const [puzzle, setPuzzle] = useState<Puzzle | undefined>(puzzleBatch[0]);
-  if (!puzzleBatch) return "All done!"
+  const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
+  const [rating, setRating] = useState<RatingHolder>(initialRating);
+
+  // TODO: handle when no more puzzles.
 
   // submit the puzzle success/failure to the server
-  const submitNextPuzzle = async (success: boolean, prv: Rating): Promise<Rating> =>
+  const submitNextPuzzle = (success: boolean, prv: RatingHolder): Promise<RatingHolder> =>
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
-      body: JSON.stringify({ puzzle_: puzzleBatch[0], success_: success, prv_: prv })
-    }).then(response => response.text()).then(s => JSON.parse(s) as Rating)
+      body: JSON.stringify({ puzzle_: puzzle, success_: success, prv_: prv })
+    }).then(response => response.text()).then(s => JSON.parse(s) as RatingHolder)
 
   // get the next puzzle
   const getNextPuzzle = () => {
-    setPuzzle(puzzleBatch[1]);
-    setPuzzleBatch(puzzleBatch.slice(1));
-    if (puzzleBatch.length < MIN_LOCAL_BATCH_LEN) {
-      const alreadyBatched = puzzleBatch;
-      fetch(`/api/puzzle/nextbatch?exceptions=${alreadyBatched}`)
-        .then((res) => res.json())
-        .then((res) => res.puzzles as Array<Puzzle>)
-        .then((puzzles: Array<Puzzle>) => {
-          setPuzzleBatch([...puzzleBatch, ...puzzles]);
-        });
-    }
+    fetch(`/api/puzzle/nextPuzzle`, {
+      method: 'GET'
+    }).then(response => response.text()).then(s => JSON.parse(s) as PuzzleWithUserRating).then(response => {
+      setPuzzle(response.puzzle);
+      setRating(response.rating);
+    })
   }
 
   return (
     <div style={wrapperStyle}>
       <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-        <PuzzleBoard puzzle={puzzle} />
+        <PuzzleBoard puzzle={puzzle} initialRating={rating} />
       </PuzzleContext.Provider>
     </div>
   )
 }
+
 export default PuzzleMode;

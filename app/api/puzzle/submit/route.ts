@@ -4,51 +4,10 @@ import GameResult from '@/rating/GameResult';
 import Rating from '@/rating/GlickoV2Rating';
 import RatingCalculator from '@/rating/RatingCalculator';
 import { Puzzle } from '@/types/lichess-api';
-import { User } from 'lucia';
 import { NextRequest } from 'next/server';
 import { RatingColl } from '../../../../models/RatingColl';
-
-const DEFAULT_VOLATILITY: number = 0.09;
-
-const fetchUserRating = async (
-  user: User
-): Promise<{ userRating: Rating; present: boolean }> => {
-  return RatingColl.findOne({ username: user.username }).then(
-    async (result) => {
-      // If it's in the rating DB, return it:
-      if (result) {
-        return {
-          userRating: new Rating(
-            result.rating,
-            result.ratingDeviation,
-            result.volatility,
-            result.numberOfResults
-          ),
-          present: true,
-        };
-      }
-      // Otherwise, retrieve all data (execept volatility which isn't public) from Lichess API:
-      const { perfs } = await fetch(
-        `https://lichess.org/api/user/${user?.username}`
-      ).then((res) => res.json());
-      const rating = perfs['puzzle']['rating'];
-      const rd = perfs['puzzle']['rd'];
-      const nb = perfs['puzzle']['games'];
-      return {
-        userRating: new Rating(rating, rd, DEFAULT_VOLATILITY, nb),
-        present: false,
-      };
-    }
-  );
-};
-
-const getPuzzleRating = (puzzle: Puzzle): Rating =>
-  new Rating(
-    puzzle.Rating,
-    puzzle.RatingDeviation,
-    DEFAULT_VOLATILITY,
-    puzzle.NbPlays
-  );
+import { RoundColl } from '@/models/RoundColl';
+import { fetchUserRating, getPuzzleRating } from '@/rating/getRating';
 
 export async function POST(req: NextRequest) {
   await dbConnect();
@@ -76,6 +35,10 @@ export async function POST(req: NextRequest) {
           present: true,
         };
 
+  if (!present) {
+    throw new Error("User's rating not found in DB");
+  }
+
   const puzzleRating: Rating = getPuzzleRating(puzzle);
 
   if (success) {
@@ -88,17 +51,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Delete previous entry if present.
-  if (present) {
-    await RatingColl.deleteOne({ username: user.username });
-  }
+  // Update user's rating.
+  await RatingColl.updateOne(
+    { username: user.username },
+    {
+      $set: {
+        rating: userRating.rating,
+        ratingDeviation: userRating.ratingDeviation,
+        volatility: userRating.volatility,
+        numberOfResults: userRating.numberOfResults,
+      },
+    }
+  );
 
-  RatingColl.create({
-    username: user.username,
-    rating: userRating.rating,
-    ratingDeviation: userRating.ratingDeviation,
-    volatility: userRating.volatility,
-    numberOfResults: userRating.numberOfResults,
+  // Insert this round into the round DB.
+  // TODO: do we need await here?
+  RoundColl.create({
+    roundId: `${user.username}+${puzzle.PuzzleId}`,
   });
 
   return new Response(JSON.stringify(userRating), { status: 200 });

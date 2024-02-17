@@ -2,7 +2,7 @@
 
 import { Chess, Move, Square } from 'chess.js';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { PuzzleContext } from './puzzle-mode';
+import { PuzzleContext, RatingHolder } from './puzzle-mode';
 import LoadingBoard from './loading-board';
 import React from 'react';
 import ChessboardWrapped from './chessboard-wrapped';
@@ -10,13 +10,13 @@ import ControlButtonBar, { PlaybackControllerContext } from './controls/control-
 import MoveViewer, { MoveNavigationContext } from './controls/move-viewer';
 import ResetPuzzleButton, { ResetPuzzleButtonContext } from './controls/reset-puzzle-button';
 import { Puzzle } from '@/types/lichess-api';
-import Rating from '@/rating/GlickoV2Rating';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
+  initialRating: RatingHolder;
 }
 // set its props to be the puzzle object
-const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
+const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   const { submitNextPuzzle: submitPuzzle, ..._ } = useContext(PuzzleContext);
   if (!puzzle) return < LoadingBoard />;
   const line = puzzle.Moves.split(' ');
@@ -37,7 +37,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
   const [fens, setFens] = useState([game.fen()]);
 
   // user's rating
-  const [rating, setRating] = useState<Rating>(new Rating(-1, -1, -1, 0));
+  const [rating, setRating] = useState<RatingHolder>(initialRating);
 
   // calculated modes
   const playbackMode = playbackPos !== linePos || solved;
@@ -165,7 +165,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
         </div>
         <div>
           <span style={{ fontSize: '20px', fontFamily: 'Arial, sans-serif', fontWeight: 'bold', marginRight: '5px' }}>Rating:</span>
-          <span style={{ fontSize: '24px', fontFamily: 'Arial, sans-serif', fontWeight: 'bold', color: 'green' }}>{rating.rating < 0 ? '?' : Math.round(rating.rating)}</span>
+          <span style={{ fontSize: '24px', fontFamily: 'Arial, sans-serif', fontWeight: 'bold', color: 'green' }}>{Math.round(rating.rating)}</span>
         </div>
       </div>
       <div>
