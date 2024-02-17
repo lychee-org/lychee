@@ -280,7 +280,7 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
       setMoveFrom(null);
       setMoveTo(null);
       setOptionSquares({});
-    } else if (moveFrom) { // TODO: update this
+    } else if (moveFrom) {
       try {
         const piece = chessjs_piece_convert(game.get(moveFrom));
         if (onPromotionCheck(moveFrom, square, piece)) {

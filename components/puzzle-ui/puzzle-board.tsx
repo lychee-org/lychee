@@ -108,8 +108,6 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({puzzle}) =>  {
   }
 
   /** HANDLE PLAYER MOVE VERIFICATION */
-  // TODO: add events to these, so that other components can pick up
-  // player moved incorrectly
   function undoWrongMove() {
     if (submitPuzzle && !wrong) submitPuzzle(false);
     game.undo();
