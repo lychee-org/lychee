@@ -72,6 +72,10 @@ const config = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+      fontFamily: {
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-azeret-mono)', 'monospace'],
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],
