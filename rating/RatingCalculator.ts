@@ -4,6 +4,7 @@ import Rating from './GlickoV2Rating';
 const CONVERGENCE_TOLERANCE: number = 0.000001;
 const ITERATION_MAX: number = 1000;
 
+// TODO(sm3421): https://github.com/lichess-org/lila/blob/master/modules/puzzle/src/main/PuzzleFinisher.scala#L200.
 export default class RatingCalculator {
   constructor(private tau: number = 0.75) {}
 
