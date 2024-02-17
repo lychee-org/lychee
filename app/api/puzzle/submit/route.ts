@@ -89,11 +89,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Delete previous entry if present.
+  // TODO: this all will be refactored in later PR.
   if (present) {
     await RatingColl.deleteOne({ username: user.username });
   }
 
-  RatingColl.create({
+  await RatingColl.create({
     username: user.username,
     rating: userRating.rating,
     ratingDeviation: userRating.ratingDeviation,

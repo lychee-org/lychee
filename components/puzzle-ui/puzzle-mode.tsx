@@ -42,7 +42,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({ initialPuzzleBatch }) => {
   if (!puzzleBatch) return "All done!"
 
   // submit the puzzle success/failure to the server
-  const submitNextPuzzle = async (success: boolean, prv: Rating): Promise<Rating> =>
+  const submitNextPuzzle = (success: boolean, prv: Rating): Promise<Rating> =>
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
       body: JSON.stringify({ puzzle_: puzzleBatch[0], success_: success, prv_: prv })
