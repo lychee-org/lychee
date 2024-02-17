@@ -1,0 +1,21 @@
+.Rating {
+    color: #131313;
+    text-align: center;
+    font-variant-numeric: lining-nums proportional-nums;
+    font-family: "Open Sans";
+    font-size: 30px;
+    
+    font-style: normal;
+    font-weight: 523;
+    line-height: normal;
+}
+
+.RatingMessage {
+    color: #131313;
+    text-align: left;
+    font-family: "Open Sans";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+}

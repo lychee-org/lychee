@@ -1,0 +1,22 @@
+.container {
+    display: grid;
+    align-items: start;
+    grid-template-columns: 30vw 10vw;
+    grid-template-rows: 20vh 25vh 20vh;
+    grid-gap: 1rem;
+}
+
+.chessboard {
+    grid-row-start: 1;
+    grid-row-end: 4;
+    display: flex;
+}
+
+.rating-container {
+    grid-column: 2;
+    grid-row: 1;
+}
+.button {
+    grid-column: 2;
+    grid-row: 2;
+}
