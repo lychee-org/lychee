@@ -64,7 +64,7 @@ export type LichessUser = {
   following: boolean;
   blocking: boolean;
   followsYou: boolean;
-}
+};
 
 export type Puzzle = {
   PuzzleId: string;
@@ -77,10 +77,4 @@ export type Puzzle = {
   Themes: string;
   GameUrl: string;
   OpeningTags: string;
-}
-
-export type Glicko = {
-  r: number
-  d: number
-  v: number
-}
+};

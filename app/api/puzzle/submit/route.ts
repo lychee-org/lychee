@@ -8,7 +8,7 @@ interface SubmitPuzzleBody {
 }
 
 export async function POST(req: NextRequest) {
-  await dbConnect()
+  await dbConnect();
   const { user } = await validateRequest();
   if (!user) return new Response('Unauthorized', { status: 401 });
   const body = await req.json();
