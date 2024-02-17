@@ -2,3 +2,19 @@
   color: green;
   font-weight: bold;
 }
+
+.move-viewer {
+  border: 1px solid;
+  display: table;
+  column-count: 2;
+  table-layout: auto;
+}
+
+.move-viewer tr:nth-child(odd) {
+  background-color: grey;
+}
+
+
+.move-viewer tr:nth-child(even) {
+  background-color: white;
+}

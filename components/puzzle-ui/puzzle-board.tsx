@@ -187,18 +187,17 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
         />
       </div>
       <div><RatingComponent rating={rating.rating} /></div>
-      <div className="button">
-      <ResetPuzzleButtonContext.Provider value={{solved, reloadPuzzle: viewSolution}}>
-        <ResetPuzzleButton />
-      </ResetPuzzleButtonContext.Provider>
+      <div className='move-viewer-container'>
+          <div>From game #1202020</div> 
+          <div>
+            <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
+              <MoveViewer />
+            </MoveNavigationContext.Provider> 
+          </div>
+          <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
+            <ControlButtonBar />
+           </PlaybackControllerContext.Provider>
       </div>
-
-      <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
-        <ControlButtonBar />
-      </PlaybackControllerContext.Provider>
-      <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
-        <MoveViewer/>
-      </MoveNavigationContext.Provider>
     </div>
   );
 };
