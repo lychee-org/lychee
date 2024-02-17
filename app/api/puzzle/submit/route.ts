@@ -6,7 +6,7 @@ import RatingCalculator from '@/rating/RatingCalculator';
 import { Puzzle } from '@/types/lichess-api';
 import { User } from 'lucia';
 import { NextRequest } from 'next/server';
-import { RatingColl } from './RatingColl';
+import { RatingColl } from '../../../../models/RatingColl';
 
 const DEFAULT_VOLATILITY: number = 0.09;
 
