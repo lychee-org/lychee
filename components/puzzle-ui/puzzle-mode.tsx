@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import PuzzleBoard from "./puzzle-board";
 import { UserInfo } from "@/app/api/user/info/route";
 import UserContext from "../auth/usercontext";
+import Rating from "@/rating/GlickoV2Rating";
 
 const MIN_LOCAL_BATCH_LEN = 5;
 
@@ -32,33 +33,35 @@ export const EVENTS = { // grouped by the intended emitter
 }
 
 export const PuzzleContext = React.createContext({
-  submitNextPuzzle: (success: boolean) => {},
-  getNextPuzzle: () => {},
+  submitNextPuzzle: (success: boolean, prv: Rating): Promise<Rating> => { throw new Error() },
+  getNextPuzzle: () => { },
 })
 
 const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch, userInfo}) => {
-  /** GET USER CONTEXT */
-  const [user, setUser] = useState<UserInfo | null>(null);
-  useEffect(() => {
-    if (!userInfo)
-      fetch(`/api/user/info`)
-      .then(res => res.json())
-      .then(res => setUser(res))
-    else setUser(userInfo);
-  }, []);
 
   /** PUZZLE CODE */
   const [puzzleBatch, setPuzzleBatch] = useState<Array<Puzzle>>(initialPuzzleBatch);
   const [puzzle, setPuzzle] = useState<Puzzle | undefined>(puzzleBatch[0]);
   if (!puzzleBatch) return "All done!"
 
+  /** GET USER CONTEXT */
+  const [user, setUser] = useState<UserInfo | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/user/info`)
+      .then(res => res.json())
+      .then(res => setUser(res));
+  }, [puzzle]);
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
   // submit the puzzle success/failure to the server
-  const submitNextPuzzle = (success: boolean) => {
+  const submitNextPuzzle = (success: boolean, prv: Rating): Promise<Rating> =>
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
-      body: JSON.stringify({ puzzleId: puzzleBatch[0]?.PuzzleId, success: success })
-    });
-  }
+      body: JSON.stringify({ puzzle_: puzzleBatch[0], success_: success, prv_: prv })
+    }).then(response => response.text()).then(s => JSON.parse(s) as Rating)
 
   // get the next puzzle
   const getNextPuzzle = () => {
@@ -75,7 +78,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch, userInfo}) =
     setPuzzle(puzzleBatch[1]);
     setPuzzleBatch(puzzleBatch.slice(1));
   }
-  
+
   return (
     <div style={wrapperStyle}>
       <UserContext.Provider value={user}>
