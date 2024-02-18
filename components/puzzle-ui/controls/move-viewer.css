@@ -1,17 +1,38 @@
-.move.highlighted {
+.moveSecondChild.highlighted {
   color: green;
   font-weight: bold;
+  width: 200px;
+  text-align: center;
+}
+
+.moveFirstChild.highlighted {
+  color: green;
+  font-weight: bold;
+  width: 200px;
+  text-align: center;
 }
 
 .move-viewer {
-  border: 1px solid;
   display: table;
   column-count: 2;
   table-layout: auto;
+  border-collapse: collapse;
+}
+
+.moveFirstChild {
+  width: 200px;
+  text-align: center;
+  border-left: none;
+}
+
+.moveSecondChild {
+  width: 200px;
+  text-align: center;
+  border-left: 1px solid black;
 }
 
 .move-viewer tr:nth-child(odd) {
-  background-color: grey;
+  background: rgba(0, 0, 0, 0.03);
 }
 
 

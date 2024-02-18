@@ -188,9 +188,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
           renderedCallback={rendered ? (()=>{return;}) : renderedCallback}
         />
       </div>
-      <div><RatingComponent rating={rating.rating} /></div>
+      <div className="rating-container"><RatingComponent rating={rating.rating} /></div>
       <div className='move-viewer-container'>
-          <div>From game #1202020</div> 
+          <div className='fromGameHeader'>From game #1202020</div> 
           <div>
             <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
               <MoveViewer />

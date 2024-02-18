@@ -14,8 +14,8 @@ const MoveViewer = () => {
     const rows = []
     for (let i = 0; i < moves.length; i+=2) {
        let row = []
-       row.push(<td key={i}className={`move ${i === currentIndex ? 'highlighted' : ''}`}>{moves[i]} </td>)
-       row.push(<td key={i + 1}className={`move ${i + 1 === currentIndex ? 'highlighted' : ''}`}>{i + 1 < moves.length ? moves[i + 1] : ""} </td>)
+       row.push(<td key={i}className={`moveFirstChild ${i === currentIndex ? 'highlighted' : ''}`}>{moves[i]} </td>)
+       row.push(<td key={i + 1}className={`moveSecondChild ${i + 1 === currentIndex ? 'highlighted' : ''}`}>{i + 1 < moves.length ? moves[i + 1] : ""} </td>)
        rows.push(<tr>{row}</tr>);
      }
     return rows;
