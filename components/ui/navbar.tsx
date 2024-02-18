@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import AuthButton from '@/components/auth/auth-button';
 import ModeToggler from './mode-toggle';
-// import MktourNavbar from './ui/mktour-logo-navbar';
 
 type NavbarProps = {
   user: any;

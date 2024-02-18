@@ -21,7 +21,7 @@ export default function AuthButton({ className, user }: AuthButtonProps) {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    const response = await fetch('/api/sign-out', {
+    const response = await fetch('/api/signout', {
       method: 'POST',
       redirect: 'manual',
     });
