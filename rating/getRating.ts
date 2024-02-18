@@ -7,34 +7,33 @@ import { isIrrelevant } from '@/app/api/puzzle/nextPuzzle/themeGenerator';
 
 const DEFAULT_VOLATILITY: number = 0.09;
 
-export const fetchUserRating = async (
-  user: User
-): Promise<{ userRating: Rating; present: boolean }> => {
+// Retrieve all data (execept volatility which isn't public) from Lichess API.
+export const fetchLichessRating = async (user: User): Promise<Rating> => {
+  const { perfs } = await fetch(
+    `https://lichess.org/api/user/${user?.username}`
+  ).then((res) => res.json());
+  return new Rating(
+    perfs['puzzle']['rating'],
+    perfs['puzzle']['rd'],
+    DEFAULT_VOLATILITY,
+    perfs['puzzle']['games']
+  );
+};
+
+// Gets a user's rating from through the collection.
+// The user must have logged in once before - this function will throw an error if not.
+export const getExistingUserRating = async (user: User): Promise<Rating> => {
   return RatingColl.findOne({ username: user.username }).then(
     async (result) => {
-      // If it's in the rating DB, return it:
       if (result) {
-        return {
-          userRating: new Rating(
-            result.rating,
-            result.ratingDeviation,
-            result.volatility,
-            result.numberOfResults
-          ),
-          present: true,
-        };
+        return new Rating(
+          result.rating,
+          result.ratingDeviation,
+          result.volatility,
+          result.numberOfResults
+        );
       }
-      // Otherwise, retrieve all data (execept volatility which isn't public) from Lichess API:
-      const { perfs } = await fetch(
-        `https://lichess.org/api/user/${user?.username}`
-      ).then((res) => res.json());
-      const rating = perfs['puzzle']['rating'];
-      const rd = perfs['puzzle']['rd'];
-      const nb = perfs['puzzle']['games'];
-      return {
-        userRating: new Rating(rating, rd, DEFAULT_VOLATILITY, nb),
-        present: false,
-      };
+      throw new Error('User not present in rating collection.');
     }
   );
 };

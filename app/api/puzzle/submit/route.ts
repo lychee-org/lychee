@@ -8,7 +8,6 @@ import { NextRequest } from 'next/server';
 import { RatingColl } from '../../../../models/RatingColl';
 import { RoundColl } from '@/models/RoundColl';
 import {
-  fetchUserRating,
   getDefaultRating,
   getPuzzleRating,
   getThemeRatings,
@@ -24,27 +23,15 @@ export async function POST(req: NextRequest) {
   }
   const { puzzle_, success_, prv_ } = await req.json();
 
-  // TODO.
   const puzzle = puzzle_ as Puzzle;
   const success = success_ as boolean;
-  const prv = prv_ as Rating;
-
-  const { userRating, present } =
-    prv.rating < 0
-      ? await fetchUserRating(user)
-      : {
-          userRating: new Rating( // MB: This is important!
-            prv.rating,
-            prv.ratingDeviation,
-            prv.volatility,
-            prv.numberOfResults
-          ),
-          present: true,
-        };
-
-  if (!present) {
-    throw new Error("User's rating not found in DB");
-  }
+  // NB: we create a new object here, so methods are present.
+  const userRating = new Rating(
+    prv_.rating,
+    prv_.ratingDeviation,
+    prv_.volatility,
+    prv_.numberOfResults
+  );
 
   if (success) {
     new RatingCalculator().updateRatings(
@@ -82,10 +69,10 @@ export async function POST(req: NextRequest) {
     }
   );
 
-  // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and 
+  // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
   // persist in the DB, as this information is useful for dashboard analysitcs.
   const ratingMap = await getThemeRatings(user, false);
-  console.log(ratingMap); // TODO(sm3421): Remove.
+  console.log(ratingMap);
 
   // Update theme ratings.
   const themes = puzzle.Themes.split(' ');
@@ -102,7 +89,7 @@ export async function POST(req: NextRequest) {
         new GameResult(getPuzzleRating(puzzle), themeRating)
       );
     }
-    
+
     await UserThemeColl.updateOne(
       { username: user.username, theme: theme },
       {

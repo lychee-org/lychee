@@ -1,6 +1,6 @@
 'use client';
 import { Puzzle } from "@/types/lichess-api";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PuzzleBoard from "./puzzle-board";
 import { PuzzleWithUserRating } from "@/app/api/puzzle/nextPuzzle/nextFor";
 
@@ -23,7 +23,7 @@ export const wrapperStyle = {
 }
 
 export const PuzzleContext = React.createContext({
-  submitNextPuzzle: (success: boolean, prv: RatingHolder): Promise<RatingHolder> => { throw new Error() },
+  submitNextPuzzle: (_success: boolean, _prv: RatingHolder): Promise<RatingHolder> => { throw new Error() },
   getNextPuzzle: () => { },
 })
 
@@ -33,8 +33,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({ initialPuzzle, initialRating })
   const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
   const [rating, setRating] = useState<RatingHolder>(initialRating);
 
-  // TODO: handle when no more puzzles.
-
+  // TODO: Handle when no more puzzles!
 
   // submit the puzzle success/failure to the server
   const submitNextPuzzle = (success: boolean, prv: RatingHolder): Promise<RatingHolder> =>

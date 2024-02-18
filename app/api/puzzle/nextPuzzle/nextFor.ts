@@ -1,7 +1,6 @@
 import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
 import { AllRoundColl } from '@/models/AllRoundColl';
-import { RatingColl } from '@/models/RatingColl';
-import { fetchUserRating, getThemeRatings } from '@/rating/getRating';
+import { getExistingUserRating, getThemeRatings } from '@/rating/getRating';
 import { Puzzle } from '@/types/lichess-api';
 import { User } from 'lucia';
 import mongoose from 'mongoose';
@@ -72,42 +71,22 @@ const nextPuzzleRepetitions = async (
 };
 
 const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
-  fetchUserRating(user).then(async ({ userRating, present }) => {
-    if (!present) {
-      // TODO(sm3421): move this logic to login.
-      RatingColl.create({
-        username: user.username,
-        rating: userRating.rating,
-        ratingDeviation: userRating.ratingDeviation,
-        volatility: userRating.volatility,
-        numberOfResults: userRating.numberOfResults,
-      });
-      // NB: This is important. If new user, set solved to be empty.
-      AllRoundColl.create({
-        username: user.username,
-        solved: [],
-      });
-    }
-    
+  getExistingUserRating(user).then(async (userRating) => {
     // NB: The persisted rating map may contain irrelevant themes, but we don't
     // want to include these for nextPuzzle / SM2, so we filter them out below.
     const ratingMap = await getThemeRatings(user, true);
-
-    // TODO: Better handle repeat avoidance.
+    // TODO: Iterate to better handle repeat avoidance.
     const exceptions = (await AllRoundColl.findOne({ username: user.username }))
       ?.solved ?? [];
-
     const puzzle = await nextPuzzleRepetitions(
       userRating.rating,
       0,
       ratingMap,
       exceptions
     );
-
     console.log(
       `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
     );
-
     return {
       puzzle: puzzle,
       rating: {
