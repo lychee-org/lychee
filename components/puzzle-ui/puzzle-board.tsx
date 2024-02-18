@@ -13,6 +13,7 @@ import { Puzzle } from '@/types/lichess-api';
 import Rating from '@/rating/GlickoV2Rating';
 import "./puzzle-board-ui.css";
 import RatingComponent from './controls/rating';
+import DisplayBox from './controls/display-box';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
@@ -31,9 +32,10 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
 
   // mode related state
   const [rendered, setRendered] = useState(false);
-  const [solved, setSolved] = useState<boolean>(false);
+  const [solved, setSolved] = useState<boolean>(false); 
   const [playbackPos, setPlaybackPos] = useState(0);
   const [wrong, setWrong] = useState<boolean>(false);
+  const [lastMoveWrong, setLastMoveWrong] = useState<boolean>(false);
   
 
   // extra playback state
@@ -57,6 +59,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
     setPlaybackPos(0);
     setLinePos(0);
     setWrong(false);
+    setLastMoveWrong(false);
   };
 
   useEffect(() => {
@@ -144,6 +147,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
     game.undo();
     setFen(game.fen());
     setWrong(true);
+    setLastMoveWrong(true);
     setFens(prev => prev.slice(0, -1));
     setLinePos(prev => prev - 1);
     setPlaybackPos(prev => prev - 1);
@@ -152,6 +156,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
   // player moved correctly
   function correctMove() {
     const timeout = setTimeout(botMove, 300); // start up the bot's move
+    setLastMoveWrong(false);
     return () => clearTimeout(timeout);
   }
 
@@ -174,8 +179,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
   });
 
   // last move for highlighting
-  const lastMoveToHighlight: Move | undefined = game.history({ verbose: true }).find((_, i) => i === playbackPos - 1);
-
+  const lastMoveToHighlight: Move | undefined = game.history({ verbose: true }).find((_, i) => i === playbackPos - 1); 
   return (
     <div className="chessboard-container">
       <div className="chessboard">
@@ -198,11 +202,15 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
             <ControlButtonBar />
            </PlaybackControllerContext.Provider>
       </div>
+      <div className='displayBox'>
+          <DisplayBox lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} />
+      </div>
+
       {/* <div>
         <ResetPuzzleButtonContext.Provider value={{ solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution }}>
           <ResetPuzzleButton />
         </ResetPuzzleButtonContext.Provider>
-      </div> */}
+      </div>   */}
     </div>
   );
 };

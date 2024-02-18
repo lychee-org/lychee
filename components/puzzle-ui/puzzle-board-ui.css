@@ -2,7 +2,7 @@
 
 .chessboard-container {
     display: grid;
-    align-items: start;
+    align-items: center;
     grid-template-columns: 70vh calc(60vw - 70vh - 1rem);
     grid-template-rows: 11vh 30vh 29vh;
     grid-gap: 1rem;
@@ -36,6 +36,14 @@
 .move-viewer-container {
     grid-column: 2;
     grid-row: 2;
+}
+
+.displayBox {
+    display: flex;
+    grid-column: 2;
+    grid-row: 3;
+    align-items: center;
+    font-size: 2vh;
 }
 
 /* .button {
