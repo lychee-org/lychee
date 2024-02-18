@@ -177,7 +177,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
   const lastMoveToHighlight: Move | undefined = game.history({ verbose: true }).find((_, i) => i === playbackPos - 1);
 
   return (
-    <div className="container">
+    <div className="chessboard-container">
       <div className="chessboard">
         <ChessboardWrapped
           side={side}
@@ -191,20 +191,18 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
       <div className="rating-container"><RatingComponent rating={rating.rating} /></div>
       <div className='move-viewer-container'>
           <div className='fromGameHeader'>From game #1202020</div> 
-          <div>
-            <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
-              <MoveViewer />
-            </MoveNavigationContext.Provider> 
-          </div>
+          <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
+            <MoveViewer />
+          </MoveNavigationContext.Provider> 
           <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
             <ControlButtonBar />
            </PlaybackControllerContext.Provider>
       </div>
-      <div>
+      {/* <div>
         <ResetPuzzleButtonContext.Provider value={{ solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution }}>
           <ResetPuzzleButton />
         </ResetPuzzleButtonContext.Provider>
-      </div>
+      </div> */}
     </div>
   );
 };

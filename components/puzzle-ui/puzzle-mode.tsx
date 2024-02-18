@@ -1,6 +1,6 @@
 'use client';
 import { Puzzle } from "@/types/lichess-api";
-import React, { useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useState } from "react";
 import PuzzleBoard from "./puzzle-board";
 import { UserInfo } from "@/app/api/user/info/route";
 import UserContext from "../auth/usercontext";
@@ -14,8 +14,10 @@ interface PuzzleModeProps {
 }
 
 export const wrapperStyle = {
-  width: `70vw`,
-  maxWidth: '70vh',
+  width: '60vw',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
   margin: '3rem auto',
 }
 export const EVENTS = { // grouped by the intended emitter
@@ -80,7 +82,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch, userInfo}) =
   }
 
   return (
-    <div style={wrapperStyle}>
+    <div style={wrapperStyle as CSSProperties}>
       <UserContext.Provider value={user}>
         <PuzzleContext.Provider value={{submitNextPuzzle, getNextPuzzle}}>
           <PuzzleBoard puzzle={puzzle}/>

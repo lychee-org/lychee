@@ -1,34 +1,46 @@
 .moveSecondChild.highlighted {
   color: green;
   font-weight: bold;
-  width: 200px;
+  width: 50%;
   text-align: center;
 }
 
 .moveFirstChild.highlighted {
   color: green;
   font-weight: bold;
-  width: 200px;
+  width: 50%;
   text-align: center;
 }
 
 .move-viewer {
+  width: 100%;
   display: table;
   column-count: 2;
   table-layout: auto;
-  border-collapse: collapse;
+  border-collapse: collapse;  
+}
+
+.scrollable-container {
+  overflow-y: auto;
+  height: 20vh;
 }
 
 .moveFirstChild {
-  width: 200px;
+  width: 50%;
   text-align: center;
   border-left: none;
+  height: 40px;
 }
 
 .moveSecondChild {
-  width: 200px;
+  width: 50%;
   text-align: center;
   border-left: 1px solid black;
+  height: 40px;
+}
+
+.move-table-row {
+  height: 40px
 }
 
 .move-viewer tr:nth-child(odd) {

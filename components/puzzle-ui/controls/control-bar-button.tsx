@@ -1,5 +1,7 @@
 import React from "react";
 import { ReactNode, useContext, useEffect } from "react";
+import { DoubleArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, DoubleArrowRightIcon } from "@radix-ui/react-icons";
+import "./control-button-bar.css"
 
 interface ControlBarButtonProps {
   onClick: () => void;
@@ -12,12 +14,9 @@ interface ControlBarButtonProps {
 const DEFAULT_CONTROL_BAR_BUTTON_WIDTH = '50px';
 
 const ControlBarButton: React.FC<ControlBarButtonProps> = ({onClick, symbol, label, width}) => {
-  let style = {
-    width: width ? width : DEFAULT_CONTROL_BAR_BUTTON_WIDTH
-  };
   return (
-    <button className="control-bar-button" title={label} onClick={onClick} style={style}>
-      {symbol}
+    <button className="control-bar-button" title={label} onClick={onClick}>
+      <div className="control-bar-button-icon">{symbol}</div>
     </button>
   )
 }
@@ -48,12 +47,25 @@ const ControlButtonBar = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [firstMove, prevMove, nextMove, lastMove]);
 
+  let firstMoveIcon = (
+    <DoubleArrowLeftIcon/>
+  )
+  let previousMoveIcon = (
+    <ChevronLeftIcon/>
+  )
+  let nextMoveIcon = (
+    <ChevronRightIcon/>
+  )
+  let lastMoveIcon = (
+    <DoubleArrowRightIcon/>
+  )
+
   return (
     <div className="control-button-bar">
-      <ControlBarButton onClick={firstMove} symbol="|&lt;" label="First move" />
-      <ControlBarButton onClick={prevMove} symbol="&lt;" label="Previous move" />
-      <ControlBarButton onClick={nextMove} symbol="&gt;" label="Next move" />
-      <ControlBarButton onClick={lastMove} symbol="&gt;|" label="Last move" />
+      <ControlBarButton onClick={firstMove} symbol={firstMoveIcon} label="First move" />
+      <ControlBarButton onClick={prevMove} symbol={previousMoveIcon} label="Previous move" />
+      <ControlBarButton onClick={nextMove} symbol={nextMoveIcon} label="Next move" />
+      <ControlBarButton onClick={lastMove} symbol={lastMoveIcon} label="Last move" />
     </div>
   );
 };
