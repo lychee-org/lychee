@@ -10,12 +10,6 @@ import {
   PromotionPieceOption
 } from 'react-chessboard/dist/chessboard/types';
 
-const boardWrapper = {
-  width: `70vw`,
-  maxWidth: '70vh',
-  margin: '3rem auto',
-};
-
 /** SQUARE STYLES */
 const SQUARE_STYLES = {
   // when cursor hovers over square selected piece can move to or piece hovers over square it can move to
@@ -241,9 +235,6 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
   /** FUNCTIONS THAT CAN ACTUALLY EXECUTE MOVES */
   function onPromotionPieceSelect(piece?: PromotionPieceOption) {
     if (piece) {
-      console.log(moveFrom, moveTo);
-      if (!moveFrom) console.log("NO MOVE FROM DEFINED")
-      if (!moveTo) console.log("NO MOVE TO DEFINED");
       try {
         game.move({
           from: moveFrom ?? "",
@@ -267,7 +258,6 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
   function onDrop(sourceSquare: Square, targetSquare: Square, piece: Piece) {
     if (!interactive) return false;
     try {
-      console.log("try");
       game.move({
         from: sourceSquare,
         to: targetSquare,
@@ -290,11 +280,10 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
       setMoveFrom(null);
       setMoveTo(null);
       setOptionSquares({});
-    } else if (moveFrom) { // TODO: update this
+    } else if (moveFrom) {
       try {
         const piece = chessjs_piece_convert(game.get(moveFrom));
         if (onPromotionCheck(moveFrom, square, piece)) {
-          console.log(moveFrom);
           setMoveTo(square);
           setShowPromotion(true);
         } else {
@@ -319,39 +308,37 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
 
   /** RETURNS MOSTLY A WRAPPED VERSION OF REACT-CHESSBOARD */
   return (
-    <div style={boardWrapper}>
-      <Chessboard
-        animationDuration={200}
-        boardOrientation={side === 'w' ? 'white' : 'black'}
-        position={fen}
-        isDraggablePiece={({ piece }) => piece[0] === side}
-        onPieceDragBegin={onPieceDragBegin}
-        onPieceDrop={onDrop}
-        onSquareClick={onSquareClick}
-        onSquareRightClick={onSquareRightClick}
-        onPromotionCheck={onPromotionCheck}
-        onPromotionPieceSelect={onPromotionPieceSelect}
-        promotionToSquare={moveTo}
-        onPieceDragEnd={onPieceDragEnd}
-        onDragOverSquare={onDragOverSquare}
-        onMouseOverSquare={onMouseOverSquare}
-        onMouseOutSquare={onMouseOutSquare}
-        showPromotionDialog={showPromotion}
-        customBoardStyle={{
-          borderRadius: '4px',
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
-        }}
-        customSquareStyles={{
-          ...optionSquares,
-          ...lastMoveHighlight(),
-          ...rightClickedSquares,
-          ...interactedSquare
-        }}
-        customDropSquareStyle={{}}
-        customPieces={customPieces}
-        ref={removePremoveRef}
-      />
-    </div>
+    <Chessboard
+      animationDuration={200}
+      boardOrientation={side === 'w' ? 'white' : 'black'}
+      position={fen}
+      isDraggablePiece={({ piece }) => piece[0] === side}
+      onPieceDragBegin={onPieceDragBegin}
+      onPieceDrop={onDrop}
+      onSquareClick={onSquareClick}
+      onSquareRightClick={onSquareRightClick}
+      onPromotionCheck={onPromotionCheck}
+      onPromotionPieceSelect={onPromotionPieceSelect}
+      promotionToSquare={moveTo}
+      onPieceDragEnd={onPieceDragEnd}
+      onDragOverSquare={onDragOverSquare}
+      onMouseOverSquare={onMouseOverSquare}
+      onMouseOutSquare={onMouseOutSquare}
+      showPromotionDialog={showPromotion}
+      customBoardStyle={{
+        borderRadius: '4px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+      }}
+      customSquareStyles={{
+        ...optionSquares,
+        ...lastMoveHighlight(),
+        ...rightClickedSquares,
+        ...interactedSquare
+      }}
+      customDropSquareStyle={{}}
+      customPieces={customPieces}
+      ref={removePremoveRef}
+    />
   );
 };
 

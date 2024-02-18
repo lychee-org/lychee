@@ -1,0 +1,18 @@
+.moverViewerContainer {
+    display: grid;
+    grid-template-columns: 30vw, 30vw;
+    grid-template-rows: 10vh, 40vh, 10vh;
+
+}
+
+.fromGameViewer {
+    grid-row: 1;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    font-family: "Open Sans";
+}
+
+.control-button-bar {
+    width: auto;
+    display: inline-block;
+}

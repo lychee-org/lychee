@@ -22,7 +22,7 @@ const ResetPuzzleButton = () => {
   const { getNextPuzzle } = useContext(PuzzleContext);
   return (
     <button style={buttonStyle} onClick={solved ? getNextPuzzle : reloadPuzzle}>
-      {solved ? 'Next Puzzle' : 'Reset Puzzle'}
+      {solved ? 'Next Puzzle' : 'View Solution'}
     </button>
   );
 }

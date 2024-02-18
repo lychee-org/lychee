@@ -3,7 +3,7 @@ import { User } from 'lucia';
 import mongoose from 'mongoose';
 
 const RATING_RADIUS = 300;
-const BATCH_SIZE = 5;
+const BATCH_SIZE = 10;
 
 export async function getPuzzleBatch(
   user: User,

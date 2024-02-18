@@ -1,6 +1,6 @@
 'use client';
 
-import LoadingBoard from "./new-attempt/loading-board"
+import LoadingBoard from "../puzzle-ui/loading-board"
 import { Chess, Square, Piece as ChessjsPiece } from 'chess.js';
 import React, { ReactNode, createRef, useEffect, useMemo, useState, useContext } from 'react';
 import { Chessboard, ClearPremoves } from 'react-chessboard';
@@ -62,7 +62,6 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
   const [fens, setFens] = useState([game.fen()]);
   const [displayText, setDisplayText] = useState('');
 
-  // TODO(sm3421).
   const [line, setLine] = useState(puzzle.Moves.split(' '));
   const [side, setSide] = useState(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
 
@@ -196,8 +195,6 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
       setLinePos((prev) => prev + 1);
       setMoveViewerMove(prev=>prev+1);
     } else {
-      // This is weird and hacky and also causes puzzle skips.
-      // TODO: fix this.
       setSolved(true);
       setDisplayText('Puzzle solved');
     }

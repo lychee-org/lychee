@@ -10,7 +10,6 @@ export default async function TestBoard() {
   if (!user) return new Response('Unauthorized', { status: 401 });
 
   const { puzzle, rating } = await nextPuzzleFor(user)
-  // console.log(puzzle, rating)
 
   return <PuzzleMode initialPuzzle={puzzle} initialRating={rating} />;
 }

@@ -39,7 +39,6 @@ export async function GET(request: Request): Promise<Response> {
     });
 
     const lichessUser: LichessUser = await lichessUserResponse.json();
-    console.log('lichessUser', lichessUser);
 
     cookies().set('token', tokens.accessToken, {
       sameSite: 'lax',

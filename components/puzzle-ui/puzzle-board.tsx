@@ -10,6 +10,8 @@ import ControlButtonBar, { PlaybackControllerContext } from './controls/control-
 import MoveViewer, { MoveNavigationContext } from './controls/move-viewer';
 import ResetPuzzleButton, { ResetPuzzleButtonContext } from './controls/reset-puzzle-button';
 import { Puzzle } from '@/types/lichess-api';
+import "./puzzle-board-ui.css";
+import RatingComponent from './controls/rating';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
@@ -31,7 +33,8 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   const [rendered, setRendered] = useState(false);
   const [solved, setSolved] = useState<boolean>(false);
   const [playbackPos, setPlaybackPos] = useState(0);
-
+  const [wrong, setWrong] = useState<boolean>(false);
+  
 
   // extra playback state
   const [fens, setFens] = useState([game.fen()]);
@@ -47,13 +50,13 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
 
   /** OVERALL RESET */
   const loadPuzzle = () => {
-    console.log("loading puzzle");
     game.load(puzzle.FEN);
     setSolved(false);
     setFens([puzzle.FEN]);
     setFen(puzzle.FEN);
     setPlaybackPos(0);
     setLinePos(0);
+    setWrong(false);
   };
 
   useEffect(() => {
@@ -72,6 +75,29 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     if (playbackMode) setFen(fens[playbackPos]);
     else setFen(game.fen());
   }, [playbackMode, playbackPos, fens, linePos]);
+
+  /** VIEW SOLUTION / GIVE UP */
+  const viewSolution = () => {
+    if (rendered && !solved) {
+      submitPuzzle(false, rating).then(r => setRating(r));
+      setWrong(true);
+      setSolved(true);
+
+      // set the line position to the end maintaining the playback position
+      setLinePos(line.length);
+
+      // update the game
+      let newFens: Array<string> = [];
+      line.slice(playbackPos).forEach(move => {
+        game.move(move);
+        newFens.push(game.fen());
+      });
+      setFens([...fens, ...newFens]);
+
+      // move the game forward by 1
+      setPlaybackPos(prev=>prev+1);
+    }
+  }
 
   /** PUZZLE LOGIC **/
   // RENDERED CALLBACK
@@ -109,15 +135,13 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   }
 
   /** HANDLE PLAYER MOVE VERIFICATION */
-  // TODO: add events to these, so that other components can pick up
-  // player moved incorrectly
   function undoWrongMove() {
-    console.log("wrong move");
-    if (submitPuzzle) {
-      submitPuzzle(false, rating).then(r => setRating(r))
+    if (submitPuzzle && !wrong) {
+      submitPuzzle(false, rating).then(r => setRating(r));
     }
     game.undo();
     setFen(game.fen());
+    setWrong(true);
     setFens(prev => prev.slice(0, -1));
     setLinePos(prev => prev - 1);
     setPlaybackPos(prev => prev - 1);
@@ -131,7 +155,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
 
   // player finished puzzle
   function finishedGame() {
-    if (submitPuzzle) {
+    if (submitPuzzle && !wrong) {
       submitPuzzle(true, rating).then(r => setRating(r))
     }
     setSolved(true);
@@ -151,33 +175,28 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   const lastMoveToHighlight: Move | undefined = game.history({ verbose: true }).find((_, i) => i === playbackPos - 1);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ marginRight: '20px' }}>
-          <ChessboardWrapped
-            side={side}
-            fen={fen}
-            lastMove={lastMoveToHighlight}
-            interactive={interactive}
-            updateGame={interactive ? playerMoveCallback : (() => { })}
-            renderedCallback={rendered ? (() => { return; }) : renderedCallback}
-          />
-        </div>
-        <div>
-          <span style={{ fontSize: '20px', fontFamily: 'Arial, sans-serif', fontWeight: 'bold', marginRight: '5px' }}>Rating:</span>
-          <span style={{ fontSize: '24px', fontFamily: 'Arial, sans-serif', fontWeight: 'bold', color: 'green' }}>{Math.round(rating.rating)}</span>
-        </div>
+    <div className="container">
+      <div className="chessboard">
+        <ChessboardWrapped
+          side={side}
+          fen={fen}
+          lastMove={lastMoveToHighlight}
+          interactive={interactive}
+          updateGame={interactive ? playerMoveCallback : (()=>{})}
+          renderedCallback={rendered ? (()=>{return;}) : renderedCallback}
+        />
       </div>
-      <div>
-        <ResetPuzzleButtonContext.Provider value={{ solved, reloadPuzzle: loadPuzzle }}>
-          <ResetPuzzleButton />
-        </ResetPuzzleButtonContext.Provider>
-        <PlaybackControllerContext.Provider value={{ firstMove, prevMove, nextMove, lastMove }}>
-          <ControlButtonBar />
-        </PlaybackControllerContext.Provider>
-        <MoveNavigationContext.Provider value={{ currentIndex: playbackPos, moves: game.history(), side }}>
-          <MoveViewer />
-        </MoveNavigationContext.Provider>
+      <div><RatingComponent rating={rating.rating} /></div>
+      <div className='move-viewer-container'>
+          <div>From game #1202020</div> 
+          <div>
+            <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
+              <MoveViewer />
+            </MoveNavigationContext.Provider> 
+          </div>
+          <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
+            <ControlButtonBar />
+           </PlaybackControllerContext.Provider>
       </div>
     </div>
   );
