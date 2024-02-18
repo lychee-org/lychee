@@ -12,7 +12,6 @@ import ResetPuzzleButton, { ResetPuzzleButtonContext } from './controls/reset-pu
 import { Puzzle } from '@/types/lichess-api';
 import "./puzzle-board-ui.css";
 import RatingComponent from './controls/rating';
-import nextPuzzleFor from '@/app/api/puzzle/nextPuzzle/nextFor';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
@@ -35,7 +34,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   const [solved, setSolved] = useState<boolean>(false);
   const [playbackPos, setPlaybackPos] = useState(0);
   const [wrong, setWrong] = useState<boolean>(false);
-  
+
 
   // extra playback state
   const [fens, setFens] = useState([game.fen()]);
@@ -96,7 +95,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
       setFens([...fens, ...newFens]);
 
       // move the game forward by 1
-      setPlaybackPos(prev=>prev+1);
+      setPlaybackPos(prev => prev + 1);
     }
   }
 
@@ -183,24 +182,24 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
           fen={fen}
           lastMove={lastMoveToHighlight}
           interactive={interactive}
-          updateGame={interactive ? playerMoveCallback : (()=>{})}
-          renderedCallback={rendered ? (()=>{return;}) : renderedCallback}
+          updateGame={interactive ? playerMoveCallback : (() => { })}
+          renderedCallback={rendered ? (() => { return; }) : renderedCallback}
         />
       </div>
       <div><RatingComponent rating={rating.rating} /></div>
       <div className='move-viewer-container'>
-          <div>From game #1202020</div> 
-          <div>
-            <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
-              <MoveViewer />
-            </MoveNavigationContext.Provider> 
-          </div>
-          <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
-            <ControlButtonBar />
-           </PlaybackControllerContext.Provider>
+        <div>From game #1202020</div>
+        <div>
+          <MoveNavigationContext.Provider value={{ currentIndex: playbackPos, moves: game.history(), side }}>
+            <MoveViewer />
+          </MoveNavigationContext.Provider>
+        </div>
+        <PlaybackControllerContext.Provider value={{ firstMove, prevMove, nextMove, lastMove }}>
+          <ControlButtonBar />
+        </PlaybackControllerContext.Provider>
       </div>
       <div>
-        <ResetPuzzleButtonContext.Provider value={{solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution}}>
+        <ResetPuzzleButtonContext.Provider value={{ solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution }}>
           <ResetPuzzleButton />
         </ResetPuzzleButtonContext.Provider>
       </div>
