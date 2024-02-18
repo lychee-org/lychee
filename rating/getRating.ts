@@ -2,6 +2,7 @@ import { RatingColl } from '@/models/RatingColl';
 import { Puzzle } from '@/types/lichess-api';
 import { User } from 'lucia';
 import Rating from './GlickoV2Rating';
+import { UserThemeColl } from '@/models/UserThemeColl';
 
 const DEFAULT_VOLATILITY: number = 0.09;
 
@@ -44,3 +45,20 @@ export const getPuzzleRating = (puzzle: Puzzle): Rating =>
     DEFAULT_VOLATILITY,
     puzzle.NbPlays
   );
+
+export const getDefaultRating = () => new Rating(1500, 350, DEFAULT_VOLATILITY, 0);
+
+export const getThemeRatings = async (user: User) => {
+  const ret = await UserThemeColl.find({
+    username: user.username,
+  });
+  return ret.reduce((map, document) => {
+    map[document.theme] = new Rating(
+      document.rating,
+      document.ratingDeviation,
+      document.volatility,
+      document.numberOfResults
+    );
+    return map;
+  }, {});
+};

@@ -7,7 +7,14 @@ import { Puzzle } from '@/types/lichess-api';
 import { NextRequest } from 'next/server';
 import { RatingColl } from '../../../../models/RatingColl';
 import { RoundColl } from '@/models/RoundColl';
-import { fetchUserRating, getPuzzleRating } from '@/rating/getRating';
+import {
+  fetchUserRating,
+  getDefaultRating,
+  getPuzzleRating,
+  getThemeRatings,
+} from '@/rating/getRating';
+import { AllRoundColl } from '@/models/AllRoundColl';
+import { UserThemeColl } from '@/models/UserThemeColl';
 
 export async function POST(req: NextRequest) {
   await dbConnect();
@@ -39,15 +46,13 @@ export async function POST(req: NextRequest) {
     throw new Error("User's rating not found in DB");
   }
 
-  const puzzleRating: Rating = getPuzzleRating(puzzle);
-
   if (success) {
     new RatingCalculator().updateRatings(
-      new GameResult(userRating, puzzleRating)
+      new GameResult(userRating, getPuzzleRating(puzzle))
     );
   } else {
     new RatingCalculator().updateRatings(
-      new GameResult(puzzleRating, userRating)
+      new GameResult(getPuzzleRating(puzzle), userRating)
     );
   }
 
@@ -64,10 +69,51 @@ export async function POST(req: NextRequest) {
     }
   );
 
+  // TODO: Uncomment when duplicates are handled in frontend.
   // Insert this round into the round DB.
-  // TODO: do we need await here?
-  RoundColl.create({
-    roundId: `${user.username}+${puzzle.PuzzleId}`,
+  // await RoundColl.create({
+  //   roundId: `${user.username}+${puzzle.PuzzleId}`,
+  // });
+
+  await AllRoundColl.updateOne(
+    { username: user.username },
+    {
+      // Append puzzle ID to the array of solved IDs.
+      $addToSet: { solved: puzzle.PuzzleId },
+    }
+  );
+
+  const ratingMap = await getThemeRatings(user);
+  console.log(ratingMap);
+
+  // Update theme ratings.
+  const themes = puzzle.Themes.split(' ');
+  themes.forEach(async (theme) => {
+    const themeRating: Rating = !ratingMap[theme]
+      ? getDefaultRating()
+      : ratingMap[theme];
+    if (success) {
+      new RatingCalculator().updateRatings(
+        // NB: We cannot use the same variable for puzzleRating, since it is changed by the updateRatings method.
+        new GameResult(themeRating, getPuzzleRating(puzzle)) 
+      );
+    } else {
+      new RatingCalculator().updateRatings(
+        new GameResult(getPuzzleRating(puzzle), themeRating)
+      );
+    }
+    await UserThemeColl.updateOne(
+      { username: user.username, theme: theme },
+      {
+        $set: {
+          rating: themeRating.rating,
+          ratingDeviation: themeRating.ratingDeviation,
+          volatility: themeRating.volatility,
+          numberOfResults: themeRating.numberOfResults,
+        },
+      },
+      { upsert: true } // Insert if not found.
+    );
   });
 
   return new Response(JSON.stringify(userRating), { status: 200 });

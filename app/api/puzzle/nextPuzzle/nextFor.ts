@@ -1,4 +1,5 @@
 import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
+import { AllRoundColl } from '@/models/AllRoundColl';
 import { RatingColl } from '@/models/RatingColl';
 import { fetchUserRating } from '@/rating/getRating';
 import { Puzzle } from '@/types/lichess-api';
@@ -22,15 +23,23 @@ const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
         volatility: userRating.volatility,
         numberOfResults: userRating.numberOfResults,
       });
+      AllRoundColl.create({
+        username: user.username,
+        solved: [],
+      });
     }
+    const exceptions = (await AllRoundColl.findOne({ username: user.username }))
+      .solved;
     // Now get puzzle based on user rating that user hasn't seen yet.
     const p = await mongoose.connection.collection('testPuzzles').findOne({
+      PuzzleId: { $nin: exceptions },
       Rating: {
         $gt: userRating.rating - RATING_RADIUS,
         $lt: userRating.rating + RATING_RADIUS,
       },
     });
     let { _id: _, ...rest } = p as any;
+    console.log(rest['Moves']);
     return {
       puzzle: rest as any as Puzzle,
       rating: {
