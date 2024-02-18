@@ -1,16 +1,19 @@
 'use client';
 import { Puzzle } from "@/types/lichess-api";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PuzzleBoard from "./puzzle-board";
-import { UserInfo } from "@/app/api/user/info/route";
-import UserContext from "../auth/usercontext";
-import Rating from "@/rating/GlickoV2Rating";
+import { PuzzleWithUserRating } from "@/app/api/puzzle/nextPuzzle/nextFor";
 
-const MIN_LOCAL_BATCH_LEN = 5;
+export type RatingHolder = {
+  rating: number,
+  ratingDeviation: number,
+  volatility: number,
+  numberOfResults: number
+}
 
 interface PuzzleModeProps {
-  initialPuzzleBatch: Array<Puzzle>,
-  userInfo?: UserInfo
+  initialPuzzle: Puzzle,
+  initialRating: RatingHolder
 }
 
 export const wrapperStyle = {
@@ -18,75 +21,44 @@ export const wrapperStyle = {
   maxWidth: '70vh',
   margin: '3rem auto',
 }
-export const EVENTS = { // grouped by the intended emitter
-  PuzzleBoard: {
-    PUZZLE_SOLVED: "puzzleSolved",
-    INCORRECT_MOVE: "puzzleIncorrect",
-    CORRECT_MOVE: "puzzleCorrect"
-  },
-  Controller: {
-    FIRST_MOVE: "firstMove",
-    PREV_MOVE: "prevMove",
-    NEXT_MOVE: "nextMove",
-    LAST_MOVE: "lastMove"
-  }
-}
 
 export const PuzzleContext = React.createContext({
-  submitNextPuzzle: (success: boolean, prv: Rating): Promise<Rating> => { throw new Error() },
+  submitNextPuzzle: (_success: boolean, _prv: RatingHolder): Promise<RatingHolder> => { throw new Error() },
   getNextPuzzle: () => { },
 })
 
-const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch, userInfo}) => {
 
+const PuzzleMode: React.FC<PuzzleModeProps> = ({ initialPuzzle, initialRating }) => {
   /** PUZZLE CODE */
-  const [puzzleBatch, setPuzzleBatch] = useState<Array<Puzzle>>(initialPuzzleBatch);
-  const [puzzle, setPuzzle] = useState<Puzzle | undefined>(puzzleBatch[0]);
-  if (!puzzleBatch) return "All done!"
+  const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
+  const [rating, setRating] = useState<RatingHolder>(initialRating);
 
-  /** GET USER CONTEXT */
-  const [user, setUser] = useState<UserInfo | null>(null);
-
-  useEffect(() => {
-    fetch(`/api/user/info`)
-      .then(res => res.json())
-      .then(res => setUser(res));
-  }, [puzzle]);
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
+  // TODO: Handle when no more puzzles!
 
   // submit the puzzle success/failure to the server
-  const submitNextPuzzle = (success: boolean, prv: Rating): Promise<Rating> =>
+  const submitNextPuzzle = (success: boolean, prv: RatingHolder): Promise<RatingHolder> =>
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
-      body: JSON.stringify({ puzzle_: puzzleBatch[0], success_: success, prv_: prv })
-    }).then(response => response.text()).then(s => JSON.parse(s) as Rating)
+      body: JSON.stringify({ puzzle_: puzzle, success_: success, prv_: prv })
+    }).then(response => response.text()).then(s => JSON.parse(s) as RatingHolder)
 
   // get the next puzzle
   const getNextPuzzle = () => {
-    if (puzzleBatch.length < MIN_LOCAL_BATCH_LEN) {
-      const alreadyBatched = puzzleBatch.map(p=>p.PuzzleId);
-      fetch(`/api/puzzle/nextbatch?exceptions=${alreadyBatched}`)
-        .then((res) => res.json())
-        .then((res) => res.puzzles as Array<Puzzle>)
-        .then((puzzles: Array<Puzzle>) => {
-          console.log(puzzles);
-          setPuzzleBatch([...puzzleBatch, ...puzzles]);
-        });
-    }
-    setPuzzle(puzzleBatch[1]);
-    setPuzzleBatch(puzzleBatch.slice(1));
+    fetch(`/api/puzzle/nextPuzzle`, {
+      method: 'GET'
+    }).then(response => response.text()).then(s => JSON.parse(s) as PuzzleWithUserRating).then(response => {
+      setPuzzle(response.puzzle);
+      setRating(response.rating);
+    })
   }
 
   return (
     <div style={wrapperStyle}>
-      <UserContext.Provider value={user}>
-        <PuzzleContext.Provider value={{submitNextPuzzle, getNextPuzzle}}>
-          <PuzzleBoard puzzle={puzzle}/>
-        </PuzzleContext.Provider>
-      </UserContext.Provider>
+      <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
+        <PuzzleBoard puzzle={puzzle} initialRating={rating} />
+      </PuzzleContext.Provider>
     </div>
   )
 }
+
 export default PuzzleMode;

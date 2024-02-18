@@ -5,6 +5,9 @@ import { lichess, lucia } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import User from '@/models/User';
 import { LichessUser } from '@/types/lichess-api';
+import { fetchLichessRating } from '@/rating/getRating';
+import { RatingColl } from '@/models/RatingColl';
+import { AllRoundColl } from '@/models/AllRoundColl';
 
 export async function GET(request: Request): Promise<Response> {
   await dbConnect();
@@ -64,18 +67,26 @@ export async function GET(request: Request): Promise<Response> {
     }
 
     const userId = generateId(15);
-    const name = `${lichessUser.profile?.firstName ?? ''}${lichessUser.profile?.lastName ? ' ' + lichessUser.profile.lastName : ''}`;
-
-    // await db.insert(users).values({
-    //     id: userId,
-    //     rating: lichessUser.perfs.blitz.rating,
-    //     username: lichessUser.id,
-    //     name,
-    // });
-
-    await User.create({
+    const user = await User.create({
       _id: userId,
       username: lichessUser.id,
+    });
+
+    // Initialise user rating.
+    const userRating = await fetchLichessRating(user);
+    await RatingColl.create({
+      username: user.username,
+      rating: userRating.rating,
+      ratingDeviation: userRating.ratingDeviation,
+      volatility: userRating.volatility,
+      numberOfResults: userRating.numberOfResults,
+    });
+
+    // Initialise user rounds.
+    // NB: This is important. If new user, set solved to be empty. The submit endpoint relies on this.
+    await AllRoundColl.create({
+      username: user.username,
+      solved: [],
     });
 
     const session = await lucia.createSession(userId, {});

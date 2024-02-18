@@ -4,51 +4,16 @@ import GameResult from '@/rating/GameResult';
 import Rating from '@/rating/GlickoV2Rating';
 import RatingCalculator from '@/rating/RatingCalculator';
 import { Puzzle } from '@/types/lichess-api';
-import { User } from 'lucia';
 import { NextRequest } from 'next/server';
 import { RatingColl } from '../../../../models/RatingColl';
-
-const DEFAULT_VOLATILITY: number = 0.09;
-
-const fetchUserRating = async (
-  user: User
-): Promise<{ userRating: Rating; present: boolean }> => {
-  return RatingColl.findOne({ username: user.username }).then(
-    async (result) => {
-      // If it's in the rating DB, return it:
-      if (result) {
-        return {
-          userRating: new Rating(
-            result.rating,
-            result.ratingDeviation,
-            result.volatility,
-            result.numberOfResults
-          ),
-          present: true,
-        };
-      }
-      // Otherwise, retrieve all data (execept volatility which isn't public) from Lichess API:
-      const { perfs } = await fetch(
-        `https://lichess.org/api/user/${user?.username}`
-      ).then((res) => res.json());
-      const rating = perfs['puzzle']['rating'];
-      const rd = perfs['puzzle']['rd'];
-      const nb = perfs['puzzle']['games'];
-      return {
-        userRating: new Rating(rating, rd, DEFAULT_VOLATILITY, nb),
-        present: false,
-      };
-    }
-  );
-};
-
-const getPuzzleRating = (puzzle: Puzzle): Rating =>
-  new Rating(
-    puzzle.Rating,
-    puzzle.RatingDeviation,
-    DEFAULT_VOLATILITY,
-    puzzle.NbPlays
-  );
+import { RoundColl } from '@/models/RoundColl';
+import {
+  getDefaultRating,
+  getPuzzleRating,
+  getThemeRatings,
+} from '@/rating/getRating';
+import { AllRoundColl } from '@/models/AllRoundColl';
+import { UserThemeColl } from '@/models/UserThemeColl';
 
 export async function POST(req: NextRequest) {
   await dbConnect();
@@ -58,47 +23,85 @@ export async function POST(req: NextRequest) {
   }
   const { puzzle_, success_, prv_ } = await req.json();
 
-  // TODO.
   const puzzle = puzzle_ as Puzzle;
   const success = success_ as boolean;
-  const prv = prv_ as Rating;
-
-  const { userRating, present } =
-    prv.rating < 0
-      ? await fetchUserRating(user)
-      : {
-          userRating: new Rating( // TODO: this is actually important to do!
-            prv.rating,
-            prv.ratingDeviation,
-            prv.volatility,
-            prv.numberOfResults
-          ),
-          present: true,
-        };
-
-  const puzzleRating: Rating = getPuzzleRating(puzzle);
+  // NB: we create a new object here, so methods are present.
+  const userRating = new Rating(
+    prv_.rating,
+    prv_.ratingDeviation,
+    prv_.volatility,
+    prv_.numberOfResults
+  );
 
   if (success) {
     new RatingCalculator().updateRatings(
-      new GameResult(userRating, puzzleRating)
+      new GameResult(userRating, getPuzzleRating(puzzle))
     );
   } else {
     new RatingCalculator().updateRatings(
-      new GameResult(puzzleRating, userRating)
+      new GameResult(getPuzzleRating(puzzle), userRating)
     );
   }
 
-  // Delete previous entry if present.
-  if (present) {
-    await RatingColl.deleteOne({ username: user.username });
-  }
+  // Update user's rating.
+  await RatingColl.updateOne(
+    { username: user.username },
+    {
+      $set: {
+        rating: userRating.rating,
+        ratingDeviation: userRating.ratingDeviation,
+        volatility: userRating.volatility,
+        numberOfResults: userRating.numberOfResults,
+      },
+    }
+  );
 
-  RatingColl.create({
-    username: user.username,
-    rating: userRating.rating,
-    ratingDeviation: userRating.ratingDeviation,
-    volatility: userRating.volatility,
-    numberOfResults: userRating.numberOfResults,
+  // Insert this round into the round DB. Currently, this is unused.
+  await RoundColl.create({
+    roundId: `${user.username}+${puzzle.PuzzleId}`,
+  });
+
+  await AllRoundColl.updateOne(
+    { username: user.username },
+    {
+      // Append puzzle ID to the array of solved IDs.
+      $addToSet: { solved: puzzle.PuzzleId },
+    }
+  );
+
+  // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
+  // persist in the DB, as this information is useful for dashboard analysitcs.
+  const ratingMap = await getThemeRatings(user, false);
+  console.log(ratingMap);
+
+  // Update theme ratings.
+  const themes = puzzle.Themes.split(' ');
+  themes.forEach(async (theme) => {
+    const themeRating: Rating = ratingMap.get(theme) || getDefaultRating();
+
+    if (success) {
+      new RatingCalculator().updateRatings(
+        // NB: We cannot use the same variable for puzzleRating, since it is changed by the updateRatings method.
+        new GameResult(themeRating, getPuzzleRating(puzzle))
+      );
+    } else {
+      new RatingCalculator().updateRatings(
+        new GameResult(getPuzzleRating(puzzle), themeRating)
+      );
+    }
+
+    await UserThemeColl.updateOne(
+      { username: user.username, theme: theme },
+      {
+        $set: {
+          rating: themeRating.rating,
+          ratingDeviation: themeRating.ratingDeviation,
+          volatility: themeRating.volatility,
+          numberOfResults: themeRating.numberOfResults,
+        },
+      },
+      { upsert: true } // Insert if not found.
+    );
   });
 
   return new Response(JSON.stringify(userRating), { status: 200 });
