@@ -19,7 +19,7 @@ interface PuzzleBoardProps {
 }
 // set its props to be the puzzle object
 const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
-  const { submitNextPuzzle: submitPuzzle, ..._ } = useContext(PuzzleContext);
+  const { submitNextPuzzle: submitPuzzle, getNextPuzzle } = useContext(PuzzleContext);
   if (!puzzle) return < LoadingBoard />;
   const line = puzzle.Moves.split(' ');
   const side = puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w';
@@ -79,7 +79,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
   /** VIEW SOLUTION / GIVE UP */
   const viewSolution = () => {
     if (rendered && !solved) {
-      submitPuzzle(false, rating).then(r => setRating(r));
+      if (!wrong) {
+        submitPuzzle(false, rating).then(r => setRating(r));
+      }
       setWrong(true);
       setSolved(true);
 
@@ -197,6 +199,11 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
           <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
             <ControlButtonBar />
            </PlaybackControllerContext.Provider>
+      </div>
+      <div>
+        <ResetPuzzleButtonContext.Provider value={{ solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution }}>
+          <ResetPuzzleButton />
+        </ResetPuzzleButtonContext.Provider>
       </div>
     </div>
   );
