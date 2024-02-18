@@ -46,19 +46,27 @@ export const getPuzzleRating = (puzzle: Puzzle): Rating =>
     puzzle.NbPlays
   );
 
-export const getDefaultRating = () => new Rating(1500, 350, DEFAULT_VOLATILITY, 0);
+export const getDefaultRating = () =>
+  new Rating(1500, 350, DEFAULT_VOLATILITY, 0);
 
-export const getThemeRatings = async (user: User) => {
-  const ret = await UserThemeColl.find({
-    username: user.username,
-  });
-  return ret.reduce((map, document) => {
-    map[document.theme] = new Rating(
-      document.rating,
-      document.ratingDeviation,
-      document.volatility,
-      document.numberOfResults
+export const getThemeRatings = async (
+  user: User
+): Promise<Map<string, Rating>> => {
+  const map: Map<string, Rating> = new Map();
+  (
+    await UserThemeColl.find({
+      username: user.username,
+    })
+  ).forEach((document) => {
+    map.set(
+      document.theme,
+      new Rating(
+        document.rating,
+        document.ratingDeviation,
+        document.volatility,
+        document.numberOfResults
+      )
     );
-    return map;
-  }, {});
+  });
+  return map;
 };

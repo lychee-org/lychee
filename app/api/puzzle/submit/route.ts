@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     prv.rating < 0
       ? await fetchUserRating(user)
       : {
-          userRating: new Rating( // TODO: this is actually important to do!
+          userRating: new Rating( // MB: This is important!
             prv.rating,
             prv.ratingDeviation,
             prv.volatility,
@@ -84,18 +84,17 @@ export async function POST(req: NextRequest) {
   );
 
   const ratingMap = await getThemeRatings(user);
-  console.log(ratingMap);
+  console.log(ratingMap); // TODO(sm3421): Remove.
 
   // Update theme ratings.
   const themes = puzzle.Themes.split(' ');
   themes.forEach(async (theme) => {
-    const themeRating: Rating = !ratingMap[theme]
-      ? getDefaultRating()
-      : ratingMap[theme];
+    const themeRating: Rating = ratingMap.get(theme) || getDefaultRating();
+
     if (success) {
       new RatingCalculator().updateRatings(
         // NB: We cannot use the same variable for puzzleRating, since it is changed by the updateRatings method.
-        new GameResult(themeRating, getPuzzleRating(puzzle)) 
+        new GameResult(themeRating, getPuzzleRating(puzzle))
       );
     } else {
       new RatingCalculator().updateRatings(

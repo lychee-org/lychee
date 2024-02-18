@@ -9,7 +9,8 @@ export async function GET(_req: NextRequest) {
   if (!user) {
     return new Response('Unauthorized', { status: 401 });
   }
-  return new Response(JSON.stringify(await nextPuzzleFor(user)), {
+  const puzzle = await nextPuzzleFor(user);
+  return new Response(JSON.stringify(puzzle), {
     status: 200,
   });
 }
