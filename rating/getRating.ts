@@ -12,12 +12,9 @@ export const fetchLichessRating = async (user: User): Promise<Rating> => {
   const { perfs } = await fetch(
     `https://lichess.org/api/user/${user?.username}`
   ).then((res) => res.json());
-  return new Rating(
-    perfs['puzzle']['rating'],
-    perfs['puzzle']['rd'],
-    DEFAULT_VOLATILITY,
-    perfs['puzzle']['games']
-  );
+  const { games, rating, rd, _ } = perfs.puzzle;
+  // Use default volatility since actual is not public.
+  return new Rating(rating, rd, DEFAULT_VOLATILITY, games);
 };
 
 // Gets a user's rating from through the collection.
@@ -42,7 +39,7 @@ export const getPuzzleRating = (puzzle: Puzzle): Rating =>
   new Rating(
     puzzle.Rating,
     puzzle.RatingDeviation,
-    DEFAULT_VOLATILITY,
+    DEFAULT_VOLATILITY, // Actual volatility not in Lichess' puzzle collection.
     puzzle.NbPlays
   );
 

@@ -8,8 +8,6 @@ export default async function TestBoard() {
   await dbConnect();
   const { user } = await validateRequest();
   if (!user) return new Response('Unauthorized', { status: 401 });
-
-  const { puzzle, rating } = await nextPuzzleFor(user)
-
+  const { puzzle, rating } = await nextPuzzleFor(user);
   return <PuzzleMode initialPuzzle={puzzle} initialRating={rating} />;
 }
