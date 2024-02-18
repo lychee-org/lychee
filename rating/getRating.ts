@@ -3,6 +3,7 @@ import { Puzzle } from '@/types/lichess-api';
 import { User } from 'lucia';
 import Rating from './GlickoV2Rating';
 import { UserThemeColl } from '@/models/UserThemeColl';
+import { isIrrelevant } from '@/app/api/puzzle/nextPuzzle/themeGenerator';
 
 const DEFAULT_VOLATILITY: number = 0.09;
 
@@ -50,7 +51,8 @@ export const getDefaultRating = () =>
   new Rating(1500, 350, DEFAULT_VOLATILITY, 0);
 
 export const getThemeRatings = async (
-  user: User
+  user: User,
+  filterOutIrrelevant: boolean // Whether to filter out irrelevant themes.
 ): Promise<Map<string, Rating>> => {
   const map: Map<string, Rating> = new Map();
   (
@@ -58,6 +60,9 @@ export const getThemeRatings = async (
       username: user.username,
     })
   ).forEach((document) => {
+    if (isIrrelevant(document.theme) && filterOutIrrelevant) {
+      return;
+    }
     map.set(
       document.theme,
       new Rating(

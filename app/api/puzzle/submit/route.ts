@@ -69,11 +69,10 @@ export async function POST(req: NextRequest) {
     }
   );
 
-  // TODO: Uncomment when duplicates are handled in frontend.
-  // Insert this round into the round DB.
-  // await RoundColl.create({
-  //   roundId: `${user.username}+${puzzle.PuzzleId}`,
-  // });
+  // Insert this round into the round DB. Currently, this is unused.
+  await RoundColl.create({
+    roundId: `${user.username}+${puzzle.PuzzleId}`,
+  });
 
   await AllRoundColl.updateOne(
     { username: user.username },
@@ -83,7 +82,9 @@ export async function POST(req: NextRequest) {
     }
   );
 
-  const ratingMap = await getThemeRatings(user);
+  // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and 
+  // persist in the DB, as this information is useful for dashboard analysitcs.
+  const ratingMap = await getThemeRatings(user, false);
   console.log(ratingMap); // TODO(sm3421): Remove.
 
   // Update theme ratings.
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest) {
         new GameResult(getPuzzleRating(puzzle), themeRating)
       );
     }
+    
     await UserThemeColl.updateOne(
       { username: user.username, theme: theme },
       {

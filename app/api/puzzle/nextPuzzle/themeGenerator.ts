@@ -74,9 +74,12 @@ const frequencyUnfiltered: { [theme: string]: number } = {
 
 const irrelevantSet = new Set(irrelevantThemes);
 
+export const isIrrelevant = (theme: string): boolean =>
+  irrelevantSet.has(theme);
+
 const frequency = Object.fromEntries(
   Object.entries(frequencyUnfiltered).filter(
-    ([theme, _]) => !irrelevantSet.has(theme)
+    ([theme, _]) => !isIrrelevant(theme)
   )
 );
 

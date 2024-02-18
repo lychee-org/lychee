@@ -6,7 +6,7 @@ import { Puzzle } from '@/types/lichess-api';
 import { User } from 'lucia';
 import mongoose from 'mongoose';
 import sm2RandomThemeFromRatingMap from './sm2';
-import frequentiallyRandomTheme from './themeGenerator';
+import frequentiallyRandomTheme, { isIrrelevant } from './themeGenerator';
 import Rating from '@/rating/GlickoV2Rating';
 
 const LOWER_RADIUS = 200;
@@ -53,22 +53,19 @@ const nextPuzzleRepetitions = async (
   if (reps == MAX_REPS) {
     throw new Error('Maximum repetitions reached... something is wrong.');
   }
-  const original = frequentiallyRandomTheme();
-  const mappedRating = ratingMap.get(original);
+  let theme = frequentiallyRandomTheme();
   // If the theme is not in the rating map, let's try to use it.
-  if (!mappedRating) {
-    const p = await nextPuzzleForThemeAndRating(original, rating, exceptions);
-    if (p) {
-      console.log(`Found theme ${original} frequentially after ${reps} reps.`);
-      return p;
-    }
-    return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
+  // Otherwise, let's run probabilistic SM2 on the rating map.
+  const useSpacedRep = ratingMap.has(theme);
+  if (useSpacedRep) {
+    theme = sm2RandomThemeFromRatingMap(ratingMap);
   }
-  // Otheriwse, let's run probabilistic SM2 on the rating map.
-  const theme = sm2RandomThemeFromRatingMap(ratingMap);
   const p = await nextPuzzleForThemeAndRating(theme, rating, exceptions);
   if (p) {
-    console.log(`Found theme ${theme} through SM2 after ${reps} reps .`);
+    if (isIrrelevant(theme)) {
+      throw new Error("Irrelevant theme found - incorrect or no filtering has occured.");
+    }
+    console.log(`Found theme ${theme} ${useSpacedRep ? 'through SM2' : 'frequentially'} after ${reps} reps.`);
     return p;
   }
   return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
@@ -77,6 +74,7 @@ const nextPuzzleRepetitions = async (
 const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
   fetchUserRating(user).then(async ({ userRating, present }) => {
     if (!present) {
+      // TODO(sm3421): move this logic to login.
       RatingColl.create({
         username: user.username,
         rating: userRating.rating,
@@ -90,8 +88,10 @@ const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
         solved: [],
       });
     }
-
-    const ratingMap = await getThemeRatings(user);
+    
+    // NB: The persisted rating map may contain irrelevant themes, but we don't
+    // want to include these for nextPuzzle / SM2, so we filter them out below.
+    const ratingMap = await getThemeRatings(user, true);
 
     // TODO: Better handle repeat avoidance.
     const exceptions = (await AllRoundColl.findOne({ username: user.username }))
@@ -107,17 +107,6 @@ const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
     console.log(
       `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
     );
-
-    // const f = new Map<string, number>();
-    // for (const [k, v] of Object.entries(frequency)) {
-    //   f.set(k, v);
-    // }
-    // const cnt = new Map<String, number>();
-    // for (let i = 0; i < 100000; ++i) {
-    //   const t = proportionallyRandomTheme(f);
-    //   cnt.set(t, (cnt.get(t) || 0) + 1);
-    // }
-    // console.log(cnt);
 
     return {
       puzzle: puzzle,
