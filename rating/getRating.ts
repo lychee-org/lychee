@@ -59,7 +59,7 @@ export const getThemeRatings = async (
       username: user.username,
     })
   ).forEach((document) => {
-    if (isIrrelevant(document.theme) && filterOutIrrelevant) {
+    if (filterOutIrrelevant && isIrrelevant(document.theme)) {
       return;
     }
     map.set(
