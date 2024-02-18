@@ -79,7 +79,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   /** VIEW SOLUTION / GIVE UP */
   const viewSolution = () => {
     if (rendered && !solved) {
-      if (!wrong) submitPuzzle(false, rating).then(r => setRating(r));
+      if (!wrong) {
+        submitPuzzle(false, rating).then(r => setRating(r));
+      }
       setWrong(true);
       setSolved(true);
 
