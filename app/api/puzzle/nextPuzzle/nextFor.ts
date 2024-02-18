@@ -95,7 +95,7 @@ const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
 
     // TODO: Better handle repeat avoidance.
     const exceptions = (await AllRoundColl.findOne({ username: user.username }))
-      .solved;
+      ?.solved ?? [];
 
     const puzzle = await nextPuzzleRepetitions(
       userRating.rating,
