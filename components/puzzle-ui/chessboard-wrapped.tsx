@@ -322,6 +322,7 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
     else setMoveFrom(null);
   }
 
+
   /** RETURNS MOSTLY A WRAPPED VERSION OF REACT-CHESSBOARD */
   return (
     <Chessboard
@@ -346,11 +347,11 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
       }}
       customSquareStyles={{
+        ...lastMoveHighlight(),
+        ...interactedSquare,
         ...checkedSquare,
         ...optionSquares,
-        ...lastMoveHighlight(),
         ...rightClickedSquares,
-        ...interactedSquare
       }}
       customDropSquareStyle={{}}
       customPieces={customPieces}
