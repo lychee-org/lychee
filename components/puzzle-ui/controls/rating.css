@@ -1,5 +1,4 @@
 .Rating {
-    color: #131313;
     text-align: center;
     font-variant-numeric: lining-nums proportional-nums;
     font-family: "Open Sans";
@@ -7,18 +6,17 @@
     font-style: normal;
     font-weight: 523;
     line-height: normal;
-    margin-bottom: 3%;
+    padding-bottom: 2.5vh;
 }
 
 .RatingMessage {
-    padding-top: 2%;
+    padding-top: 1.5vh;
     padding-left: 10%;
-    color: #131313;
+    padding-bottom: 1vh;
     text-align: left;
     font-family: "Open Sans";
-    font-size: 25px;
+    font-size: 20px;
     font-style: normal;
     font-weight: 300;
     line-height: normal;
-
 }

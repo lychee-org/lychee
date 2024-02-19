@@ -46,8 +46,7 @@ interface PuzzleBoardProps {
 // set its props to be the puzzle object
 const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSubmitCallback}) =>  {
   const puzzle = useContext(PuzzleContext);
-  if (!puzzle) return <LoadingBoard/>
-  const game = useMemo(() => new Chess(puzzle.FEN), []);
+  const game = useMemo(() => new Chess(puzzle?.FEN), []);
   const [fen, setFen] = useState(game.fen());
   const [rightClickedSquares, setRightClickedSquares] =
     useState<CustomSquareStyles>({});
@@ -56,14 +55,13 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
   const removePremoveRef = createRef<ClearPremoves>();
   const [rendered, setRendered] = useState(false);
-  let output: ReactNode | null = null;
   // some stuff for the control bar
   const [moveViewerMove, setMoveViewerMove] = useState(0);
   const [fens, setFens] = useState([game.fen()]);
   const [displayText, setDisplayText] = useState('');
 
-  const [line, setLine] = useState(puzzle.Moves.split(' '));
-  const [side, setSide] = useState(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
+  const [line, setLine] = useState(puzzle?.Moves.split(' '));
+  const [side, setSide] = useState(puzzle?.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
 
   const [linePos, setLinePos] = useState(0);
 
@@ -85,6 +83,8 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
   const hoveredSquareStyle: Record<string, string|number> = {
     background: "rgba(255, 255, 0, 0.4)",
   };
+
+  const [solved, setSolved] = useState<boolean>(false);
 
   const customPieces = useMemo(() => {
     const pieceComponents: CustomPieces = {};
@@ -118,7 +118,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
     let timeout = setTimeout(() => {
       setTimeout(() => {
         console.log(rendered);
-        game.move(line[linePos]);
+        game.move(line ? line[linePos] : '');
         setFen(game.fen());
         setFens(prev=>[...prev, game.fen()]);
         setLinePos(1);
@@ -151,6 +151,8 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
     }
   }, [linePos]);
 
+  if (!puzzle) return <LoadingBoard/>;
+
   const loadPuzzle = () => {
     game.load(puzzle.FEN);
     setFen(game.fen());
@@ -164,13 +166,11 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
     console.log(line)
   };
 
-  const [solved, setSolved] = useState<boolean>(false);
-
   function verifyPlayerMove(successCallback?: () => (() => void)) {
     // callback only executed if the move was correct
     // verify last move by user was correct according to line.
     // if it was incorrect then undo the move
-    if (linePos > 0 && game.history({ verbose: true }).pop()?.lan !== line[linePos - 1]) {
+    if (linePos > 0 && game.history({ verbose: true }).pop()?.lan !== (line ? line[linePos - 1] : '')) {
       setDisplayText('Incorrect move');
       const timeout = setTimeout(() => {
         game.undo();
@@ -188,8 +188,8 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
 
   function botMove() {
     // if it was correct bot move the next move in the line
-    if (linePos < line.length) {
-      game.move(line[linePos]);
+    if (linePos < (line?.length ?? 0)) {
+      game.move(line ? line[linePos] : '');
       setFen(game.fen());
       setFens(prev=>[...prev, game.fen()]);
       setLinePos((prev) => prev + 1);
@@ -400,7 +400,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
       <button style={buttonStyle} onClick={solved ? nextPuzzleCallback : loadPuzzle}>
         {solved ? 'Next Puzzle' : 'Reset Puzzle'}
       </button>
-      <ControlBar moves={["...", ...line.slice(0, linePos)]} currentIndex={moveViewerMove} setIndex={setMoveViewerMove} display={displayText} />
+      <ControlBar moves={["...", ...(line?.slice(0, linePos) ?? [])]} currentIndex={moveViewerMove} setIndex={setMoveViewerMove} display={displayText} />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import './move-viewer.css';
+import { cn } from '@/lib/utils';
 
 type Side = 'w' | 'b';
 
@@ -12,30 +13,30 @@ export const MoveNavigationContext = React.createContext({
 
 const MoveViewer = () => {
   let {currentIndex, moves, side} = useContext(MoveNavigationContext);
-  if(side === 'w') {
+  if (side === 'w') {
     moves = ["...", ...moves]
   }
 
-  const renderMoves = () => {
-    const rows = []
-    for(let i = 0; i <= 4; i++) {
-      rows.push(<tr className="move-table-row" key={`move-table-empty-row-${i}`}><td className="moveFirstChild"></td><td className="moveSecondChild"></td></tr>)
+  const renderMoves = (minRows: number) => {
+    const rows = [];
+    let currentMove = currentIndex - (side === "w" ? 0 : 1);
+    let createRow = (i: number, val1: string, val2: string) => {
+      return (
+        <tr className="move-table-row odd:bg-tablerow-dark even:bg-tablerow-light divide-solid divide-x-2 divide-tablerow-divide" key={`move-viewer-row-${Math.floor(i/2)}`}>
+          <td className={cn("moveChild", i === currentMove ? "highlighted" : "")}>{val1}</td><td className={cn("moveChild", i + 1 === currentMove ? "highlighted" : "")}>{val2}</td>
+        </tr>
+      )
     }
-    for (let i = 0; i < moves.length; i+=2) {
-       let row = [];
-       let key = `move-viewer-row-${i}`;
-       row.push(<td key={i}className={`moveFirstChild ${i === currentIndex - (side === "w" ? 0 : 1) ? 'highlighted' : ''}`}>{moves[i]} </td>);
-       row.push(<td key={i + 1}className={`moveSecondChild ${i + 1 === currentIndex - (side === "w" ? 0 : 1) ? 'highlighted' : ''}`}>{i + 1 < moves.length ? moves[i + 1] : ""}</td>);
-       rows[i/2] = (<tr className="move-table-row" key={key}>{row}</tr>);
-     }
+    for (let i = 0; i < Math.max(moves.length, minRows); i+=2)
+      rows[i/2] = createRow(i, (i < moves.length) ? moves[i] : "", (i + 1 < moves.length) ? moves[i + 1] : "");
     return rows;
- }
+  }
 
   return (
    <div className="scrollable-container" >
       <table className="move-viewer">
         <tbody>
-          {renderMoves()}
+          {renderMoves(8)}
         </tbody>
       </table>
    </div>

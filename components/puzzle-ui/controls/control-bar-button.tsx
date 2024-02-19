@@ -15,7 +15,7 @@ const DEFAULT_CONTROL_BAR_BUTTON_WIDTH = '50px';
 
 const ControlBarButton: React.FC<ControlBarButtonProps> = ({onClick, symbol, label, width}) => {
   return (
-    <button className="control-bar-button" title={label} onClick={onClick}>
+    <button className="control-bar-button bg-controller-dark hover:bg-controller-light" title={label} onClick={onClick}>
       <div className="control-bar-button-icon">{symbol}</div>
     </button>
   )

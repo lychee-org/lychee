@@ -1,53 +1,27 @@
-.moveSecondChild.highlighted {
+.move-viewer .moveChild.highlighted {
   color: green;
   font-weight: bold;
-  width: 50%;
-  text-align: center;
-}
-
-.moveFirstChild.highlighted {
-  color: green;
-  font-weight: bold;
-  width: 50%;
-  text-align: center;
+  background-color: rgba(160, 255, 160, 1);
 }
 
 .move-viewer {
   width: 100%;
   display: table;
-  column-count: 2;
   table-layout: auto;
-  border-collapse: collapse;  
+  border-collapse: collapse;
 }
 
 .scrollable-container {
-  overflow-y: auto;
+  overflow-y: scroll;
   height: 20vh;
 }
 
-.moveFirstChild {
+.moveChild {
   width: 50%;
   text-align: center;
   border-left: none;
-  height: 40px;
-}
-
-.moveSecondChild {
-  width: 50%;
-  text-align: center;
-  border-left: 1px solid black;
-  height: 40px;
 }
 
 .move-table-row {
   height: 40px
-}
-
-.move-viewer tr:nth-child(odd) {
-  background: rgba(0, 0, 0, 0.03);
-}
-
-
-.move-viewer tr:nth-child(even) {
-  background-color: white;
 }

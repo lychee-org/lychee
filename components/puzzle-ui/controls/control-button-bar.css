@@ -1,7 +1,6 @@
 .control-button-bar {
     display: flex;
     flex-direction: row;
-    background-color: #CECECE;
     height: 5vh;
     width: 100%;
 }

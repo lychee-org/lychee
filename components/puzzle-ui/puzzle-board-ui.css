@@ -2,9 +2,7 @@
 
 .chessboard-container {
     display: grid;
-    /* align-items: center; */
     place-self: center;
-    /* justify-items: center; */
     grid-template-columns: 70vh calc(60vw - 70vh - 1rem);
     grid-gap: 1rem;
     width: 70vw;
@@ -22,8 +20,7 @@
 .fromGameHeader {
     font-family: "Open Sans";
     text-align: center;
-    padding-top: 10px;  
-    background: #B9B9B9;
+    line-height: 5vh;
     font-size: 2vh;
     height: 5vh;
 }
@@ -40,7 +37,3 @@
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     height: 70vh;
 }
-/* .button {
-    grid-column: 2;
-    grid-row: 2;
-} */

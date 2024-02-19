@@ -8,7 +8,6 @@ import React from 'react';
 import ChessboardWrapped from './chessboard-wrapped';
 import ControlButtonBar, { PlaybackControllerContext } from './controls/control-bar-button';
 import MoveViewer, { MoveNavigationContext } from './controls/move-viewer';
-import ResetPuzzleButton, { ResetPuzzleButtonContext } from './controls/reset-puzzle-button';
 import { Puzzle } from '@/types/lichess-api';
 import Rating from '@/rating/GlickoV2Rating';
 import "./puzzle-board-ui.css";
@@ -21,12 +20,11 @@ interface PuzzleBoardProps {
 // set its props to be the puzzle object
 const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
   const { submitNextPuzzle: submitPuzzle, getNextPuzzle } = useContext(PuzzleContext);
-  if (!puzzle) return < LoadingBoard />;
-  const line = puzzle.Moves.split(' ');
-  const side = puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w';
+  const line = puzzle?.Moves.split(' ') ?? [];
+  const side = puzzle?.FEN.split(' ')[1] === 'w' ? 'b' : 'w';
 
   // game state
-  const game = useMemo(() => new Chess(puzzle.FEN), [puzzle]);
+  const game = useMemo(() => new Chess(puzzle?.FEN), [puzzle]);
   const [fen, setFen] = useState(game.fen());
   const [linePos, setLinePos] = useState(0);
 
@@ -49,13 +47,12 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
   const inPlay = rendered && !playbackMode && !solved;
   const interactive = inPlay && linePos % 2 === 1;
 
-
   /** OVERALL RESET */
   const loadPuzzle = () => {
-    game.load(puzzle.FEN);
+    if (puzzle) game.load(puzzle.FEN);
     setSolved(false);
-    setFens([puzzle.FEN]);
-    setFen(puzzle.FEN);
+    if (puzzle) setFens([puzzle.FEN]);
+    if (puzzle) setFen(puzzle.FEN);
     setPlaybackPos(0);
     setLinePos(0);
     setWrong(false);
@@ -79,37 +76,6 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
     else setFen(game.fen());
   }, [playbackMode, playbackPos, fens, linePos]);
 
-  /** VIEW SOLUTION / GIVE UP */
-  const viewSolution = () => {
-    if (rendered && !solved) {
-      if (!wrong) {
-        submitPuzzle(false, rating).then(r => setRating(r));
-      }
-      setWrong(true);
-      setSolved(true);
-
-      // set the line position to the end maintaining the playback position
-      setLinePos(line.length);
-
-      // update the game
-      let newFens: Array<string> = [];
-      line.slice(playbackPos).forEach(move => {
-        game.move(move);
-        newFens.push(game.fen());
-      });
-      setFens([...fens, ...newFens]);
-
-      // move the game forward by 1
-      setPlaybackPos(prev=>prev+1);
-    }
-  }
-
-  /** PUZZLE LOGIC **/
-  // RENDERED CALLBACK
-  const renderedCallback = () => {
-    if (!rendered) setRendered(true);
-    return {};
-  }
 
   // MOVEMENT
   // try the bot's first move after rendering
@@ -178,6 +144,40 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
     }
   });
 
+  if (!puzzle) return < LoadingBoard />;
+
+  /** VIEW SOLUTION / GIVE UP */
+  const viewSolution = () => {
+    if (rendered && !solved) {
+      if (!wrong) {
+        submitPuzzle(false, rating).then(r => setRating(r));
+      }
+      setWrong(true);
+      setSolved(true);
+
+      // set the line position to the end maintaining the playback position
+      setLinePos(line.length);
+
+      // update the game
+      let newFens: Array<string> = [];
+      line.slice(playbackPos).forEach(move => {
+        game.move(move);
+        newFens.push(game.fen());
+      });
+      setFens([...fens, ...newFens]);
+
+      // move the game forward by 1
+      setPlaybackPos(prev=>prev+1);
+    }
+  }
+
+  /** PUZZLE LOGIC **/
+  // RENDERED CALLBACK
+  const renderedCallback = () => {
+    if (!rendered) setRendered(true);
+    return {};
+  }
+
   // last move for highlighting
   const lastMoveToHighlight: Move | undefined = game.history({ verbose: true }).find((_, i) => i === playbackPos - 1); 
   return (
@@ -193,9 +193,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
         />
       </div>
       <div className="control-panel">
-        <div className="rating-container"><RatingComponent rating={rating.rating} /></div>
+        <div className="rating-container bg-card"><RatingComponent rating={rating.rating} /></div>
         <div className='move-viewer-container'>
-            <div className='fromGameHeader'>From game #1202020</div> 
+            <div className='fromGameHeader bg-controller hover:bg-controller-light'>Puzzle #{puzzle.PuzzleId}</div> 
             <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
               <MoveViewer />
             </MoveNavigationContext.Provider> 
@@ -203,7 +203,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
               <ControlButtonBar />
             </PlaybackControllerContext.Provider>
         </div>
-        <div className='displayBox'>
+        <div className='displayBox bg-card'>
           <DisplayBox lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} viewSolution={viewSolution}/>
         </div>
       </div>

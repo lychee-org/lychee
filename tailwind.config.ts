@@ -52,6 +52,17 @@ const config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        tablerow: {
+          DEFAULT: 'hsl(var(--tablerow-dark))',
+          light: 'hsl(var(--tablerow-light))',
+          dark: 'hsl(var(--tablerow-dark))',
+          divide: 'hsl(var(--tablerow-divide))',
+        },
+        controller: {
+          DEFAULT: 'hsl(var(--controller-dark))',
+          dark: 'hsl(var(--controller-dark))',
+          light: 'hsl(var(--controller-light))'
+        }
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -1,9 +1,8 @@
 'use client';
 import { Puzzle } from "@/types/lichess-api";
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { CSSProperties, useState } from "react";
 import PuzzleBoard from "./puzzle-board";
 import { UserInfo } from "@/app/api/user/info/route";
-import UserContext from "../auth/usercontext";
 import Rating from "@/rating/GlickoV2Rating";
 
 const MIN_LOCAL_BATCH_LEN = 5;
@@ -46,18 +45,6 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch, userInfo}) =
   const [puzzle, setPuzzle] = useState<Puzzle | undefined>(puzzleBatch[0]);
   if (!puzzleBatch) return "All done!"
 
-  /** GET USER CONTEXT */
-  const [user, setUser] = useState<UserInfo | null>(null);
-
-  useEffect(() => {
-    fetch(`/api/user/info`)
-      .then(res => res.json())
-      .then(res => setUser(res));
-  }, [puzzle]);
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-
   // submit the puzzle success/failure to the server
   const submitNextPuzzle = (success: boolean, prv: Rating): Promise<Rating> =>
     fetch(`/api/puzzle/submit`, {
@@ -83,11 +70,9 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({initialPuzzleBatch, userInfo}) =
 
   return (
     <div style={wrapperStyle as CSSProperties}>
-      <UserContext.Provider value={user}>
-        <PuzzleContext.Provider value={{submitNextPuzzle, getNextPuzzle}}>
-          <PuzzleBoard puzzle={puzzle}/>
-        </PuzzleContext.Provider>
-      </UserContext.Provider>
+      <PuzzleContext.Provider value={{submitNextPuzzle, getNextPuzzle}}>
+        <PuzzleBoard puzzle={puzzle}/>
+      </PuzzleContext.Provider>
     </div>
   )
 }
