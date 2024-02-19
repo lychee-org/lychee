@@ -5,15 +5,16 @@ import { useContext } from "react"
 import { PuzzleContext } from "../puzzle-mode"
 import './display-box.css'
 
-const DisplayBox = ({solved, lastMoveWrong, linePos, side}: {solved: Boolean, lastMoveWrong: Boolean, linePos: number, side: string}) => {
+const DisplayBox = ({solved, lastMoveWrong, linePos, side, viewSolution}: {solved: Boolean, lastMoveWrong: Boolean, linePos: number, side: string, viewSolution: ()=>void}) => {
     let wrongIcon = <CrossCircledIcon className="radix-icon"/>
     let correctIcon = <CheckCircledIcon className="radix-icon" />
     const { getNextPuzzle } = useContext(PuzzleContext);
-
+    const { solved: _, reloadPuzzle } = useContext(ResetPuzzleButtonContext);
 
     let wrongDiv = (<div className="icon-container"> 
                         {wrongIcon}
                         Sorry, that's not it...
+                    <button className="buttonstyle" onClick={viewSolution}>Show Solutions</button>    
                     </div>)
     let correctDiv = (<div className="icon-container">
                         {correctIcon}
@@ -22,20 +23,9 @@ const DisplayBox = ({solved, lastMoveWrong, linePos, side}: {solved: Boolean, la
     let solvedDiv = (<div className="icon-container">
                         {correctIcon}
                         Amazing! You solved it
-                    <button className="buttonstyle" onClick={getNextPuzzle}>Next Puzzle</button></div>)
-    let sideInfo = (<div className="icon-container"> You are playing as {side === "w" ? "white" : "black"} </div>)
-
-    // let nextPuzzle = <div>
-    //                     {/* <ResetPuzzleButtonContext.Provider value={{ solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution }}>
-    //                         <ResetPuzzleButton />
-    //                     </ResetPuzzleButtonContext.Provider> */}
-    //                 </div>
-//     <div>
-//     <ResetPuzzleButtonContext.Provider value={{ solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution }}>
-//       <ResetPuzzleButton />
-//     </ResetPuzzleButtonContext.Provider>
-//   </div>  
-    
+                    <button className="buttonstyle" onClick={getNextPuzzle}>Next Puzzle</button>
+                    </div>)
+    let sideInfo = (<div className="icon-container"> You are playing as {side === "w" ? "white" : "black"} </div>) 
 
     let guideText;
     if (solved) {

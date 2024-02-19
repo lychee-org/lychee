@@ -203,7 +203,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
            </PlaybackControllerContext.Provider>
       </div>
       <div className='displayBox'>
-          <DisplayBox lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} />
+          <DisplayBox lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} viewSolution={viewSolution}/>
       </div>
 
       <div>
