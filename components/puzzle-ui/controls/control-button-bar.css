@@ -1,0 +1,21 @@
+.control-button-bar {
+    display: flex;
+    flex-direction: row;
+    height: 5vh;
+    width: 100%;
+}
+
+.control-bar-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 100%;
+    width: 25%;
+}
+
+.control-bar-button-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}

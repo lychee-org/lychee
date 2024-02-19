@@ -1,20 +1,27 @@
-.move.highlighted {
+.move-viewer .moveChild.highlighted {
   color: green;
   font-weight: bold;
+  background-color: rgba(160, 255, 160, 1);
 }
 
 .move-viewer {
-  border: 1px solid;
+  width: 100%;
   display: table;
-  column-count: 2;
   table-layout: auto;
+  border-collapse: collapse;
 }
 
-.move-viewer tr:nth-child(odd) {
-  background-color: grey;
+.scrollable-container {
+  overflow-y: scroll;
+  height: 20vh;
 }
 
+.moveChild {
+  width: 50%;
+  text-align: center;
+  border-left: none;
+}
 
-.move-viewer tr:nth-child(even) {
-  background-color: white;
+.move-table-row {
+  height: 40px
 }

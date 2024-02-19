@@ -1,6 +1,6 @@
 'use client';
 import { Puzzle } from "@/types/lichess-api";
-import React, { useState } from "react";
+import React, { CSSProperties, useState } from "react";
 import PuzzleBoard from "./puzzle-board";
 import { PuzzleWithUserRating } from "@/app/api/puzzle/nextPuzzle/nextFor";
 
@@ -17,8 +17,10 @@ interface PuzzleModeProps {
 }
 
 export const wrapperStyle = {
-  width: `70vw`,
-  maxWidth: '70vh',
+  width: '60vw',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
   margin: '3rem auto',
 }
 
@@ -53,9 +55,9 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({ initialPuzzle, initialRating })
   }
 
   return (
-    <div style={wrapperStyle}>
-      <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-        <PuzzleBoard puzzle={puzzle} initialRating={rating} />
+    <div style={wrapperStyle as CSSProperties}>
+      <PuzzleContext.Provider value={{submitNextPuzzle, getNextPuzzle}}>
+        <PuzzleBoard puzzle={puzzle} initialRating={rating}/>
       </PuzzleContext.Provider>
     </div>
   )

@@ -1,28 +1,39 @@
-.container {
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans');
+
+.chessboard-container {
     display: grid;
-    align-items: start;
-    grid-template-columns: 30vw 20vw;
-    grid-template-rows: 7vh 25vh 20vh;
+    place-self: center;
+    grid-template-columns: 70vh calc(60vw - 70vh - 1rem);
     grid-gap: 1rem;
+    width: 70vw;
 }
 
 .chessboard {
-    grid-row-start: 1;
-    grid-row-end: 4;
+    grid-column: 1;
     display: flex;
 }
 
 .rating-container {
-    grid-column: 2;
-    grid-row: 1;
+    align-content: center;
 }
 
-.move-viewer-container {
-    grid-column: 2;
-    grid-row: 2;
+.fromGameHeader {
+    font-family: "Open Sans";
+    text-align: center;
+    line-height: 5vh;
+    font-size: 2vh;
+    height: 5vh;
 }
 
-.button {
+.displayBox {
+    display: flex;
+    align-items: center;
+    font-size: 2vh;
+    height: 27vh;
+}
+
+.control-panel {
     grid-column: 2;
-    grid-row: 2;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    height: 70vh;
 }

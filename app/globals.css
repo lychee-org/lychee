@@ -7,7 +7,7 @@
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 99%;
     --card-foreground: 240 10% 3.9%;
 
     --popover: 0 0% 100%;
@@ -33,13 +33,20 @@
     --ring: 240 10% 3.9%;
 
     --radius: 0.5rem;
+
+    /* PUZZLE MODE CONSTANTS */
+    --tablerow-light: 0, 0%, 100%;
+    --tablerow-dark: 0 0% 97%;
+    --tablerow-divide: 0 0% 93%;
+    --controller-dark: 0 0% 75%;
+    --controller-light: 0 0% 70%;
   }
 
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
+    --card: 240 5% 5%;
     --card-foreground: 0 0% 98%;
 
     --popover: 240 10% 3.9%;
@@ -63,6 +70,13 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
+
+    /* PUZZLE MODE CONSTANTS */
+    --tablerow-light: 0, 0%, 5%;
+    --tablerow-dark: 0 0% 8.5%;
+    --tablerow-divide: 0 0% 15%;
+    --controller-dark: 0 0% 10%;
+    --controller-light: 0 0% 15%;
   }
 }
 
