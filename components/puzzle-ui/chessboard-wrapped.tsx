@@ -1,6 +1,6 @@
 'use client';
 
-import { Chess, Square, Piece as ChessjsPiece, Move } from 'chess.js';
+import { Chess, Square, Piece as ChessjsPiece, Move, SQUARES } from 'chess.js';
 import { createRef, useEffect, useMemo, useState } from 'react';
 import { Chessboard, ClearPremoves } from 'react-chessboard';
 import {
@@ -28,6 +28,10 @@ const SQUARE_STYLES = {
   EMPTY_OPTION: {
     background: 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
     borderRadius: '50%',
+  },
+  CHECKED_SQUARE: {
+    background: 'radial-gradient(circle, rgba(255,0,0,0.7) 0%, rgba(255,0,0,0.7) 10%, transparent 75%)',
+    borderRadius: '50%'
   },
 };
 
@@ -88,6 +92,21 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
   const [showPromotion, setShowPromotion] = useState(false);
   const [moveTo, setMoveTo] = useState<Square | null>(null);
   const removePremoveRef = createRef<ClearPremoves>();
+  const [checkedSquare, setCheckedSquares] = useState<CustomSquareStyles>({});
+
+  /** CHECKING FOR CHECKS */
+  useEffect(() => {
+    if (game.inCheck()) {
+      for (let square of SQUARES) {
+        if (game.get(square) && game.get(square).type === 'k' && game.get(square).color === turn) {
+          setCheckedSquares({ [square]: SQUARE_STYLES.CHECKED_SQUARE });
+          return;
+        }
+      }
+    } else {
+      setCheckedSquares({});
+    }
+  }, [fen, game, turn]);
 
   /** MAKING SURE PARENT COMPONENT KNOWS WHEN INITIAL BOARD IS RENDERED */
   const timeouts: Array<NodeJS.Timeout> = [];
@@ -363,8 +382,9 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
         borderRadius: '4px',
       }}
       customSquareStyles={{
-        ...lastMoveHighlight(),
+        ...checkedSquare,
         ...optionSquares,
+        ...lastMoveHighlight(),
         ...rightClickedSquares,
         ...interactedSquare,
       }}
