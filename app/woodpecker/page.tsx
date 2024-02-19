@@ -1,7 +1,7 @@
 import { dbConnect } from '@/lib/db';
 import React from 'react';
 import { validateRequest } from '@/lib/auth';
-import { getExistingUserRating } from '@/rating/getRating';
+import { getExistingUserRating } from '@/src/rating/getRating';
 import WoodpeckerLoader from '@/components/woodpecker/loader';
 import { AllRoundColl } from '@/models/AllRoundColl';
 
@@ -16,6 +16,14 @@ export default async function TestBoard() {
     username: user.username,
     solved: [],
   });
+
+  // Testing aggregation.
+  // const puzzles2 = await mongoose.connection.collection('testPuzzles').aggregate([
+  //   { $addFields: { theme: { $function: { body: 'function(x) { return x + " bruh"; }', args: ['$Themes'], lang: 'js' } } } },
+  //   { $match: { theme: { $not: { $regex: /^P/ } } } },
+  //   { $sort: { theme: 1 } },
+  //   { $limit: 1 },
+  // ]).toArray();
 
   const r = await getExistingUserRating(user);
   return <WoodpeckerLoader rating={{ rating: r.rating, ratingDeviation: r.ratingDeviation, volatility: r.volatility, numberOfResults: r.numberOfResults }} />;

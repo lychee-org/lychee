@@ -1,12 +1,12 @@
 import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
 import { AllRoundColl } from '@/models/AllRoundColl';
-import { getExistingUserRating, getThemeRatings } from '@/rating/getRating';
+import { getExistingUserRating, getThemeRatings } from '@/src/rating/getRating';
 import { Puzzle } from '@/types/lichess-api';
 import { User } from 'lucia';
 import mongoose from 'mongoose';
-import sm2RandomThemeFromRatingMap from './sm2';
+import sm2RandomThemeFromRatingMap from '../../../../src/sm2';
 import frequentiallyRandomTheme, { isIrrelevant } from './themeGenerator';
-import Rating from '@/rating/GlickoV2Rating';
+import Rating from '@/src/rating/GlickoV2Rating';
 
 const LOWER_RADIUS = 200;
 const UPPER_RADIUS = 200;

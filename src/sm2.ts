@@ -1,4 +1,4 @@
-import Rating from '@/rating/GlickoV2Rating';
+import Rating from '@/src/rating/GlickoV2Rating';
 
 type SmResponse = {
   interval: number;

@@ -1,4 +1,4 @@
-import { calculateSm2 } from '../app/api/puzzle/nextPuzzle/sm2';
+import { calculateSm2 } from '../src/sm2';
 
 // Adapted from https://github.com/thyagoluciano/sm2/blob/master/test/sm2_test.dart.
 describe('Testing sm2 algorithm implementation', () => {

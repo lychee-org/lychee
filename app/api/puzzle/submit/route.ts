@@ -1,8 +1,8 @@
 import { validateRequest } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
-import GameResult from '@/rating/GameResult';
-import Rating from '@/rating/GlickoV2Rating';
-import RatingCalculator from '@/rating/RatingCalculator';
+import GameResult from '@/src/rating/GameResult';
+import Rating from '@/src/rating/GlickoV2Rating';
+import RatingCalculator from '@/src/rating/RatingCalculator';
 import { Puzzle } from '@/types/lichess-api';
 import { NextRequest } from 'next/server';
 import { RatingColl } from '../../../../models/RatingColl';
@@ -11,7 +11,7 @@ import {
   getDefaultRating,
   getPuzzleRating,
   getThemeRatings,
-} from '@/rating/getRating';
+} from '@/src/rating/getRating';
 import { AllRoundColl } from '@/models/AllRoundColl';
 import { UserThemeColl } from '@/models/UserThemeColl';
 import addRound from './addRound';
