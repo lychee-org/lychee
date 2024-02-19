@@ -192,18 +192,20 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
           renderedCallback={rendered ? (()=>{return;}) : renderedCallback}
         />
       </div>
-      <div className="rating-container"><RatingComponent rating={rating.rating} /></div>
-      <div className='move-viewer-container'>
-          <div className='fromGameHeader'>From game #1202020</div> 
-          <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
-            <MoveViewer />
-          </MoveNavigationContext.Provider> 
-          <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
-            <ControlButtonBar />
-           </PlaybackControllerContext.Provider>
-      </div>
-      <div className='displayBox'>
+      <div className="control-panel">
+        <div className="rating-container"><RatingComponent rating={rating.rating} /></div>
+        <div className='move-viewer-container'>
+            <div className='fromGameHeader'>From game #1202020</div> 
+            <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
+              <MoveViewer />
+            </MoveNavigationContext.Provider> 
+            <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
+              <ControlButtonBar />
+            </PlaybackControllerContext.Provider>
+        </div>
+        <div className='displayBox'>
           <DisplayBox lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} viewSolution={viewSolution}/>
+        </div>
       </div>
       <div>
       </div>  

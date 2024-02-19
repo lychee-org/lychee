@@ -7,9 +7,12 @@
     font-style: normal;
     font-weight: 523;
     line-height: normal;
+    margin-bottom: 3%;
 }
 
 .RatingMessage {
+    padding-top: 2%;
+    padding-left: 10%;
     color: #131313;
     text-align: left;
     font-family: "Open Sans";
@@ -17,4 +20,5 @@
     font-style: normal;
     font-weight: 300;
     line-height: normal;
+
 }
