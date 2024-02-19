@@ -22,7 +22,8 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
 
   const newBatch = async () => {
     // This will find puzzles, persisting them in AllRound and in LastBatch.
-    // TODO: which of these do we want to do on completion only? (Should just be the callback to WoodPeckerMode)
+    // TODO: which of these do we want to do on (1) now, (2) mode completion, (3) puzzle completion? 
+    // (Should just be the callback to WoodPeckerMode for (2), and submitNextPuzzle within the mode for (3))
     await fetch(`/api/puzzle/nextBatch`, {
       method: 'GET'
     }).then(response => response.text()).then(s => JSON.parse(s) as Puzzle[]).then(response => {
@@ -45,8 +46,20 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
     })
   }
 
-  const similarReview = () => {
-    console.log("Same review");
+  const similarReview = async () => {
+    // This will find similar puzzles, persisting them in AllRound and in LastBatch.
+    await fetch(`/api/puzzle/similarBatch`, {
+      method: 'GET'
+    }).then(response => response.text()).then(s => JSON.parse(s) as Puzzle[]).then(response => {
+      console.log(`response: ${response}`)
+      if (response.length === 0) {
+        console.log("No puzzles to review.");
+        return;
+      }
+      // TODO: uncomment! Just for debugging.
+      // randomShuffle(response);
+      setPuzzles(response);
+    })
   }
 
   return (
@@ -58,7 +71,6 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
     </div>
     :
     <WoodPeckerMode initialPuzzles={puzzles} initialRating={rating} callback={() => setPuzzles([])} />
-
   )
 }
 

@@ -4,13 +4,15 @@ import { validateRequest } from '@/lib/auth';
 import { getExistingUserRating } from '@/src/rating/getRating';
 import WoodpeckerLoader from '@/components/woodpecker/loader';
 import { AllRoundColl } from '@/models/AllRoundColl';
+import { LastBatchColl } from '@/models/LastBatch';
 
 export default async function TestBoard() {
   await dbConnect();
   const { user } = await validateRequest();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  // Temporarily clear solved puzzles:
+  // Temporarily clear solved puzzles and last batch:
+  await LastBatchColl.deleteOne({ username: user.username });
   await AllRoundColl.deleteOne({ username: user.username });
   await AllRoundColl.create({
     username: user.username,

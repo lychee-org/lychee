@@ -8,8 +8,9 @@ import sm2RandomThemeFromRatingMap from '../../../../src/sm2';
 import frequentiallyRandomTheme, { isIrrelevant } from './themeGenerator';
 import Rating from '@/src/rating/GlickoV2Rating';
 
-const LOWER_RADIUS = 200;
-const UPPER_RADIUS = 200;
+export const LOWER_RADIUS = 200;
+export const UPPER_RADIUS = 200;
+
 const MAX_REPS = 100;
 
 export type PuzzleWithUserRating = {
@@ -17,7 +18,15 @@ export type PuzzleWithUserRating = {
   rating: RatingHolder;
 };
 
-const puzzleFromDocument = (document: any): Puzzle => {
+export const getUserSolvedPuzzleIDs = async (user: User): Promise<string[]> => {
+  const doc = await AllRoundColl.findOne({ username: user.username })
+  if (!doc) {
+    throw new Error("AllRound collection not populated with user, should happen on first login");
+  }
+  return doc.solved;
+}
+
+export const puzzleFromDocument = (document: any): Puzzle => {
   let { _id: _, ...rest } = document;
   return rest as any as Puzzle;
 };
@@ -76,8 +85,8 @@ const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
     // want to include these for nextPuzzle / SM2, so we filter them out below.
     const ratingMap = await getThemeRatings(user, true);
     // TODO: Iterate to better handle repeat avoidance.
-    const exceptions = (await AllRoundColl.findOne({ username: user.username }))
-      ?.solved ?? [];
+    const exceptions: string[] = await getUserSolvedPuzzleIDs(user);
+    console.log(exceptions);
     const puzzle = await nextPuzzleRepetitions(
       userRating.rating,
       0,
