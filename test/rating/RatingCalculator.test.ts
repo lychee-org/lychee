@@ -1,6 +1,6 @@
-import RatingCalculator from '../rating/RatingCalculator';
-import GameResult from '../rating/GameResult';
-import Rating from '../rating/GlickoV2Rating';
+import RatingCalculator from '../../src/rating/RatingCalculator';
+import GameResult from '../../src/rating/GameResult';
+import Rating from '../../src/rating/GlickoV2Rating';
 
 const INT_EPSILON = -0.5;
 

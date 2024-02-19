@@ -5,7 +5,7 @@ import { lichess, lucia } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import User from '@/models/User';
 import { LichessUser } from '@/types/lichess-api';
-import { fetchLichessRating } from '@/rating/getRating';
+import { fetchLichessRating } from '@/src/rating/getRating';
 import { RatingColl } from '@/models/RatingColl';
 import { AllRoundColl } from '@/models/AllRoundColl';
 

@@ -76,5 +76,5 @@ export type Puzzle = {
   NbPlays: number;
   Themes: string;
   GameUrl: string;
-  OpeningTags: string;
+  hierarchy_tags: string;
 };
