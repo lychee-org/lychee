@@ -47,8 +47,8 @@ const orderedDistance = (a: Tag[][], b: Tag[][]): number => {
     }
     return Math.min(
         tagListDistance(a[0], b[0]) + orderedDistance(a.slice(1), b.slice(1)),
-        1 + orderedDistance(a.slice(1), b),
-        1 + orderedDistance(a, b.slice(1))
+        a[0].length + orderedDistance(a.slice(1), b),
+        b[0].length + orderedDistance(a, b.slice(1))
     );
 }
 
