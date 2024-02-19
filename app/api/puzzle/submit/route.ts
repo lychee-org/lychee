@@ -14,6 +14,7 @@ import {
 } from '@/rating/getRating';
 import { AllRoundColl } from '@/models/AllRoundColl';
 import { UserThemeColl } from '@/models/UserThemeColl';
+import addRound from './addRound';
 
 export async function POST(req: NextRequest) {
   await dbConnect();
@@ -56,18 +57,7 @@ export async function POST(req: NextRequest) {
     }
   );
 
-  // Insert this round into the round DB. Currently, this is unused.
-  await RoundColl.create({
-    roundId: `${user.username}+${puzzle.PuzzleId}`,
-  });
-
-  await AllRoundColl.updateOne(
-    { username: user.username },
-    {
-      // Append puzzle ID to the array of solved IDs.
-      $addToSet: { solved: puzzle.PuzzleId },
-    }
-  );
+  await addRound(user, puzzle);
 
   // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
   // persist in the DB, as this information is useful for dashboard analysitcs.
