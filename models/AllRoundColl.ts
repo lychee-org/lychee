@@ -5,7 +5,7 @@ const allRoundSchema = new Schema({
   solved: Array<String>,
 });
 
-// Index on roundId for fast lookups.
+// Index on username for fast lookups.
 allRoundSchema.index({ username: 1 }, { unique: true });
 
 export const AllRoundColl =

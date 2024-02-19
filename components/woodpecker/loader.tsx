@@ -10,21 +10,55 @@ interface Props {
   rating: RatingHolder
 }
 
+const randomShuffle = (arr: any[]) => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
 const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
   const [puzzles, setPuzzles] = useState<Puzzle[]>([]);
-  const onPress = () => {
-    fetch(`/api/puzzle/nextPuzzles`, {
+
+  const newBatch = async () => {
+    // This will find puzzles, persisting them in AllRound and in LastBatch.
+    // TODO: which of these do we want to do on completion only? (Should just be the callback to WoodPeckerMode)
+    await fetch(`/api/puzzle/nextBatch`, {
       method: 'GET'
     }).then(response => response.text()).then(s => JSON.parse(s) as Puzzle[]).then(response => {
-      console.log(response);
       setPuzzles(response);
     })
   }
+
+  const sameReview = async () => {
+    // We need not persist anything since the batch is the same as before!
+    await fetch(`/api/puzzle/lastBatch`, {
+      method: 'GET'
+    }).then(response => response.text()).then(s => JSON.parse(s) as Puzzle[]).then(response => {
+      console.log(`response: ${response}`)
+      if (response.length === 0) {
+        console.log("No puzzles to review.");
+        return;
+      }
+      randomShuffle(response);
+      setPuzzles(response);
+    })
+  }
+
+  const similarReview = () => {
+    console.log("Same review");
+  }
+
   return (
     puzzles.length === 0 ?
-    <button style={buttonStyle} onClick={onPress}>Start Pecking!</button>
+    <div>
+    <button style={buttonStyle} onClick={newBatch}>New batch</button>
+    <button style={buttonStyle} onClick={similarReview}>Review similar puzzles to previous batch</button>
+    <button style={buttonStyle} onClick={sameReview}>Review same puzzles as previous batch</button>
+    </div>
     :
     <WoodPeckerMode initialPuzzles={puzzles} initialRating={rating} callback={() => setPuzzles([])} />
+
   )
 }
 
