@@ -91,6 +91,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
     if (inPlay && linePos < line.length) {
       game.move(line[linePos]);
       setFen(game.fen());
+      setLastMoveWrong(false);
       setFens(prev => [...prev, game.fen()]);
       setLinePos((prev) => prev + 1);
       setPlaybackPos((prev) => prev + 1);
@@ -99,6 +100,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
 
   const playerMoveCallback = (from: Square, to: Square, promotion?: string) => {
     game.move({ from: from, to: to, promotion: promotion });
+    console.log(game.fen());
     setFen(game.fen());
     setFens(prev => [...prev, game.fen()]);
     setLinePos(prev => prev + 1);
@@ -109,10 +111,10 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
   function undoWrongMove() {
     if (submitPuzzle && !wrong) {
       submitPuzzle(false, rating).then(r => setRating(r));
+      setWrong(true);
     }
     game.undo();
     setFen(game.fen());
-    setWrong(true);
     setLastMoveWrong(true);
     setFens(prev => prev.slice(0, -1));
     setLinePos(prev => prev - 1);
@@ -122,7 +124,6 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
   // player moved correctly
   function correctMove() {
     const timeout = setTimeout(botMove, 300); // start up the bot's move
-    setLastMoveWrong(false);
     return () => clearTimeout(timeout);
   }
 
@@ -139,7 +140,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
       if (game.history({ verbose: true }).pop()?.lan !== line[linePos - 1])
         setTimeout(undoWrongMove, 300);
       else if (linePos >= line.length) finishedGame();
-      else correctMove();
+      else return correctMove(); // there's a timeout here so we should return it
       return;
     }
   });
@@ -180,6 +181,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
 
   // last move for highlighting
   const lastMoveToHighlight: Move | undefined = game.history({ verbose: true }).find((_, i) => i === playbackPos - 1); 
+
   return (
     <div className="chessboard-container">
       <div className="chessboard">
