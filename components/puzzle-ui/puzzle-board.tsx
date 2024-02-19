@@ -206,11 +206,13 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle }) => {
           <DisplayBox lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} />
       </div>
 
-      {/* <div>
+      <div>
         <ResetPuzzleButtonContext.Provider value={{ solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution }}>
           <ResetPuzzleButton />
         </ResetPuzzleButtonContext.Provider>
-      </div>   */}
+      </div>
+      <div>
+      </div>  
     </div>
   );
 };

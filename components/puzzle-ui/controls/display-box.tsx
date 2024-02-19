@@ -1,9 +1,42 @@
+import { CrossCircledIcon, CheckCircledIcon } from "@radix-ui/react-icons"
+import { ResetPuzzleButtonContext } from "./reset-puzzle-button"
+import ResetPuzzleButton from "./reset-puzzle-button"
+import { useContext } from "react"
+import { PuzzleContext } from "../puzzle-mode"
+import './display-box.css'
+
 const DisplayBox = ({solved, lastMoveWrong, linePos, side}: {solved: Boolean, lastMoveWrong: Boolean, linePos: number, side: string}) => {
-    let wrongDiv = (<div className="boxMessages"> Sorry, that's not it... </div>)
-    let correctDiv = (<div className="boxMessages"> Good job! Keep it going... </div>)
-    let solvedDiv = (<div className="boxMessages">Amazing! You solved it</div>)
-    let sideInfo = (<div> You are playing as {side} </div>)
+    let wrongIcon = <CrossCircledIcon className="radix-icon"/>
+    let correctIcon = <CheckCircledIcon className="radix-icon" />
+    const { getNextPuzzle } = useContext(PuzzleContext);
+
+
+    let wrongDiv = (<div className="icon-container"> 
+                        {wrongIcon}
+                        Sorry, that's not it...
+                    </div>)
+    let correctDiv = (<div className="icon-container">
+                        {correctIcon}
+                        Good job! Keep it going... 
+                      </div>)
+    let solvedDiv = (<div className="icon-container">
+                        {correctIcon}
+                        Amazing! You solved it
+                    <button className="buttonstyle" onClick={getNextPuzzle}>Next Puzzle</button></div>)
+    let sideInfo = (<div className="icon-container"> You are playing as {side === "w" ? "white" : "black"} </div>)
+
+    // let nextPuzzle = <div>
+    //                     {/* <ResetPuzzleButtonContext.Provider value={{ solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution }}>
+    //                         <ResetPuzzleButton />
+    //                     </ResetPuzzleButtonContext.Provider> */}
+    //                 </div>
+//     <div>
+//     <ResetPuzzleButtonContext.Provider value={{ solved: solved, reloadPuzzle: solved ? getNextPuzzle : viewSolution }}>
+//       <ResetPuzzleButton />
+//     </ResetPuzzleButtonContext.Provider>
+//   </div>  
     
+
     let guideText;
     if (solved) {
         guideText = solvedDiv;
@@ -13,7 +46,7 @@ const DisplayBox = ({solved, lastMoveWrong, linePos, side}: {solved: Boolean, la
     	guideText = sideInfo
     else guideText = correctDiv
     
-    return guideText
+    return guideText  
 }
 
 export default DisplayBox;

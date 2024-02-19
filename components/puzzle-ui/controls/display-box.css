@@ -1,0 +1,28 @@
+
+.icon-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+}
+
+
+
+.radix-icon {
+    align-self: center;
+    height: 40px;
+    width: 40px;
+}
+
+
+.buttonstyle {
+    padding: '10px 20px';
+    cursor: pointer;
+    margin: 10px 10px 0px 0px;
+    border-radius: 6px;
+    background-color: #f0d9b5;
+    border: none;
+    box-shadow: '0 2px 5px rgba(0, 0, 0, 0.5)';
+    width: 40%;
+    align-self: center;
+  }

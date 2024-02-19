@@ -2,7 +2,9 @@
 
 .chessboard-container {
     display: grid;
-    align-items: center;
+    /* align-items: center; */
+    place-self: center;
+    /* justify-items: center; */
     grid-template-columns: 70vh calc(60vw - 70vh - 1rem);
     grid-template-rows: 11vh 30vh 29vh;
     grid-gap: 1rem;
