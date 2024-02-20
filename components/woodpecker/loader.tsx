@@ -4,8 +4,8 @@ import { Puzzle } from "@/types/lichess-api";
 import { RatingHolder, wrapperStyle } from "../puzzle-ui/puzzle-mode";
 import { CSSProperties, useState } from "react";
 import WoodPeckerMode from "./woodpecker-mode";
-import './loader.css';
 import WoodLoadingBoard from "./loading";
+import './loader.css';
 
 interface Props {
   rating: RatingHolder
@@ -33,7 +33,7 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
     // (Should just be the callback to WoodPeckerMode for (2), and submitNextPuzzle within the mode for (3))
     await fetch(`/api/puzzle/nextBatch`, {
       method: 'GET'
-    }).then(response => {console.log(response); return response.text()}).then(s => JSON.parse(s) as Puzzle[]).then(response => {
+    }).then(response => response.text()).then(s => JSON.parse(s) as Puzzle[]).then(response => {
       setPuzzles(response);
     })
   }
