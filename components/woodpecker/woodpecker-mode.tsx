@@ -1,7 +1,7 @@
 'use client';
 
 import { Puzzle } from "@/types/lichess-api";
-import React, { useState } from "react";
+import React, { CSSProperties, useState } from "react";
 import PuzzleBoard from "../puzzle-ui/puzzle-board";
 import { PuzzleContext, RatingHolder, wrapperStyle } from "../puzzle-ui/puzzle-mode";
 
@@ -28,7 +28,7 @@ const WoodPeckerMode: React.FC<WoodpeckerModeProps> = ({ initialPuzzles, initial
   }
 
   return (
-    <div style={wrapperStyle}>
+    <div style={wrapperStyle as CSSProperties}>
       <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
         <PuzzleBoard puzzle={puzzle} initialRating={initialRating} />
       </PuzzleContext.Provider>
