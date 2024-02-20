@@ -1,13 +1,20 @@
 'use client';
 
 import { Puzzle } from "@/types/lichess-api";
-import { buttonStyle } from "../puzzle-ui/controls/reset-puzzle-button";
-import { RatingHolder } from "../puzzle-ui/puzzle-mode";
-import { useState } from "react";
+import { RatingHolder, wrapperStyle } from "../puzzle-ui/puzzle-mode";
+import { CSSProperties, useState } from "react";
 import WoodPeckerMode from "./woodpecker-mode";
+import './loader.css';
+import WoodLoadingBoard from "./loading";
 
 interface Props {
   rating: RatingHolder
+}
+
+const colWrapperStyle = {
+  flex: 'align-center',
+  justifyContent: 'center',
+  margin: '3rem auto',
 }
 
 const randomShuffle = (arr: any[]) => {
@@ -64,13 +71,16 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
 
   return (
     puzzles.length === 0 ?
-    <div>
-    <button style={buttonStyle} onClick={newBatch}>New batch</button>
-    <button style={buttonStyle} onClick={similarReview}>Review similar puzzles to previous batch</button>
-    <button style={buttonStyle} onClick={sameReview}>Review same puzzles as previous batch</button>
-    </div>
-    :
-    <WoodPeckerMode initialPuzzles={puzzles} initialRating={rating} callback={() => setPuzzles([])} />
+      <div style={colWrapperStyle as CSSProperties}>
+        <WoodLoadingBoard />
+        <div style={wrapperStyle as CSSProperties}>
+          <button className="buttonstylec bg-controller-dark hover:bg-controller-light" onClick={newBatch}>New Batch</button>
+          <button className="buttonstylec bg-controller-dark hover:bg-controller-light" onClick={similarReview}>Similar Review</button>
+          <button className="buttonstylec bg-controller-dark hover:bg-controller-light" onClick={sameReview}>Identical Review</button>
+        </div>
+      </div>
+      :
+      <WoodPeckerMode initialPuzzles={puzzles} initialRating={rating} callback={() => setPuzzles([])} />
   )
 }
 
