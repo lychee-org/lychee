@@ -56,7 +56,7 @@ const applySm2 = (elos: Map<string, Rating>): Map<string, number> => {
   elos.forEach((v, k) => {
     const r = v.rating;
     const nb = v.numberOfResults;
-    const normalised = Math.round(((r - min) / (max - min)) * 5);
+    const normalised = max === min ? 3 : Math.round(((r - min) / (max - min)) * 5);
     result.set(k, 9 - calculateSm2(normalised, nb, 3, 2.5).interval);
   });
   return result;
