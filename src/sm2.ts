@@ -49,16 +49,22 @@ export const calculateSm2 = (
 
 const applySm2 = (elos: Map<string, Rating>): Map<string, number> => {
   const ratings = Array.from(elos.values(), (r) => r.rating);
-  const min = Math.min(...ratings);
-  const max = Math.max(...ratings);
+  
+  const mean = ratings.reduce((acc, curr) => acc + curr, 0) / ratings.length;
+  const std = Math.sqrt(
+    ratings.reduce((acc, curr) => acc + (curr - mean) ** 2, 0) / ratings.length
+  );
 
   const result = new Map<string, number>();
   elos.forEach((v, k) => {
     const r = v.rating;
+    // TODO: Do we want to include Lichess (non-SR) results here (as we do now)?
     const nb = v.numberOfResults;
-    const normalised = Math.round(((r - min) / (max - min)) * 5);
+    const normalised = Math.round(((r - mean) / std) * 5);
+    // TODO: Use actual previous metrics, fix magic numbers.
     result.set(k, 9 - calculateSm2(normalised, nb, 3, 2.5).interval);
   });
+
   return result;
 };
 
