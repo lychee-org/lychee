@@ -56,13 +56,16 @@ const applySm2 = (elos: Map<string, Rating>): Map<string, number> => {
   );
 
   const result = new Map<string, number>();
+  // Actually, this doesn't work because we want normalised value to be between 0 and 1.
   elos.forEach((v, k) => {
     const r = v.rating;
     // TODO: Do we want to include Lichess (non-SR) results here (as we do now)?
     const nb = v.numberOfResults;
-    const normalised = Math.round(((r - mean) / std) * 5);
+    // If std is 0, let's use 0.5 as the normalised value instead:
+    const normalised = std === 0 ? 0.5 : (r - mean) / std;
+    const quality = Math.round(normalised * 5);
     // TODO: Use actual previous metrics, fix magic numbers.
-    result.set(k, 9 - calculateSm2(normalised, nb, 3, 2.5).interval);
+    result.set(k, 9 - calculateSm2(quality, nb, 3, 2.5).interval);
   });
 
   return result;
