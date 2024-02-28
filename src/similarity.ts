@@ -61,7 +61,7 @@ const tagListDistanceDP = (a: Tag[], b: Tag[]): number => {
         }
     }
 
-    return table[rows - 1][columns - 1]
+    return table[rows - 1][columns - 1];
 } 
 
 const unorderedDistance = (a: Tag[][], b: Tag[][]): number => 
@@ -79,6 +79,35 @@ const orderedDistance = (a: Tag[][], b: Tag[][]): number => {
         a[0].length + orderedDistance(a.slice(1), b),
         b[0].length + orderedDistance(a, b.slice(1))
     );
+}
+
+const orderedDistanceDP = (a: Tag[][], b: Tag[][]): number => {
+    // Create a n x m DP table
+    const rows = a.length;
+    const columns = b.length;
+    const table: number[][] = new Array(rows).fill(null).map(() => new Array(columns).fill(0))
+
+    // Initialize value for [0, ...] and [..., 0]
+    for (let i = 0; i < rows; i++) {
+        table[i][0] = a.slice(0, i+1).flat().length;
+    }
+    for (let j = 0; j < columns; j++) {
+        table[0][j] = b.slice(0, j+1).flat().length;
+    }
+
+    // DP
+    for (let i = 1; i < rows; i++) {
+        for (let j = 1; j < columns; j++) {
+            const distance = tagListDistanceDP(a[i - 1], b[j - 1]);
+            table[i][j] = Math.min(
+                distance + table[i - 1][j - 1],
+                a[i-1].length + table[i - 1][j],
+                b[j-1].length + table[i][j - 1]
+            );
+        }
+    }
+
+    return table[rows - 1][columns - 1];
 }
 
 const distanceTags = (a: Tag[][], b: Tag[][]): number => {
