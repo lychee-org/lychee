@@ -1,9 +1,11 @@
-type Tag = string;
+import similarBatchFor from "@/app/api/puzzle/similarBatch/similarBatchFor";
+
+export type Tag = string;
 
 const parseTags = (s: string): Tag[][] => 
     s.split("/").map(move => move.split(" "));
 
-const tagDistance = (a: Tag, b: Tag): number => {
+export const tagDistance = (a: Tag, b: Tag): number => {
     if (a === b) {
         return 0;
     }
@@ -35,23 +37,25 @@ const tagListDistance = (a: Tag[], b: Tag[]): number => {
     );
 }
 
-const tagListDistanceDP = (a: Tag[], b: Tag[]): number => {
+export const tagListDistanceDP = (a: Tag[], b: Tag[]): number => {
     // Create a n x m DP table
+    a.sort()
+    b.sort()
     const rows = a.length;
     const columns = b.length;
-    const table: number[][] = new Array(rows).fill(null).map(() => new Array(columns).fill(0))
-
+    const table: number[][] = new Array(rows+1).fill(null).map(() => new Array(columns+1).fill(0))
+    
     // Initialize value for [0, ...] and [..., 0]
-    for (let i = 0; i < rows; i++) {
+    for (let i = 0; i < rows + 1; i++) {
         table[i][0] = i;
     }
-    for (let j = 0; j < columns; j++) {
+    for (let j = 0; j < columns + 1; j++) {
         table[0][j] = j;
     }
 
     // DP
-    for (let i = 1; i < rows; i++) {
-        for (let j = 1; j < columns; j++) {
+    for (let i = 1; i < rows + 1; i++) {
+        for (let j = 1; j < columns + 1; j++) {
             const distance = tagDistance(a[i - 1], b[j - 1]);
             table[i][j] = Math.min(
                 distance + table[i - 1][j - 1],
@@ -61,7 +65,7 @@ const tagListDistanceDP = (a: Tag[], b: Tag[]): number => {
         }
     }
 
-    return table[rows - 1][columns - 1];
+    return table[rows][columns];
 } 
 
 const unorderedDistance = (a: Tag[][], b: Tag[][]): number => 
@@ -81,23 +85,23 @@ const orderedDistance = (a: Tag[][], b: Tag[][]): number => {
     );
 }
 
-const orderedDistanceDP = (a: Tag[][], b: Tag[][]): number => {
+export const orderedDistanceDP = (a: Tag[][], b: Tag[][]): number => {
     // Create a n x m DP table
     const rows = a.length;
     const columns = b.length;
-    const table: number[][] = new Array(rows).fill(null).map(() => new Array(columns).fill(0))
+    const table: number[][] = new Array(rows + 1).fill(null).map(() => new Array(columns + 1).fill(0))
 
     // Initialize value for [0, ...] and [..., 0]
-    for (let i = 0; i < rows; i++) {
-        table[i][0] = a.slice(0, i+1).flat().length;
+    for (let i = 0; i <= rows; i++) {
+        table[i][0] = a.slice(0, i).flat().length;
     }
-    for (let j = 0; j < columns; j++) {
-        table[0][j] = b.slice(0, j+1).flat().length;
+    for (let j = 0; j <= columns; j++) {
+        table[0][j] = b.slice(0, j).flat().length;
     }
 
     // DP
-    for (let i = 1; i < rows; i++) {
-        for (let j = 1; j < columns; j++) {
+    for (let i = 1; i < rows + 1; i++) {
+        for (let j = 1; j < columns + 1; j++) {
             const distance = tagListDistanceDP(a[i - 1], b[j - 1]);
             table[i][j] = Math.min(
                 distance + table[i - 1][j - 1],
@@ -106,13 +110,12 @@ const orderedDistanceDP = (a: Tag[][], b: Tag[][]): number => {
             );
         }
     }
-
-    return table[rows - 1][columns - 1];
+    return table[rows][columns];
 }
 
 const distanceTags = (a: Tag[][], b: Tag[][]): number => {
-    return unorderedDistance(a, b) + orderedDistance(a.slice(0, -1), b.slice(0, -1));
-}
+    return unorderedDistance(a, b) + orderedDistanceDP(a.slice(0, -1), b.slice(0, -1));
+} 
 
 const similarity_distance = (s1: string, s2: string): number => {
     return distanceTags(parseTags(s1), parseTags(s2));
