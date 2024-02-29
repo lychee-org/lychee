@@ -34,6 +34,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   const [playbackPos, setPlaybackPos] = useState(0);
   const [wrong, setWrong] = useState<boolean>(false);
   const [lastMoveWrong, setLastMoveWrong] = useState<boolean>(false);
+  const [givedUp, setGivedUp] = useState<boolean>(false)
   
 
   // extra playback state
@@ -155,6 +156,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
       }
       setWrong(true);
       setSolved(true);
+      setGivedUp(true);
 
       // set the line position to the end maintaining the playback position
       setLinePos(line.length);
@@ -206,7 +208,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
             </PlaybackControllerContext.Provider>
         </div>
         <div className='displayBox bg-card'>
-          <DisplayBox lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} viewSolution={viewSolution}/>
+          <DisplayBox givedUp={givedUp} lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} viewSolution={viewSolution}/>
         </div>
       </div>
       <div>

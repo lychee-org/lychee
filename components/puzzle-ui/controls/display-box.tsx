@@ -3,7 +3,7 @@ import { useContext } from "react"
 import { PuzzleContext } from "../puzzle-mode"
 import './display-box.css'
 
-const DisplayBox = ({solved, lastMoveWrong, linePos, side, viewSolution}: {solved: Boolean, lastMoveWrong: Boolean, linePos: number, side: string, viewSolution: ()=>void}) => {
+const DisplayBox = ({givedUp, solved, lastMoveWrong, linePos, side, viewSolution}: {givedUp:Boolean, solved: Boolean, lastMoveWrong: Boolean, linePos: number, side: string, viewSolution: ()=>void}) => {
     let wrongIcon = <CrossCircledIcon className="radix-icon"/>
     let correctIcon = <CheckCircledIcon className="radix-icon" />
     const { getNextPuzzle } = useContext(PuzzleContext);
@@ -23,10 +23,20 @@ const DisplayBox = ({solved, lastMoveWrong, linePos, side, viewSolution}: {solve
                     <button className="buttonstyle bg-controller-dark hover:bg-controller-light" onClick={getNextPuzzle}>Next Puzzle</button>
                     </div>)
     let sideInfo = (<div className="icon-container"><div className="text-wrapper">Your turn: Find the best move for {side === "w" ? "white" : "black"}</div></div>) 
+    let givedUpDiv = (<div className="icon-container">
+                        <div className="icon-wrapper text-yellow-500">{wrongIcon}</div>
+                        <div className="text-wrapper">Here is the correct solution</div>
+                    <button className="buttonstyle bg-controller-dark hover:bg-controller-light" onClick={getNextPuzzle}>Next Puzzle</button>
+                    </div>)
+
 
     let guideText;
     if (solved) {
-        guideText = solvedDiv;
+        if (givedUp) {
+            guideText = givedUpDiv
+        } else {
+            guideText = solvedDiv;
+        }
     } else if (lastMoveWrong) {
         guideText = wrongDiv;
     } else if (linePos < 3)
