@@ -14,6 +14,10 @@ describe('Testing similarity distance algorithm porting', () => {
     ).toBe(0.25);
 
     expect(
+      tagDistance('pin:preventsAttack', 'pin:preventsAttack:f')
+    ).toBe(0.25);
+
+    expect(
       tagListDistanceDP(["pin:preventsAttack:q", "fork:r"], ["pin:preventsAttack:r", "pin:preventsEscape:r", "fork:q"])
     ).toBe(1.75)
 
