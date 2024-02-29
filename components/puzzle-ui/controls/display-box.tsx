@@ -29,7 +29,6 @@ const DisplayBox = ({gaveUp, solved, lastMoveWrong, linePos, side, viewSolution}
                     <button className="buttonstyle bg-controller-dark hover:bg-controller-light" onClick={getNextPuzzle}>Next Puzzle</button>
                     </div>)
 
-
     let guideText;
     if (solved) {
         if (gaveUp) {

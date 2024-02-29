@@ -58,6 +58,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     setLinePos(0);
     setWrong(false);
     setLastMoveWrong(false);
+    setGaveUp(false);
   };
 
   useEffect(() => {
@@ -76,7 +77,6 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     if (playbackMode) setFen(fens[playbackPos]);
     else setFen(game.fen());
   }, [playbackMode, playbackPos, fens, linePos]);
-
 
   // MOVEMENT
   // try the bot's first move after rendering
