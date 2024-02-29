@@ -4,11 +4,14 @@ import {tagListDistanceDP} from '../src/similarity';
 import {orderedDistanceDP} from '../src/similarity';
 
 describe('Testing similarity distance algorithm porting', () => {
-  // TODO(sm3421): Remove duplicates.
   test('Correcly ported', () => {    
     expect(
       tagDistance('fork:n', 'fork:q')
     ).toBe(0.5);
+    
+    expect(
+      tagDistance('pin:preventsAttack:q', 'pin:preventsAttack:f')
+    ).toBe(0.25);
 
     expect(
       tagListDistanceDP(["pin:preventsAttack:q", "fork:r"], ["pin:preventsAttack:r", "pin:preventsEscape:r", "fork:q"])

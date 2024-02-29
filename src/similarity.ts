@@ -45,7 +45,7 @@ export const tagListDistanceDP = (a: Tag[], b: Tag[]): number => {
     const columns = b.length;
     const table: number[][] = new Array(rows+1).fill(null).map(() => new Array(columns+1).fill(0))
     
-    // Initialize value for [0, ...] and [..., 0]
+    // Initialize value for ([empty], [..., .....]) and ([..., .....], [empty])
     for (let i = 0; i < rows + 1; i++) {
         table[i][0] = i;
     }
