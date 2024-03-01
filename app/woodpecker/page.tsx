@@ -28,5 +28,14 @@ export default async function TestBoard() {
   // ]).toArray();
 
   const r = await getExistingUserRating(user);
-  return <WoodpeckerLoader rating={{ rating: r.rating, ratingDeviation: r.ratingDeviation, volatility: r.volatility, numberOfResults: r.numberOfResults }} />;
+  return (
+    <WoodpeckerLoader
+      rating={{
+        rating: r.rating,
+        ratingDeviation: r.ratingDeviation,
+        volatility: r.volatility,
+        numberOfResults: r.numberOfResults,
+      }}
+    />
+  );
 }

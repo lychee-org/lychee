@@ -1,16 +1,23 @@
 'use client';
 
-import LoadingBoard from "../puzzle-ui/loading-board"
+import LoadingBoard from '../puzzle-ui/loading-board';
 import { Chess, Square, Piece as ChessjsPiece } from 'chess.js';
-import React, { ReactNode, createRef, useEffect, useMemo, useState, useContext } from 'react';
+import React, {
+  ReactNode,
+  createRef,
+  useEffect,
+  useMemo,
+  useState,
+  useContext,
+} from 'react';
 import { Chessboard, ClearPremoves } from 'react-chessboard';
 import {
   CustomPieces,
   CustomSquareStyles,
-  Piece
+  Piece,
 } from 'react-chessboard/dist/chessboard/types';
 import ControlBar from './controlbar/control-bar';
-import { PuzzleContext } from "./puzzle-mode";
+import { PuzzleContext } from './puzzle-mode';
 
 const buttonStyle = {
   cursor: 'pointer',
@@ -36,22 +43,28 @@ const boardWrapper = {
   margin: '3rem auto',
 };
 
-const chessjs_piece_convert = (piece: ChessjsPiece) => (piece.color + piece.type.toUpperCase()) as Piece;
+const chessjs_piece_convert = (piece: ChessjsPiece) =>
+  (piece.color + piece.type.toUpperCase()) as Piece;
 
 interface PuzzleBoardProps {
   nextPuzzleCallback: () => void;
-  puzzleSubmitCallback?: (puzzleId: string, success: boolean) => void
+  puzzleSubmitCallback?: (puzzleId: string, success: boolean) => void;
 }
 
 // set its props to be the puzzle object
-const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSubmitCallback}) =>  {
+const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
+  nextPuzzleCallback,
+  puzzleSubmitCallback,
+}) => {
   const puzzle = useContext(PuzzleContext);
   const game = useMemo(() => new Chess(puzzle?.FEN), []);
   const [fen, setFen] = useState(game.fen());
   const [rightClickedSquares, setRightClickedSquares] =
     useState<CustomSquareStyles>({});
   const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
-  const [interactedSquare, setInteractedSquare] = useState<CustomSquareStyles>({});
+  const [interactedSquare, setInteractedSquare] = useState<CustomSquareStyles>(
+    {}
+  );
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
   const removePremoveRef = createRef<ClearPremoves>();
   const [rendered, setRendered] = useState(false);
@@ -61,7 +74,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
   const [displayText, setDisplayText] = useState('');
 
   const [line, setLine] = useState(puzzle?.Moves.split(' '));
-  const [side, setSide] = useState(puzzle?.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
+  const [side, setSide] = useState(
+    puzzle?.FEN.split(' ')[1] === 'w' ? 'b' : 'w'
+  );
 
   const [linePos, setLinePos] = useState(0);
 
@@ -80,8 +95,8 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
     'bK',
   ];
 
-  const hoveredSquareStyle: Record<string, string|number> = {
-    background: "rgba(255, 255, 0, 0.4)",
+  const hoveredSquareStyle: Record<string, string | number> = {
+    background: 'rgba(255, 255, 0, 0.4)',
   };
 
   const [solved, setSolved] = useState<boolean>(false);
@@ -120,7 +135,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
         console.log(rendered);
         game.move(line ? line[linePos] : '');
         setFen(game.fen());
-        setFens(prev=>[...prev, game.fen()]);
+        setFens((prev) => [...prev, game.fen()]);
         setLinePos(1);
         setMoveViewerMove(1);
       }, 300);
@@ -137,7 +152,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
     } else {
       setFen(game.fen());
     }
-  })
+  });
 
   // move bot after user
   useEffect(() => {
@@ -151,7 +166,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
     }
   }, [linePos]);
 
-  if (!puzzle) return <LoadingBoard/>;
+  if (!puzzle) return <LoadingBoard />;
 
   const loadPuzzle = () => {
     game.load(puzzle.FEN);
@@ -162,28 +177,34 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
     setLine(puzzle.Moves.split(' '));
     setSide(puzzle.FEN.split(' ')[1] === 'w' ? 'b' : 'w');
     setLinePos(0);
-    console.log(fen)
-    console.log(line)
+    console.log(fen);
+    console.log(line);
   };
 
-  function verifyPlayerMove(successCallback?: () => (() => void)) {
+  function verifyPlayerMove(successCallback?: () => () => void) {
     // callback only executed if the move was correct
     // verify last move by user was correct according to line.
     // if it was incorrect then undo the move
-    if (linePos > 0 && game.history({ verbose: true }).pop()?.lan !== (line ? line[linePos - 1] : '')) {
+    if (
+      linePos > 0 &&
+      game.history({ verbose: true }).pop()?.lan !==
+        (line ? line[linePos - 1] : '')
+    ) {
       setDisplayText('Incorrect move');
       const timeout = setTimeout(() => {
         game.undo();
         setFen(game.fen());
-        setLinePos(prev => prev - 1);
-        setMoveViewerMove(prev => prev - 1);
+        setLinePos((prev) => prev - 1);
+        setMoveViewerMove((prev) => prev - 1);
       }, 300);
-      return ()=>{ clearTimeout(timeout) };
+      return () => {
+        clearTimeout(timeout);
+      };
     }
     setDisplayText('Nice! Keep going...');
-    setFens(prev=>[...prev, game.fen()]);
+    setFens((prev) => [...prev, game.fen()]);
     if (successCallback) successCallback();
-    return ()=>{};
+    return () => {};
   }
 
   function botMove() {
@@ -191,9 +212,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
     if (linePos < (line?.length ?? 0)) {
       game.move(line ? line[linePos] : '');
       setFen(game.fen());
-      setFens(prev=>[...prev, game.fen()]);
+      setFens((prev) => [...prev, game.fen()]);
       setLinePos((prev) => prev + 1);
-      setMoveViewerMove(prev=>prev+1);
+      setMoveViewerMove((prev) => prev + 1);
     } else {
       setSolved(true);
       setDisplayText('Puzzle solved');
@@ -226,7 +247,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
       setFen(game.fen());
       setOptionSquares({});
       setLinePos((prev) => prev + 1);
-      setMoveViewerMove(prev => prev + 1);
+      setMoveViewerMove((prev) => prev + 1);
       setMoveFrom(null);
       setInteractedSquare({});
       return true;
@@ -253,7 +274,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
       newSquares[move.to] = {
         background:
           game.get(move.to) &&
-            game.get(move.to).color !== game.get(square).color
+          game.get(move.to).color !== game.get(square).color
             ? 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)'
             : 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
         borderRadius: '50%',
@@ -283,7 +304,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
       setInteractedSquare({});
       return;
     }
-    let possible_squares = moveFrom ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to) : [];
+    let possible_squares = moveFrom
+      ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to)
+      : [];
     if (possible_squares.includes(square)) {
       setInteractedSquare({ [square]: hoveredSquareStyle });
     } else {
@@ -297,11 +320,19 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
     if (moveFrom && square === moveFrom) {
       setMoveFrom(null);
       setOptionSquares({});
-    } else if (moveFrom && onDrop(moveFrom, square, chessjs_piece_convert(game.get(moveFrom)))) {
+    } else if (
+      moveFrom &&
+      onDrop(moveFrom, square, chessjs_piece_convert(game.get(moveFrom)))
+    ) {
       setMoveFrom(null);
     } else {
       getMoveOptions(square);
-      if (game.get(square) && game.get(square).color === side && square !== moveFrom) setMoveFrom(square);
+      if (
+        game.get(square) &&
+        game.get(square).color === side &&
+        square !== moveFrom
+      )
+        setMoveFrom(square);
       else setMoveFrom(null);
     }
   }
@@ -315,7 +346,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
       setInteractedSquare({});
       return;
     }
-    let possible_squares = moveFrom ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to) : [];
+    let possible_squares = moveFrom
+      ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to)
+      : [];
     if (possible_squares.includes(square)) {
       setInteractedSquare({ [square]: hoveredSquareStyle });
     } else {
@@ -367,40 +400,48 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ nextPuzzleCallback, puzzleSub
   return (
     <div style={boardWrapper}>
       {/* {rendered ? '' : <LoadingBoard/>} */}
-      <div style={{display: rendered ? "block" : "none"}}>
-      <Chessboard
-        animationDuration={200}
-        boardOrientation={side === 'w' ? 'white' : 'black'}
-        position={fen}
-        isDraggablePiece={({ piece }) => piece[0] === side}
-        onPieceDragBegin={onPieceDragBegin}
-        onPieceDrop={onDrop}
-        onSquareClick={onSquareClick}
-        onSquareRightClick={onSquareRightClick}
-        onPromotionCheck={onPromotionCheck}
-        onPieceDragEnd={onPieceDragEnd}
-        onDragOverSquare={onDragOverSquare}
-        onMouseOverSquare={onMouseOverSquare}
-        onMouseOutSquare={onMouseOutSquare}
-        customBoardStyle={{
-          borderRadius: '4px',
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
-        }}
-        customSquareStyles={{
-          ...optionSquares,
-          ...lastMoveHighlight(),
-          ...rightClickedSquares,
-          ...interactedSquare
-        }}
-        customDropSquareStyle={{}}
-        customPieces={customPieces}
-        ref={removePremoveRef}
-      />
+      <div style={{ display: rendered ? 'block' : 'none' }}>
+        <Chessboard
+          animationDuration={200}
+          boardOrientation={side === 'w' ? 'white' : 'black'}
+          position={fen}
+          isDraggablePiece={({ piece }) => piece[0] === side}
+          onPieceDragBegin={onPieceDragBegin}
+          onPieceDrop={onDrop}
+          onSquareClick={onSquareClick}
+          onSquareRightClick={onSquareRightClick}
+          onPromotionCheck={onPromotionCheck}
+          onPieceDragEnd={onPieceDragEnd}
+          onDragOverSquare={onDragOverSquare}
+          onMouseOverSquare={onMouseOverSquare}
+          onMouseOutSquare={onMouseOutSquare}
+          customBoardStyle={{
+            borderRadius: '4px',
+            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+          }}
+          customSquareStyles={{
+            ...optionSquares,
+            ...lastMoveHighlight(),
+            ...rightClickedSquares,
+            ...interactedSquare,
+          }}
+          customDropSquareStyle={{}}
+          customPieces={customPieces}
+          ref={removePremoveRef}
+        />
       </div>
-      <button style={buttonStyle} onClick={solved ? nextPuzzleCallback : loadPuzzle}>
+      <button
+        style={buttonStyle}
+        onClick={solved ? nextPuzzleCallback : loadPuzzle}
+      >
         {solved ? 'Next Puzzle' : 'Reset Puzzle'}
       </button>
-      <ControlBar moves={["...", ...(line?.slice(0, linePos) ?? [])]} currentIndex={moveViewerMove} setIndex={setMoveViewerMove} display={displayText} />
+      <ControlBar
+        moves={['...', ...(line?.slice(0, linePos) ?? [])]}
+        currentIndex={moveViewerMove}
+        setIndex={setMoveViewerMove}
+        display={displayText}
+      />
     </div>
   );
 };

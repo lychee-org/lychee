@@ -61,8 +61,8 @@ const config = {
         controller: {
           DEFAULT: 'hsl(var(--controller-dark))',
           dark: 'hsl(var(--controller-dark))',
-          light: 'hsl(var(--controller-light))'
-        }
+          light: 'hsl(var(--controller-light))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

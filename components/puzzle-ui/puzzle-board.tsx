@@ -6,10 +6,12 @@ import { PuzzleContext, RatingHolder } from './puzzle-mode';
 import LoadingBoard from './loading-board';
 import React from 'react';
 import ChessboardWrapped from './chessboard-wrapped';
-import ControlButtonBar, { PlaybackControllerContext } from './controls/control-bar-button';
+import ControlButtonBar, {
+  PlaybackControllerContext,
+} from './controls/control-bar-button';
 import MoveViewer, { MoveNavigationContext } from './controls/move-viewer';
 import { Puzzle } from '@/types/lichess-api';
-import "./puzzle-board-ui.css";
+import './puzzle-board-ui.css';
 import RatingComponent from './controls/rating';
 import DisplayBox from './controls/display-box';
 
@@ -19,7 +21,8 @@ interface PuzzleBoardProps {
 }
 // set its props to be the puzzle object
 const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
-  const { submitNextPuzzle: submitPuzzle, getNextPuzzle } = useContext(PuzzleContext);
+  const { submitNextPuzzle: submitPuzzle, getNextPuzzle } =
+    useContext(PuzzleContext);
   const line = puzzle?.Moves.split(' ') ?? [];
   const side = puzzle?.FEN.split(' ')[1] === 'w' ? 'b' : 'w';
 
@@ -30,12 +33,11 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
 
   // mode related state
   const [rendered, setRendered] = useState(false);
-  const [solved, setSolved] = useState<boolean>(false); 
+  const [solved, setSolved] = useState<boolean>(false);
   const [playbackPos, setPlaybackPos] = useState(0);
   const [wrong, setWrong] = useState<boolean>(false);
   const [lastMoveWrong, setLastMoveWrong] = useState<boolean>(false);
-  const [gaveUp, setGaveUp] = useState<boolean>(false)
-  
+  const [gaveUp, setGaveUp] = useState<boolean>(false);
 
   // extra playback state
   const [fens, setFens] = useState([game.fen()]);
@@ -63,14 +65,23 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
 
   useEffect(() => {
     loadPuzzle();
-  }, [puzzle])
+  }, [puzzle]);
 
   // memoized functions for playback
   // playback
-  const firstMove = useMemo(() => (() => setPlaybackPos(0)), [setPlaybackPos]);
-  const lastMove = useMemo(() => (() => setPlaybackPos(linePos)), [setPlaybackPos, linePos]);
-  const nextMove = useMemo(() => (() => setPlaybackPos(pos => Math.min(linePos, pos + 1))), [setPlaybackPos, linePos, playbackPos]);
-  const prevMove = useMemo(() => (() => setPlaybackPos(pos => Math.max(0, pos - 1))), [setPlaybackPos, playbackPos]);
+  const firstMove = useMemo(() => () => setPlaybackPos(0), [setPlaybackPos]);
+  const lastMove = useMemo(
+    () => () => setPlaybackPos(linePos),
+    [setPlaybackPos, linePos]
+  );
+  const nextMove = useMemo(
+    () => () => setPlaybackPos((pos) => Math.min(linePos, pos + 1)),
+    [setPlaybackPos, linePos, playbackPos]
+  );
+  const prevMove = useMemo(
+    () => () => setPlaybackPos((pos) => Math.max(0, pos - 1)),
+    [setPlaybackPos, playbackPos]
+  );
 
   /** PLAYBACK MODE */
   useEffect(() => {
@@ -84,7 +95,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     if (rendered && linePos === 0) {
       const timeout = setTimeout(botMove, 400);
       return () => clearTimeout(timeout);
-    };
+    }
   });
 
   // bot move
@@ -93,7 +104,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
       game.move(line[linePos]);
       setFen(game.fen());
       setLastMoveWrong(false);
-      setFens(prev => [...prev, game.fen()]);
+      setFens((prev) => [...prev, game.fen()]);
       setLinePos((prev) => prev + 1);
       setPlaybackPos((prev) => prev + 1);
     }
@@ -103,23 +114,23 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     game.move({ from: from, to: to, promotion: promotion });
     console.log(game.fen());
     setFen(game.fen());
-    setFens(prev => [...prev, game.fen()]);
-    setLinePos(prev => prev + 1);
+    setFens((prev) => [...prev, game.fen()]);
+    setLinePos((prev) => prev + 1);
     setPlaybackPos((prev) => prev + 1);
-  }
+  };
 
   /** HANDLE PLAYER MOVE VERIFICATION */
   function undoWrongMove() {
     if (submitPuzzle && !wrong) {
-      submitPuzzle(false, rating).then(r => setRating(r));
+      submitPuzzle(false, rating).then((r) => setRating(r));
       setWrong(true);
     }
     game.undo();
     setFen(game.fen());
     setLastMoveWrong(true);
-    setFens(prev => prev.slice(0, -1));
-    setLinePos(prev => prev - 1);
-    setPlaybackPos(prev => prev - 1);
+    setFens((prev) => prev.slice(0, -1));
+    setLinePos((prev) => prev - 1);
+    setPlaybackPos((prev) => prev - 1);
   }
 
   // player moved correctly
@@ -131,7 +142,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   // player finished puzzle
   function finishedGame() {
     if (submitPuzzle && !wrong) {
-      submitPuzzle(true, rating).then(r => setRating(r))
+      submitPuzzle(true, rating).then((r) => setRating(r));
     }
     setSolved(true);
   }
@@ -146,13 +157,13 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     }
   });
 
-  if (!puzzle) return < LoadingBoard />;
+  if (!puzzle) return <LoadingBoard />;
 
   /** VIEW SOLUTION / GIVE UP */
   const viewSolution = () => {
     if (rendered && !solved) {
       if (!wrong) {
-        submitPuzzle(false, rating).then(r => setRating(r));
+        submitPuzzle(false, rating).then((r) => setRating(r));
       }
       setWrong(true);
       setSolved(true);
@@ -163,56 +174,78 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
 
       // update the game
       let newFens: Array<string> = [];
-      line.slice(playbackPos).forEach(move => {
+      line.slice(playbackPos).forEach((move) => {
         game.move(move);
         newFens.push(game.fen());
       });
       setFens([...fens, ...newFens]);
 
       // move the game forward by 1
-      setPlaybackPos(prev=>prev+1);
+      setPlaybackPos((prev) => prev + 1);
     }
-  }
+  };
 
   /** PUZZLE LOGIC **/
   // RENDERED CALLBACK
   const renderedCallback = () => {
     if (!rendered) setRendered(true);
     return {};
-  }
+  };
 
   // last move for highlighting
-  const lastMoveToHighlight: Move | undefined = game.history({ verbose: true }).find((_, i) => i === playbackPos - 1); 
+  const lastMoveToHighlight: Move | undefined = game
+    .history({ verbose: true })
+    .find((_, i) => i === playbackPos - 1);
 
   return (
-    <div className="chessboard-container">
-      <div className="chessboard">
+    <div className='chessboard-container'>
+      <div className='chessboard'>
         <ChessboardWrapped
           side={side}
           fen={fen}
           lastMove={lastMoveToHighlight}
           interactive={interactive}
-          updateGame={interactive ? playerMoveCallback : (() => { })}
-          renderedCallback={rendered ? (() => { return; }) : renderedCallback}
+          updateGame={interactive ? playerMoveCallback : () => {}}
+          renderedCallback={
+            rendered
+              ? () => {
+                  return;
+                }
+              : renderedCallback
+          }
         />
       </div>
-      <div className="control-panel">
-        <div className="rating-container bg-card"><RatingComponent rating={rating.rating} /></div>
+      <div className='control-panel'>
+        <div className='rating-container bg-card'>
+          <RatingComponent rating={rating.rating} />
+        </div>
         <div className='move-viewer-container'>
-            <div className='fromGameHeader bg-controller hover:bg-controller-light'>Puzzle #{puzzle.PuzzleId}</div> 
-            <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
-              <MoveViewer />
-            </MoveNavigationContext.Provider> 
-            <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
-              <ControlButtonBar />
-            </PlaybackControllerContext.Provider>
+          <div className='fromGameHeader bg-controller hover:bg-controller-light'>
+            Puzzle #{puzzle.PuzzleId}
+          </div>
+          <MoveNavigationContext.Provider
+            value={{ currentIndex: playbackPos, moves: game.history(), side }}
+          >
+            <MoveViewer />
+          </MoveNavigationContext.Provider>
+          <PlaybackControllerContext.Provider
+            value={{ firstMove, prevMove, nextMove, lastMove }}
+          >
+            <ControlButtonBar />
+          </PlaybackControllerContext.Provider>
         </div>
         <div className='displayBox bg-card'>
-          <DisplayBox gaveUp={gaveUp} lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} viewSolution={viewSolution}/>
+          <DisplayBox
+            gaveUp={gaveUp}
+            lastMoveWrong={lastMoveWrong}
+            solved={solved}
+            linePos={linePos}
+            side={side}
+            viewSolution={viewSolution}
+          />
         </div>
       </div>
-      <div>
-      </div>  
+      <div></div>
     </div>
   );
 };

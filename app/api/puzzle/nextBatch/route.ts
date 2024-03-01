@@ -21,7 +21,11 @@ export async function GET(_req: NextRequest) {
     await addRound(user, puzzle); // TODO: Does this need fix?
     puzzles.push(puzzle);
   }
-  await LastBatchColl.updateOne({ username: user.username }, { batch: puzzles }, { upsert: true });
+  await LastBatchColl.updateOne(
+    { username: user.username },
+    { batch: puzzles },
+    { upsert: true }
+  );
   return new Response(JSON.stringify(puzzles), {
     status: 200,
   });

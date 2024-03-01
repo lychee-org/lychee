@@ -1,39 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans');
 
 .chessboard-container {
-    display: grid;
-    place-self: center;
-    grid-template-columns: 70vh calc(60vw - 70vh - 1rem);
-    grid-gap: 1rem;
-    width: 70vw;
+  display: grid;
+  place-self: center;
+  grid-template-columns: 70vh calc(60vw - 70vh - 1rem);
+  grid-gap: 1rem;
+  width: 70vw;
 }
 
 .chessboard {
-    grid-column: 1;
-    display: flex;
+  grid-column: 1;
+  display: flex;
 }
 
 .rating-container {
-    align-content: center;
+  align-content: center;
 }
 
 .fromGameHeader {
-    font-family: "Open Sans";
-    text-align: center;
-    line-height: 5vh;
-    font-size: 2vh;
-    height: 5vh;
+  font-family: 'Open Sans';
+  text-align: center;
+  line-height: 5vh;
+  font-size: 2vh;
+  height: 5vh;
 }
 
 .displayBox {
-    display: flex;
-    align-items: center;
-    font-size: 2vh;
-    height: 27vh;
+  display: flex;
+  align-items: center;
+  font-size: 2vh;
+  height: 27vh;
 }
 
 .control-panel {
-    grid-column: 2;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-    height: 70vh;
+  grid-column: 2;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  height: 70vh;
 }

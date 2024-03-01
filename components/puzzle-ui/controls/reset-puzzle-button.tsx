@@ -1,11 +1,11 @@
-import { useContext } from "react";
-import { PuzzleContext } from "../puzzle-mode";
-import React from "react";
+import { useContext } from 'react';
+import { PuzzleContext } from '../puzzle-mode';
+import React from 'react';
 
 export const ResetPuzzleButtonContext = React.createContext({
   solved: false,
-  reloadPuzzle: () => {}
-})
+  reloadPuzzle: () => {},
+});
 
 export const buttonStyle = {
   cursor: 'pointer',
@@ -18,13 +18,13 @@ export const buttonStyle = {
 };
 
 const ResetPuzzleButton = () => {
-  const {solved, reloadPuzzle} = useContext(ResetPuzzleButtonContext);
+  const { solved, reloadPuzzle } = useContext(ResetPuzzleButtonContext);
   const { getNextPuzzle } = useContext(PuzzleContext);
   return (
     <button style={buttonStyle} onClick={solved ? getNextPuzzle : reloadPuzzle}>
       {solved ? 'Next Puzzle' : 'View Solution'}
     </button>
   );
-}
+};
 
 export default ResetPuzzleButton;

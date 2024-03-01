@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Azeret_Mono, Inter, } from 'next/font/google';
+import { Azeret_Mono, Inter } from 'next/font/google';
 import './globals.css';
 import './(styles)/chessground.css';
 import './(styles)/cg-board.css';
@@ -8,7 +8,10 @@ import { ThemeProvider } from '@/components/ui/theme-provider';
 import NavbarWrapper from '@/components/ui/navbar-wrapper';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const azeret_mono = Azeret_Mono({ subsets: ['latin'], variable: '--font-azeret-mono' });
+const azeret_mono = Azeret_Mono({
+  subsets: ['latin'],
+  variable: '--font-azeret-mono',
+});
 
 export const metadata: Metadata = {
   title: 'Lychee',

@@ -19,12 +19,14 @@ export type PuzzleWithUserRating = {
 };
 
 export const getUserSolvedPuzzleIDs = async (user: User): Promise<string[]> => {
-  const doc = await AllRoundColl.findOne({ username: user.username })
+  const doc = await AllRoundColl.findOne({ username: user.username });
   if (!doc) {
-    throw new Error("AllRound collection not populated with user, should happen on first login");
+    throw new Error(
+      'AllRound collection not populated with user, should happen on first login'
+    );
   }
   return doc.solved;
-}
+};
 
 export const puzzleFromDocument = (document: any): Puzzle => {
   let { _id: _, ...rest } = document;
@@ -71,9 +73,13 @@ const nextPuzzleRepetitions = async (
   const p = await nextPuzzleForThemeAndRating(theme, rating, exceptions);
   if (p) {
     if (isIrrelevant(theme)) {
-      throw new Error("Irrelevant theme found - incorrect or no filtering has occured.");
+      throw new Error(
+        'Irrelevant theme found - incorrect or no filtering has occured.'
+      );
     }
-    console.log(`Found theme ${theme} ${useSpacedRep ? 'through SM2' : 'frequentially'} after ${reps} reps.`);
+    console.log(
+      `Found theme ${theme} ${useSpacedRep ? 'through SM2' : 'frequentially'} after ${reps} reps.`
+    );
     return p;
   }
   return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
