@@ -96,7 +96,7 @@ const nextPuzzleRepetitions = async (
   if (p) {
     if (isIrrelevant(theme)) {
       throw new Error(
-        'Irrelevant theme found - incorrect or no filtering has occured.'
+        'Irrelevant theme found - incorrect/no filtering has occured.'
       );
     }
     console.log(
