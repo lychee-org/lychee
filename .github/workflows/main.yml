@@ -1,0 +1,19 @@
+name: Formatting
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches: [main]
+
+jobs:
+  Prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check Formatting
+        run: |
+          npm install 
+          npm run format
