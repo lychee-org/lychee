@@ -1,0 +1,20 @@
+name: Prettier Check
+
+on:
+  push:
+    branches:
+      - master
+      
+  pull_request:
+    branches: [master]
+
+jobs:
+  Jest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check Formatting
+        run: |
+          npm install 
+          npm run format
+
