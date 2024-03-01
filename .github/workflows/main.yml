@@ -1,15 +1,15 @@
-name: Prettier Check
+name: Formatting
 
 on:
   push:
     branches:
       - '**'
-      
+
   pull_request:
     branches: [master]
 
 jobs:
-  Jest:
+  Prettier:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -17,4 +17,3 @@ jobs:
         run: |
           npm install 
           npm run format
-
