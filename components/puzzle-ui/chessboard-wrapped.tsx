@@ -7,7 +7,7 @@ import {
   CustomPieces,
   CustomSquareStyles,
   Piece,
-  PromotionPieceOption
+  PromotionPieceOption,
 } from 'react-chessboard/dist/chessboard/types';
 
 /** SQUARE STYLES */
@@ -21,9 +21,15 @@ const SQUARE_STYLES = {
   ANNOTATE: { background: 'rgba(0, 0, 255, 0.4)' },
   // possible moves
   SELECTED_SQUARE: { background: 'rgba(255, 255, 0, 0.4)' },
-  ATTACK_OPTION: { background: 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)', borderRadius: '50%' },
-  EMPTY_OPTION: { background: 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)', borderRadius: '50%' },
-}
+  ATTACK_OPTION: {
+    background: 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)',
+    borderRadius: '50%',
+  },
+  EMPTY_OPTION: {
+    background: 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
+    borderRadius: '50%',
+  },
+};
 
 /** some constants for chess logic */
 
@@ -42,21 +48,29 @@ const pieces: Piece[] = [
   'bK',
 ];
 
-type Side = "w" | "b";
+type Side = 'w' | 'b';
 
-const chessjs_piece_convert = (piece: ChessjsPiece) => (piece.color + piece.type.toUpperCase()) as Piece;
+const chessjs_piece_convert = (piece: ChessjsPiece) =>
+  (piece.color + piece.type.toUpperCase()) as Piece;
 
 interface ChessboardWrappedProps {
   side: Side;
   fen: string;
   lastMove?: Move;
   interactive: boolean;
-  updateGame?: ((from: Square, to: Square, promotion?: string) => void); // expect this to be null or undefined if interactive
+  updateGame?: (from: Square, to: Square, promotion?: string) => void; // expect this to be null or undefined if interactive
   renderedCallback?: () => void; // expect this to be null or undefined if the rendering has already been done
 }
 
 // set its props to be the puzzle object
-const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMove, interactive, updateGame, renderedCallback }) =>  {
+const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
+  side,
+  fen,
+  lastMove,
+  interactive,
+  updateGame,
+  renderedCallback,
+}) => {
   // some common attributes derived from game
   let newGame = new Chess();
   newGame.load(fen);
@@ -64,9 +78,12 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
   const turn = fen.split(' ')[1];
 
   /** POSITION STATES */
-  const [rightClickedSquares, setRightClickedSquares] = useState<CustomSquareStyles>({});
+  const [rightClickedSquares, setRightClickedSquares] =
+    useState<CustomSquareStyles>({});
   const [optionSquares, setOptionSquares] = useState<CustomSquareStyles>({});
-  const [interactedSquare, setInteractedSquare] = useState<CustomSquareStyles>({});
+  const [interactedSquare, setInteractedSquare] = useState<CustomSquareStyles>(
+    {}
+  );
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
   const [showPromotion, setShowPromotion] = useState(false);
   const [moveTo, setMoveTo] = useState<Square | null>(null);
@@ -86,8 +103,10 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
   }
   useEffect(() => {
     if (renderedCallback) tryTriggerRender();
-    return () => {timeouts.forEach(to=>clearTimeout(to))}
-  }, [removePremoveRef, renderedCallback])
+    return () => {
+      timeouts.forEach((to) => clearTimeout(to));
+    };
+  }, [removePremoveRef, renderedCallback]);
 
   /** MORE STYLING THAT NEED TO BE RENDERED */
   // custom board pieces
@@ -107,7 +126,7 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
     });
     return pieceComponents;
   }, []);
-  
+
   function lastMoveHighlight() {
     if (lastMove) {
       return {
@@ -150,9 +169,10 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
     } = {};
 
     moves.map((move) => {
-      newSquares[move.to] = game.get(move.to) && game.get(move.to).color !== game.get(square).color
-            ? SQUARE_STYLES.ATTACK_OPTION
-            : SQUARE_STYLES.EMPTY_OPTION;
+      newSquares[move.to] =
+        game.get(move.to) && game.get(move.to).color !== game.get(square).color
+          ? SQUARE_STYLES.ATTACK_OPTION
+          : SQUARE_STYLES.EMPTY_OPTION;
       return move;
     });
 
@@ -180,7 +200,9 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
       setInteractedSquare({});
       return;
     }
-    let possible_squares = moveFrom ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to) : [];
+    let possible_squares = moveFrom
+      ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to)
+      : [];
     if (possible_squares.includes(square)) {
       setInteractedSquare({ [square]: SQUARE_STYLES.HOVERED_SQUARE });
     } else {
@@ -194,7 +216,9 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
       setInteractedSquare({});
       return;
     }
-    let possible_squares = moveFrom ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to) : [];
+    let possible_squares = moveFrom
+      ? game.moves({ square: moveFrom, verbose: true }).map((move) => move.to)
+      : [];
     if (possible_squares.includes(square)) {
       setInteractedSquare({ [square]: SQUARE_STYLES.HOVERED_SQUARE });
     } else if (moveFrom) {
@@ -203,7 +227,7 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
   }
 
   /** PROMOTION SHIT */
-  
+
   function onPromotionCheck(
     sourceSquare: Square,
     targetSquare: Square,
@@ -225,10 +249,8 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
 
     // valid, check if promotion move
     return (
-      (foundMove.color === 'w' &&
-        targetSquare[1] === '8') ||
-      (foundMove.color === 'b' &&
-        targetSquare[1] === '1')
+      (foundMove.color === 'w' && targetSquare[1] === '8') ||
+      (foundMove.color === 'b' && targetSquare[1] === '1')
     );
   }
 
@@ -237,13 +259,18 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
     if (piece) {
       try {
         game.move({
-          from: moveFrom ?? "",
-          to: moveTo ?? "",
-          promotion: piece[1].toLowerCase()
+          from: moveFrom ?? '',
+          to: moveTo ?? '',
+          promotion: piece[1].toLowerCase(),
         });
-        if (updateGame) updateGame(moveFrom ?? "a1", moveTo ?? "a2", piece[1].toLowerCase() ?? 'q');
+        if (updateGame)
+          updateGame(
+            moveFrom ?? 'a1',
+            moveTo ?? 'a2',
+            piece[1].toLowerCase() ?? 'q'
+          );
       } catch {
-        console.log("ERROR IN PROMOTION PIECE SELECT");
+        console.log('ERROR IN PROMOTION PIECE SELECT');
         return false;
       }
     }
@@ -266,7 +293,8 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
       setOptionSquares({});
       setMoveFrom(null);
       setInteractedSquare({});
-      if (updateGame) updateGame(sourceSquare, targetSquare, piece[1].toLowerCase() ?? 'q');
+      if (updateGame)
+        updateGame(sourceSquare, targetSquare, piece[1].toLowerCase() ?? 'q');
       return true;
     } catch {
       return false;
@@ -296,13 +324,19 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
           setMoveFrom(null);
           setMoveTo(null);
           setInteractedSquare({});
-          if (updateGame) updateGame(moveFrom, square, piece[1].toLowerCase() ?? 'q');
+          if (updateGame)
+            updateGame(moveFrom, square, piece[1].toLowerCase() ?? 'q');
         }
         return;
-      } catch { }
-    } 
+      } catch {}
+    }
     getMoveOptions(square);
-    if (game.get(square) && game.get(square).color === turn && square !== moveFrom) setMoveFrom(square);
+    if (
+      game.get(square) &&
+      game.get(square).color === turn &&
+      square !== moveFrom
+    )
+      setMoveFrom(square);
     else setMoveFrom(null);
   }
 
@@ -333,7 +367,7 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
         ...optionSquares,
         ...lastMoveHighlight(),
         ...rightClickedSquares,
-        ...interactedSquare
+        ...interactedSquare,
       }}
       customDropSquareStyle={{}}
       customPieces={customPieces}

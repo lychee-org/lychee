@@ -21,38 +21,41 @@ const PuzzleMode: React.FC<Props> = ({ initialPuzzleBatch }) => {
   const puzzleSubmit = (puzzleId: string, success: boolean) => {
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
-      body: JSON.stringify({ puzzleId, success })
+      body: JSON.stringify({ puzzleId, success }),
     });
-  }
+  };
 
   const getNewPuzzles = () => {
-    const alreadyBatched = [nextPuzzle.PuzzleId, ...puzzleBatch.map(p => p.PuzzleId)];
+    const alreadyBatched = [
+      nextPuzzle.PuzzleId,
+      ...puzzleBatch.map((p) => p.PuzzleId),
+    ];
     fetch(`/api/puzzle/nextbatch?exceptions=${alreadyBatched}`)
       .then((res) => res.json())
       .then((res) => res.puzzles as Array<Puzzle>)
       .then((puzzles: Array<Puzzle>) => {
-        setPuzzleBatch([...puzzleBatch, ...puzzles])
+        setPuzzleBatch([...puzzleBatch, ...puzzles]);
       });
-  }
+  };
 
   useEffect(() => {
     if (puzzleBatch.length <= MINIMUM_PUZZLES) getNewPuzzles();
-  })
+  });
 
   if (!nextPuzzle) {
     return 'All Done!';
   }
   return (
     <PuzzleContext.Provider value={nextPuzzle}>
-    <PuzzleBoard
-      nextPuzzleCallback={() => {
-        setNextPuzzle(puzzleBatch[0]);
-        setPuzzleBatch(puzzleBatch.slice(1));
-      }}
-      puzzleSubmitCallback={puzzleSubmit}
-    />
+      <PuzzleBoard
+        nextPuzzleCallback={() => {
+          setNextPuzzle(puzzleBatch[0]);
+          setPuzzleBatch(puzzleBatch.slice(1));
+        }}
+        puzzleSubmitCallback={puzzleSubmit}
+      />
     </PuzzleContext.Provider>
   );
-}
+};
 
 export default PuzzleMode;

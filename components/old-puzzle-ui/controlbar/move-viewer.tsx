@@ -14,7 +14,7 @@ const MoveViewer: React.FC<MoveViewerProps> = ({ moves, currentIndex }) => {
   }, [currentIndex]);
 
   return (
-    <div className="move-viewer">
+    <div className='move-viewer'>
       {moves.map((move, index) => (
         <div
           key={index}

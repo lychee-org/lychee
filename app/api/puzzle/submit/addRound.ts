@@ -1,7 +1,7 @@
-import { AllRoundColl } from "@/models/AllRoundColl";
-import { RoundColl } from "@/models/RoundColl";
-import { Puzzle } from "@/types/lichess-api";
-import { User } from "lucia";
+import { AllRoundColl } from '@/models/AllRoundColl';
+import { RoundColl } from '@/models/RoundColl';
+import { Puzzle } from '@/types/lichess-api';
+import { User } from 'lucia';
 
 const addRound = async (user: User, puzzle: Puzzle): Promise<void> => {
   // TODO:
@@ -18,6 +18,6 @@ const addRound = async (user: User, puzzle: Puzzle): Promise<void> => {
       $addToSet: { solved: puzzle.PuzzleId },
     }
   );
-}
+};
 
 export default addRound;

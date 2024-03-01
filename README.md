@@ -1,4 +1,5 @@
-# Lychee_
+# Lychee\_
+
 An app to improve your chess skills through personalized puzzles  
 https://lychee-omega.vercel.app
 
@@ -22,6 +23,7 @@ https://lychee-omega.vercel.app
 ## Installation
 
 Install packages
+
 ```bash
 # Clone the repository
 git clone https://github.com/ahmedmahmud/lychee.git
@@ -34,20 +36,25 @@ npm install
 ```
 
 Setup .env file
+
 ```bash
 mv .env.template .env.local
 ```
+
 Run/host a mongoDB server and set its uri in `.env.local`
+
 ```env
 MONGODB_URI=...
 ```
 
 Run the server
+
 ```
 npm run dev
 ```
 
 Open it at
+
 ```
 localhost:3000
 ```

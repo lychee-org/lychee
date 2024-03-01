@@ -1,22 +1,22 @@
 .Rating {
-    text-align: center;
-    font-variant-numeric: lining-nums proportional-nums;
-    font-family: "Open Sans";
-    font-size: 45px;
-    font-style: normal;
-    font-weight: 523;
-    line-height: normal;
-    padding-bottom: 2.5vh;
+  text-align: center;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-family: 'Open Sans';
+  font-size: 45px;
+  font-style: normal;
+  font-weight: 523;
+  line-height: normal;
+  padding-bottom: 2.5vh;
 }
 
 .RatingMessage {
-    padding-top: 1.5vh;
-    padding-left: 10%;
-    padding-bottom: 1vh;
-    text-align: left;
-    font-family: "Open Sans";
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 300;
-    line-height: normal;
+  padding-top: 1.5vh;
+  padding-left: 10%;
+  padding-bottom: 1vh;
+  text-align: left;
+  font-family: 'Open Sans';
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: normal;
 }

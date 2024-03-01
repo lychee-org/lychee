@@ -1,12 +1,10 @@
 import { validateRequest } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
-import { NextRequest } from "next/server";
+import { NextRequest } from 'next/server';
 import { getPuzzleBatch } from './nextbatch';
 
-
-
-export async function GET(request: NextRequest): Promise<Response>  {
-  await dbConnect()
+export async function GET(request: NextRequest): Promise<Response> {
+  await dbConnect();
   const { user } = await validateRequest();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
@@ -17,5 +15,5 @@ export async function GET(request: NextRequest): Promise<Response>  {
   const puzzles = await getPuzzleBatch(user, exceptions);
 
   // Placeholder code to return a puzzle list
-  return new Response(JSON.stringify({puzzles: puzzles}));
+  return new Response(JSON.stringify({ puzzles: puzzles }));
 }

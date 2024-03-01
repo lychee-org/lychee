@@ -1,55 +1,60 @@
 import similarity_distance from '../src/similarity';
-import {tagDistance} from '../src/similarity'; 
-import {tagListDistanceDP} from '../src/similarity'; 
-import {orderedDistanceDP} from '../src/similarity';
+import { tagDistance } from '../src/similarity';
+import { tagListDistanceDP } from '../src/similarity';
+import { orderedDistanceDP } from '../src/similarity';
 
 describe('Testing similarity distance algorithm porting', () => {
-  test('Correcly ported', () => {    
-    expect(
-      tagDistance('fork:n', 'fork:q')
-    ).toBe(0.5);
-    
-    expect(
-      tagDistance('pin:preventsAttack:q', 'pin:preventsAttack:f')
-    ).toBe(0.25);
+  test('Correcly ported', () => {
+    expect(tagDistance('fork:n', 'fork:q')).toBe(0.5);
+
+    expect(tagDistance('pin:preventsAttack:q', 'pin:preventsAttack:f')).toBe(
+      0.25
+    );
+
+    expect(tagDistance('pin:preventsAttack', 'pin:preventsAttack:f')).toBe(
+      0.25
+    );
 
     expect(
-      tagDistance('pin:preventsAttack', 'pin:preventsAttack:f')
-    ).toBe(0.25);
+      tagListDistanceDP(
+        ['pin:preventsAttack:q', 'fork:r'],
+        ['pin:preventsAttack:r', 'pin:preventsEscape:r', 'fork:q']
+      )
+    ).toBe(1.75);
 
     expect(
-      tagListDistanceDP(["pin:preventsAttack:q", "fork:r"], ["pin:preventsAttack:r", "pin:preventsEscape:r", "fork:q"])
-    ).toBe(1.75)
+      tagListDistanceDP(
+        ['pin:preventsAttack:q', 'pin:preventsAttack:q', 'fork:r'],
+        ['fork:q', 'pin:preventsEscape:r', 'pin:preventsEscape:b']
+      )
+    ).toBe(1.5);
 
     expect(
-      tagListDistanceDP(["pin:preventsAttack:q", "pin:preventsAttack:q", "fork:r"], 
-                        ["fork:q", "pin:preventsEscape:r", "pin:preventsEscape:b"])
-    ).toBe(1.5)
-
-    expect(
-      orderedDistanceDP([["pin:preventsAttack:q"], ["fork:r"]], 
-                        [["fork:q"], ["pin:preventsAttack:q"]])
-    ).toBe(2)
+      orderedDistanceDP(
+        [['pin:preventsAttack:q'], ['fork:r']],
+        [['fork:q'], ['pin:preventsAttack:q']]
+      )
+    ).toBe(2);
 
     expect(
       similarity_distance('/fork:r//crushing long', 'fork:n///crushing long')
     ).toBe(2.5);
 
     expect(
-       similarity_distance(
+      similarity_distance(
         'pin:preventsAttack:q//advantage short',
         '/pin:preventsAttack:r pin:preventsEscape:r/advantage short'
-       )
-     ).toBe(4.25);
+      )
+    ).toBe(4.25);
 
     expect(
       similarity_distance('/fork:q/crushing short', 'fork:p//advantage short')
     ).toBe(3.5);
-    
+
     expect(
-     similarity_distance('fork:n///crushing long', '/fork:q/crushing short')
+      similarity_distance('fork:n///crushing long', '/fork:q/crushing short')
     ).toBe(3.5);
-        
+
     expect(
       similarity_distance(
         '/pin:preventsAttack:q/crushing kingsideAttack short',
@@ -82,8 +87,9 @@ describe('Testing similarity distance algorithm porting', () => {
       )
     ).toBe(4.75);
 
-    expect(similarity_distance('//advantage short', '//crushing short')
-    ).toBe(1);
+    expect(similarity_distance('//advantage short', '//crushing short')).toBe(
+      1
+    );
 
     expect(
       similarity_distance(
@@ -92,13 +98,17 @@ describe('Testing similarity distance algorithm porting', () => {
       )
     ).toBe(1);
 
-    expect(similarity_distance('//crushing short', '//advantage short')).toBe(1);
+    expect(similarity_distance('//crushing short', '//advantage short')).toBe(
+      1
+    );
 
     expect(
       similarity_distance('fork:n//crushing short', 'fork:q//crushing short')
     ).toBe(1.0);
 
-    expect(similarity_distance('//crushing short', '//advantage short')).toBe(1);
+    expect(similarity_distance('//crushing short', '//advantage short')).toBe(
+      1
+    );
 
     expect(
       similarity_distance('///crushing long rEndgame', '//advantage short')
@@ -110,170 +120,170 @@ describe('Testing similarity distance algorithm porting', () => {
         '/sacrifice:r/crushing short'
       )
     ).toBe(4);
-    
+
     expect(
       similarity_distance(
         '/defensiveMove:k/advantage short',
         '/trappedPiece/crushing short'
       )
     ).toBe(4);
-    
+
     expect(
       similarity_distance('////crushing veryLong', '//advantage short')
     ).toBe(4);
-    
+
     expect(
       similarity_distance(
         '/sacrifice:r/////crushing veryLong',
         'defensiveMove:n////crushing veryLong'
       )
     ).toBe(4);
-    
+
     expect(
       similarity_distance(
         '/defensiveMove:k/advantage short',
         '//advantage short'
       )
     ).toBe(2);
-    
+
     expect(
       similarity_distance('fork:n//crushing short', '//advantage short')
     ).toBe(3);
-    
+
     expect(
       similarity_distance('///deflection/crushing veryLong', '//crushing short')
     ).toBe(4);
-    
+
     expect(
       similarity_distance(
         '//interference/advantage long',
         '/skewer:r/advantage short'
       )
     ).toBe(4);
-    
+
     expect(
       similarity_distance('fork:n//crushing short', '/mate mateIn1 oneMove')
     ).toBe(4);
-    
+
     expect(
       similarity_distance(
         '///crushing long rEndgame',
         'fork:p////advantage veryLong'
       )
     ).toBe(4);
-    
+
     expect(
       similarity_distance(
         '//advantage short',
         '//backRankMate mate mateIn2 short'
       )
     ).toBe(3);
-    
+
     expect(
       similarity_distance(
         '//backRankMate mate mateIn2 short',
         '//advantage rEndgame short'
       )
     ).toBe(3);
-    
+
     expect(
       similarity_distance('/trappedPiece/crushing short', '//advantage short')
     ).toBe(3);
-    
+
     expect(
       similarity_distance('/mate mateIn1 oneMove', '//mate mateIn2 short')
     ).toBe(3);
-    
+
     expect(
       similarity_distance('/mate mateIn1 oneMove', '//crushing short')
     ).toBe(4);
-    
+
     expect(
       similarity_distance('fork:q//advantage short', '//advantage short')
     ).toBe(2);
-    
+
     expect(
       similarity_distance('//mate mateIn2 short', '//skewer:r/crushing long')
     ).toBe(4);
-    
+
     expect(
       similarity_distance(
         'fork:q//advantage short',
         'hangingPiece//advantage short'
       )
     ).toBe(2);
-    
+
     expect(
       similarity_distance('//mate mateIn2 short', 'fork:n//crushing short')
     ).toBe(3);
-    
+
     expect(
       similarity_distance('//advantage short', '/fork:r//crushing long')
     ).toBe(4);
-    
+
     expect(
       similarity_distance(
         '/pin:preventsAttack:q//advantage long',
         'fork:p////advantage veryLong'
       )
     ).toBe(4);
-    
+
     expect(
       similarity_distance('///crushing long', '///deflection/crushing veryLong')
     ).toBe(3);
-    
+
     expect(
       similarity_distance(
         '///crushing long rEndgame',
         'skewer:r/exposedKing//crushing long rEndgame'
       )
     ).toBe(4);
-    
+
     expect(
       similarity_distance('//mate mateIn2 short', '//advantage short')
     ).toBe(2);
-    
+
     expect(
       similarity_distance('/fork:r//crushing long', 'fork:q//advantage short')
     ).toBe(4.0);
-    
+
     expect(
       similarity_distance('//advantage short', 'hangingPiece//advantage short')
     ).toBe(2);
-    
+
     expect(
       similarity_distance(
         '///crushing long',
         '/discoveredAttack/crushing short'
       )
     ).toBe(4);
-    
+
     expect(
       similarity_distance(
         '/deflection/crushing short',
         '///crushing long pEndgame'
       )
     ).toBe(4);
-    
+
     expect(
       similarity_distance('hangingPiece//advantage short', '//crushing short')
     ).toBe(3);
-    
+
     expect(
       similarity_distance('fork:n//crushing short', '//crushing short')
     ).toBe(2);
-    
+
     expect(
       similarity_distance(
         '/discoveredAttack/crushing short',
         '//advantage short'
       )
     ).toBe(3);
-    
+
     expect(
       similarity_distance('/sacrifice:r/crushing short', '//advantage short')
     ).toBe(3);
-    
+
     expect(
       similarity_distance('fork:q//advantage short', '//advantage short')
     ).toBe(2);
