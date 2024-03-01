@@ -1,4 +1,4 @@
-name: CI/CD 
+name: CI
 
 on:
   push:
@@ -26,4 +26,3 @@ jobs:
         run: |
           npm install 
           npm test
-
