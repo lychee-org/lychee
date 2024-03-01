@@ -8,10 +8,8 @@ import sm2RandomThemeFromRatingMap from '../../../../src/sm2';
 import frequentiallyRandomTheme, { isIrrelevant } from './themeGenerator';
 import Rating from '@/src/rating/GlickoV2Rating';
 
-export const LOWER_RADIUS = 200;
-export const UPPER_RADIUS = 200;
-
-const MAX_REPS = 100;
+const MAX_REPS = 20;
+const MAX_COMPROMISE = 3;
 
 export type PuzzleWithUserRating = {
   puzzle: Puzzle;
@@ -33,23 +31,47 @@ export const puzzleFromDocument = (document: any): Puzzle => {
   return rest as any as Puzzle;
 };
 
+// Clamp rating between 400 and 2700, similar to
+// https://github.com/clarkerubber/lila/blob/1651e001c4e2794a6b6804860fc729401a670469/modules/puzzle/src/main/Selector.scala#L63
+const clampRating = (glicko: number): number =>
+  Math.max(400, Math.min(2700, glicko));
+
+// We compute the radius (`ratingFlex`) as in
+// https://github.com/lichess-org/lila/blob/e6ce7245b528035ba9bc6ee37ae34799728cdc19/modules/puzzle/src/main/PuzzlePath.scala#L43
+// except, since we don't use paths, we allow for a larger initial radius by compromoie = 1, scaling by a factor of 1/2.
+const radiusForRating = (rating: number, compromise: number): number =>
+  0.5 * compromise * (100 + Math.abs(1500 - rating) / 4);
+
 const nextPuzzleForThemeAndRating = async (
   theme: string,
-  rating: number,
-  exceptions: any
+  rawRating: number,
+  exceptions: any,
+  compromise: number = 1
 ): Promise<Puzzle | undefined> => {
+  if (compromise > MAX_COMPROMISE) {
+    return undefined;
+  }
+  const rating = compromise > 1 ? rawRating : clampRating(rawRating);
+  const radius = radiusForRating(rating, compromise);
+  console.log(`radius = ${radius}, theme = ${theme}, rating = ${rating}`);
   const p = await mongoose.connection.collection('testPuzzles').findOne({
     PuzzleId: { $nin: exceptions },
     Rating: {
-      $gt: rating - LOWER_RADIUS,
-      $lt: rating + UPPER_RADIUS,
+      $gt: rating - radius,
+      $lt: rating + radius,
     },
     // TODO: Improve this. Maybe transform testPuzzles to not have this annoying
     // space-separated string of themes?
     Themes: { $regex: new RegExp('\\b' + theme + '\\b', 'i') },
   });
+  // No puzzle found; increase compromise.
   if (p === null) {
-    return undefined;
+    return await nextPuzzleForThemeAndRating(
+      theme,
+      rating,
+      exceptions,
+      compromise + 1
+    );
   }
   return puzzleFromDocument(p);
 };
@@ -61,7 +83,7 @@ const nextPuzzleRepetitions = async (
   exceptions: any
 ): Promise<Puzzle> => {
   if (reps == MAX_REPS) {
-    throw new Error('Maximum repetitions reached... something is wrong.');
+    throw new Error('Maximum repetitions reached during puzzle selection');
   }
   let theme = frequentiallyRandomTheme();
   // If the theme is not in the rating map, let's try to use it.
@@ -92,7 +114,6 @@ const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
     const ratingMap = await getThemeRatings(user, true);
     // TODO: Iterate to better handle repeat avoidance.
     const exceptions: string[] = await getUserSolvedPuzzleIDs(user);
-    console.log(exceptions);
     const puzzle = await nextPuzzleRepetitions(
       userRating.rating,
       0,
