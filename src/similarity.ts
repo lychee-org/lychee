@@ -1,6 +1,4 @@
-import similarBatchFor from '@/app/api/puzzle/similarBatch/similarBatchFor';
-
-export type Tag = string;
+type Tag = string;
 
 const parseTags = (s: string): Tag[][] =>
   s.split('/').map((move) => move.split(' '));
@@ -137,14 +135,10 @@ export const orderedDistanceDP = (a: Tag[][], b: Tag[][]): number => {
   return table[rows][columns];
 };
 
-const distanceTags = (a: Tag[][], b: Tag[][]): number => {
-  return (
-    unorderedDistance(a, b) + orderedDistanceDP(a.slice(0, -1), b.slice(0, -1))
-  );
-};
+const distanceTags = (a: Tag[][], b: Tag[][]): number =>
+  unorderedDistance(a, b) + orderedDistanceDP(a.slice(0, -1), b.slice(0, -1));
 
-const similarity_distance = (s1: string, s2: string): number => {
-  return distanceTags(parseTags(s1), parseTags(s2));
-};
+const similarity_distance = (s1: string, s2: string): number =>
+  distanceTags(parseTags(s1), parseTags(s2));
 
 export default similarity_distance;
