@@ -7,6 +7,8 @@ import WoodPeckerMode from './woodpecker-mode';
 import WoodLoadingBoard from './loading';
 import './loader.css';
 
+const WOODPECKER_BATCH_SIZE: number = 2;
+
 interface Props {
   rating: RatingHolder;
 }
@@ -32,7 +34,8 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
     // TODO: which of these do we want to do on (1) now, (2) mode completion, (3) puzzle completion?
     // (Should just be the callback to WoodPeckerMode for (2), and submitNextPuzzle within the mode for (3))
     await fetch(`/api/puzzle/nextBatch`, {
-      method: 'GET',
+      method: 'POST',
+      body: JSON.stringify({ batchSize: WOODPECKER_BATCH_SIZE }),
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as Puzzle[])
@@ -62,7 +65,7 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
   const similarReview = async () => {
     // This will find similar puzzles, persisting them in AllRound and in LastBatch.
     await fetch(`/api/puzzle/similarBatch`, {
-      method: 'GET',
+      method: 'POST',
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as Puzzle[])
