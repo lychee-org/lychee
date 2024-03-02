@@ -3,9 +3,9 @@ import lastBatchFor from '../lastBatch/lastBatchFor';
 import { Puzzle } from '@/types/lichess-api';
 import {
   getUserSolvedPuzzleIDs,
-  LOWER_RADIUS,
+  clampRating,
+  radiusForRating,
   puzzleFromDocument,
-  UPPER_RADIUS,
 } from '../nextPuzzle/nextFor';
 import { AllRoundColl } from '@/models/AllRoundColl';
 import { LastBatchColl } from '@/models/LastBatch';
@@ -17,12 +17,16 @@ import similarity_distance from '@/src/similarity';
 const similarBatchFor = async (user: User): Promise<Puzzle[]> => {
   const lastBatch = await lastBatchFor(user);
   if (lastBatch.length === 0) {
-    return lastBatch; // Let's exit early to avoid an unnecessary read.
+    return lastBatch; // Exit early to avoid an unnecessary read.
   }
 
   const solvedArray = await getUserSolvedPuzzleIDs(user);
   const solvedSet = new Set(solvedArray);
   const { rating } = await getExistingUserRating(user);
+
+  // TODO: If thie `candidates` batch is small, we may want to increase
+  // the compromise factor and try again.
+  const radius = radiusForRating(clampRating(rating), 1);
 
   // For efficiency, let's compute all non-solved puzzles in the radius.
   // Observe that the solved array should update to avoid repeats in
@@ -33,8 +37,8 @@ const similarBatchFor = async (user: User): Promise<Puzzle[]> => {
       .find({
         PuzzleId: { $nin: solvedArray },
         Rating: {
-          $gt: rating - LOWER_RADIUS,
-          $lt: rating + UPPER_RADIUS,
+          $gt: rating - radius,
+          $lt: rating + radius,
         },
       })
       .toArray()
@@ -62,6 +66,9 @@ const similarBatchFor = async (user: User): Promise<Puzzle[]> => {
     );
     solvedSet.add(closest_puzzle.PuzzleId);
     solvedArray.push(closest_puzzle.PuzzleId); // Let's write to AllRound in one go later instead.
+
+    // TODO: If closest puzzle is sufficiently far away (which may be determined by `min_distance`),
+    // we should prefer repeating the puzzle (instead of providing a very un-"similar" puzzle).
     return closest_puzzle;
   });
 

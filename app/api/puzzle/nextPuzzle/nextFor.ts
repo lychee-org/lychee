@@ -33,13 +33,13 @@ export const puzzleFromDocument = (document: any): Puzzle => {
 
 // Clamp rating between 400 and 2700, similar to
 // https://github.com/clarkerubber/lila/blob/1651e001c4e2794a6b6804860fc729401a670469/modules/puzzle/src/main/Selector.scala#L63
-const clampRating = (glicko: number): number =>
+export const clampRating = (glicko: number): number =>
   Math.max(400, Math.min(2700, glicko));
 
 // We compute the radius (`ratingFlex`) as in
 // https://github.com/lichess-org/lila/blob/e6ce7245b528035ba9bc6ee37ae34799728cdc19/modules/puzzle/src/main/PuzzlePath.scala#L43
 // except, since we don't use paths, we allow for a larger initial radius by compromoie = 1, scaling by a factor of 1/2.
-const radiusForRating = (rating: number, compromise: number): number =>
+export const radiusForRating = (rating: number, compromise: number): number =>
   0.5 * compromise * (100 + Math.abs(1500 - rating) / 4);
 
 const nextPuzzleForThemeAndRating = async (
