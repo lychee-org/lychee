@@ -38,9 +38,9 @@ export const clampRating = (glicko: number): number =>
 
 // We compute the radius (`ratingFlex`) as in
 // https://github.com/lichess-org/lila/blob/e6ce7245b528035ba9bc6ee37ae34799728cdc19/modules/puzzle/src/main/PuzzlePath.scala#L43
-// except, since we don't use paths, we allow for a larger initial radius by compromoie = 1, scaling by a factor of 1/2.
+// except, since we don't use paths, we allow for a larger initial radius by compromoie = 1, scaling by a factor of 3/4;
 export const radiusForRating = (rating: number, compromise: number): number =>
-  0.5 * compromise * (100 + Math.abs(1500 - rating) / 4);
+  0.75 * compromise * (100 + Math.abs(1500 - rating) / 4);
 
 const nextPuzzleForThemeAndRating = async (
   theme: string,
