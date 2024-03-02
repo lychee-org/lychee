@@ -3,7 +3,7 @@ import { dbConnect } from '@/lib/db';
 import { NextRequest } from 'next/server';
 import similarBatchFor from './similarBatchFor';
 
-export async function GET(_req: NextRequest) {
+export async function POST(_req: NextRequest) {
   await dbConnect();
   const { user } = await validateRequest();
   if (!user) {
