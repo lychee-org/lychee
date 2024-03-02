@@ -13,6 +13,11 @@ import { getExistingUserRating } from '@/src/rating/getRating';
 import mongoose from 'mongoose';
 import similarity_distance from '@/src/similarity';
 
+// TODO: A bit of conflict here; in theory we want a large number of puzzle candidates,
+// but we also don't want to take into account those outside the user's rating range.
+// A robust similarity algorithm would not class puzzles of substantially differing
+// difficulties as similar though.
+
 // We use a larger initial compromise (and so a larger initial radius)
 // as we'd like more similarity candidates to choose from, and this is
 // a batched mode, so more puzzle rating variance is acceptable.
