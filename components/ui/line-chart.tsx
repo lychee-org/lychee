@@ -40,49 +40,48 @@ export const LineChart = ({
 
   const yScale = useMemo(() => {
     return d3.scaleLinear().domain([0, 3000]).range([boundsHeight, 0]);
-  }, [data, height]);
+  }, [boundsHeight]);
 
   const xScale = useMemo(() => {
     return d3.scaleTime().domain([start, end]).range([0, boundsWidth]);
-  }, [data, width, start, end]);
-  console.log(xScale.ticks(), 'xScale');
-
-  const formatMillisecond = d3.timeFormat('.%L'),
-    formatSecond = d3.timeFormat(':%S'),
-    formatMinute = d3.timeFormat('%I:%M'),
-    formatHour = d3.timeFormat('%I %p'),
-    formatDay = d3.timeFormat('%a %d'),
-    formatWeek = d3.timeFormat('%b %e'),
-    formatMonth = d3.timeFormat('%b'),
-    formatYear = d3.timeFormat('%Y');
-
-  function multiFormat(date: Date | d3.NumberValue, i: number) {
-    if (i % 2 === 0) return '';
-    if (date instanceof Date) {
-      return (
-        d3.timeSecond(date) < date
-          ? formatMillisecond
-          : d3.timeMinute(date) < date
-            ? formatSecond
-            : d3.timeHour(date) < date
-              ? formatMinute
-              : d3.timeDay(date) < date
-                ? formatHour
-                : d3.timeMonth(date) < date
-                  ? d3.timeWeek(date) < date
-                    ? formatDay
-                    : formatWeek
-                  : d3.timeYear(date) < date
-                    ? formatMonth
-                    : formatYear
-      )(date);
-    } else {
-      return date.toString();
-    }
-  }
+  }, [start, end, boundsWidth]);
 
   // Render the X and Y axis using d3.js, not react
   useEffect(() => {
+    const formatMillisecond = d3.timeFormat('.%L'),
+      formatSecond = d3.timeFormat(':%S'),
+      formatMinute = d3.timeFormat('%I:%M'),
+      formatHour = d3.timeFormat('%I %p'),
+      formatDay = d3.timeFormat('%a %d'),
+      formatWeek = d3.timeFormat('%b %e'),
+      formatMonth = d3.timeFormat('%b'),
+      formatYear = d3.timeFormat('%Y');
+
+    function multiFormat(date: Date | d3.NumberValue, i: number) {
+      if (i % 2 === 0) return '';
+      if (date instanceof Date) {
+        return (
+          d3.timeSecond(date) < date
+            ? formatMillisecond
+            : d3.timeMinute(date) < date
+              ? formatSecond
+              : d3.timeHour(date) < date
+                ? formatMinute
+                : d3.timeDay(date) < date
+                  ? formatHour
+                  : d3.timeMonth(date) < date
+                    ? d3.timeWeek(date) < date
+                      ? formatDay
+                      : formatWeek
+                    : d3.timeYear(date) < date
+                      ? formatMonth
+                      : formatYear
+        )(date);
+      } else {
+        return date.toString();
+      }
+    }
+
     const svgElement = d3.select(axesRef.current);
     svgElement.selectAll('*').remove();
 

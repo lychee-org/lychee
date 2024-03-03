@@ -48,10 +48,10 @@ export default function LineChartPeriod({ data }: LineChartPeriodProps) {
       <RadioGroup
         defaultValue='1d'
         className='flex gap-2 justify-center'
-        value={period}
-        onValueChange={(v) => {
-          setPeriod(v);
-        }}
+        // value={period}
+        // onValueChange={(v) => {
+        //   setPeriod(v);
+        // }}
       >
         <Chip text='1H' value='1h' />
         <Chip text='1D' value='1d' />
