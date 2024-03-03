@@ -7,5 +7,5 @@ export default async function Home() {
   if (!user) {
     return <Unauthorized />;
   }
-  return <Dashboard />;
+  return <Dashboard user={user} />;
 }

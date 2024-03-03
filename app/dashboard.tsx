@@ -1,16 +1,13 @@
 import React from 'react';
 import LineChartPeriod from '@/components/ui/line-chart-period';
-import { dbConnect } from '@/lib/db';
-import { validateRequest } from '@/lib/auth';
 import { getThemes } from './api/dashboard/getThemes';
 import { Card, CardContent } from '@/components/ui/card';
 import { capitalize } from '@/lib/utils';
 import Image from 'next/image';
+import { User } from 'lucia';
 
-export default async function Dashboard() {
-  const { user } = await validateRequest();
-  const themes = await getThemes(user!);
-
+export default async function Dashboard({ user }: { user: User }) {
+  const themes = await getThemes(user);
   return (
     <div className='h-svh flex flex-col items-center pt-12'>
       <div className='flex flex-col max-w-3xl w-full items-stretch gap-8'>
