@@ -35,7 +35,7 @@ export default function AuthButton({ className, user }: AuthButtonProps) {
     return (
       <div className={className}>
         <Link href='/login/lichess'>
-          <Button className={`flex-row gap-2 p-2 font-mono`} variant='ghost'>
+          <Button className='flex-row gap-2 p-2 font-mono' variant='ghost'>
             <LichessLogo size='24' />
             sign in
           </Button>
@@ -48,7 +48,7 @@ export default function AuthButton({ className, user }: AuthButtonProps) {
     <div className={className}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant='ghost' className='select-none gap-2 p-3'>
+          <Button variant='ghost' className='select-none gap-2 p-3 font-mono'>
             <PersonIcon />
             {user.username}
           </Button>
