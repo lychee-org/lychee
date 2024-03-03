@@ -7,11 +7,21 @@ import { isIrrelevant } from '@/app/api/puzzle/nextPuzzle/themeGenerator';
 
 const DEFAULT_VOLATILITY: number = 0.09;
 
+// Default, provisional rating.
+export const getDefaultRating = () =>
+  new Rating(1500, 350, DEFAULT_VOLATILITY, 0);
+
 // Retrieve all data (execept volatility which isn't public) from Lichess API.
 export const fetchLichessRating = async (user: User): Promise<Rating> => {
   const { perfs } = await fetch(
     `https://lichess.org/api/user/${user?.username}`
   ).then((res) => res.json());
+
+  // If the user has solved no puzzles, use the default, provisional rating.
+  if (!perfs.puzzle) {
+    return getDefaultRating();
+  }
+
   const { games, rating, rd, _ } = perfs.puzzle;
   // Use default volatility since actual is not public.
   return new Rating(rating, rd, DEFAULT_VOLATILITY, games);
@@ -42,9 +52,6 @@ export const getPuzzleRating = (puzzle: Puzzle): Rating =>
     DEFAULT_VOLATILITY, // Actual volatility not in Lichess' puzzle collection.
     puzzle.NbPlays
   );
-
-export const getDefaultRating = () =>
-  new Rating(1500, 350, DEFAULT_VOLATILITY, 0);
 
 export const getThemeRatings = async (
   user: User,
