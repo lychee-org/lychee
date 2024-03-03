@@ -51,7 +51,7 @@ export default function LineChartPeriod({ data, theme }: LineChartPeriodProps) {
         className='flex gap-2 justify-center'
         value={period}
         onValueChange={(v) => {
-          console.log("hehellweo", v)
+          console.log('hehellweo', v);
           setPeriod(v);
         }}
       >
@@ -69,10 +69,22 @@ export default function LineChartPeriod({ data, theme }: LineChartPeriodProps) {
   );
 }
 
-function Chip({ text, theme, value }: { text: string; theme: string, value: string }) {
+function Chip({
+  text,
+  theme,
+  value,
+}: {
+  text: string;
+  theme: string;
+  value: string;
+}) {
   return (
     <div>
-      <RadioGroupItem id={`${value}-${theme}`} value={value} className='peer sr-only' />
+      <RadioGroupItem
+        id={`${value}-${theme}`}
+        value={value}
+        className='peer sr-only'
+      />
       <Label
         htmlFor={`${value}-${theme}`}
         className='flex rounded-full border-2 border-muted bg-popover px-3 py-1 text-xs hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-background peer-data-[state=checked]:border-primary'
