@@ -43,7 +43,7 @@ export default async function Dashboard({ user }: { user: User }) {
                 </p>
               </div>
               <div className='flex-1'>
-                <LineChartPeriod data={ratings} />
+                <LineChartPeriod data={ratings} theme={theme} />
               </div>
             </CardContent>
           </Card>

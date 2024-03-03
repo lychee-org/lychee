@@ -10,9 +10,10 @@ import { timeDay, timeHour, timeMonth, timeWeek, timeYear } from 'd3-time';
 type Datapoint = { createdAt: Date; rating: number };
 type LineChartPeriodProps = {
   data: Datapoint[];
+  theme: string;
 };
 
-export default function LineChartPeriod({ data }: LineChartPeriodProps) {
+export default function LineChartPeriod({ data, theme }: LineChartPeriodProps) {
   const [period, setPeriod] = useState('1d');
   const container = useRef(null);
   const { width, height } = useDimensions(container);
@@ -48,17 +49,18 @@ export default function LineChartPeriod({ data }: LineChartPeriodProps) {
       <RadioGroup
         defaultValue='1d'
         className='flex gap-2 justify-center'
-        // value={period}
-        // onValueChange={(v) => {
-        //   setPeriod(v);
-        // }}
+        value={period}
+        onValueChange={(v) => {
+          console.log("hehellweo", v)
+          setPeriod(v);
+        }}
       >
-        <Chip text='1H' value='1h' />
-        <Chip text='1D' value='1d' />
-        <Chip text='1W' value='1w' />
-        <Chip text='1M' value='1m' />
-        <Chip text='3M' value='3m' />
-        <Chip text='1Y' value='1y' />
+        <Chip text='1H' value='1h' theme={theme} />
+        <Chip text='1D' value='1d' theme={theme} />
+        <Chip text='1W' value='1w' theme={theme} />
+        <Chip text='1M' value='1m' theme={theme} />
+        <Chip text='3M' value='3m' theme={theme} />
+        <Chip text='1Y' value='1y' theme={theme} />
       </RadioGroup>
       <div ref={container} className='flex-1'>
         <LineChart width={width} height={height} data={data} offset={offset} />
@@ -67,12 +69,12 @@ export default function LineChartPeriod({ data }: LineChartPeriodProps) {
   );
 }
 
-function Chip({ text, value }: { text: string; value: string }) {
+function Chip({ text, theme, value }: { text: string; theme: string, value: string }) {
   return (
     <div>
-      <RadioGroupItem value={value} id={value} className='peer sr-only' />
+      <RadioGroupItem id={`${value}-${theme}`} value={value} className='peer sr-only' />
       <Label
-        htmlFor={value}
+        htmlFor={`${value}-${theme}`}
         className='flex rounded-full border-2 border-muted bg-popover px-3 py-1 text-xs hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-background peer-data-[state=checked]:border-primary'
       >
         {text}
