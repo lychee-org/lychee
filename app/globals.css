@@ -108,7 +108,8 @@ svg #labelText {
   font-size: 10px;
 }
 
-svg #line { /*target the image with css*/
+svg #line {
+  /*target the image with css*/
   stroke: hsl(var(--line));
 }
 

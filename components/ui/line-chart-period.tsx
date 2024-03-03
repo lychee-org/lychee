@@ -49,7 +49,9 @@ export default function LineChartPeriod({ data }: LineChartPeriodProps) {
         defaultValue='1d'
         className='flex gap-2 justify-center'
         value={period}
-        onValueChange={(v) => {setPeriod(v)}}
+        onValueChange={(v) => {
+          setPeriod(v);
+        }}
       >
         <Chip text='1H' value='1h' />
         <Chip text='1D' value='1d' />
@@ -59,12 +61,7 @@ export default function LineChartPeriod({ data }: LineChartPeriodProps) {
         <Chip text='1Y' value='1y' />
       </RadioGroup>
       <div ref={container} className='flex-1'>
-        <LineChart
-          width={width}
-          height={height}
-          data={data}
-          offset={offset}
-        />
+        <LineChart width={width} height={height} data={data} offset={offset} />
       </div>
     </div>
   );

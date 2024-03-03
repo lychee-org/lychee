@@ -123,10 +123,8 @@ export const LineChart = ({
           .attr('stroke-dasharray', '4,2')
       )
       .call((g) =>
-      g
-        .selectAll('.tick:first-of-type line')
-        .attr('stroke-opacity', 0)
-    )
+        g.selectAll('.tick:first-of-type line').attr('stroke-opacity', 0)
+      )
       .call((g) => g.selectAll('.tick text').attr('id', 'axis'));
     // .call((g) => g.selectAll('.tick text').attr('x', 4).attr('dy', -4));
   }, [xScale, yScale, boundsWidth, boundsHeight]);
@@ -224,12 +222,7 @@ export const LineChart = ({
                   // rx={7}
                   ry={10}
                 />
-                <text
-                  x={0}
-                  y={-14}
-                  textAnchor='middle'
-                  id='labelText'
-                >
+                <text x={0} y={-14} textAnchor='middle' id='labelText'>
                   {Math.round(getClosestPoint(cursorPosition)?.rating)}
                 </text>
               </g>

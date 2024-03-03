@@ -41,7 +41,9 @@ export default async function Dashboard() {
                 className='w-20'
               />
               <div className='flex flex-col items-center justify-center text-center w-48'>
-                <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{capitalize(theme)}</h3>
+                <h3 className='scroll-m-20 text-2xl font-semibold tracking-tight'>
+                  {capitalize(theme)}
+                </h3>
                 <p className='text-xl text-muted-foreground'>
                   {Math.round(rating)}
                 </p>
