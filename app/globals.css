@@ -40,6 +40,8 @@
     --tablerow-divide: 0 0% 93%;
     --controller-dark: 0 0% 75%;
     --controller-light: 0 0% 70%;
+
+    --line: 142.1 76.2% 36.3%;
   }
 
   .dark {
@@ -77,6 +79,8 @@
     --tablerow-divide: 0 0% 15%;
     --controller-dark: 0 0% 10%;
     --controller-light: 0 0% 15%;
+
+    --line: 142.1 70.6% 45.3%;
   }
 }
 
@@ -87,4 +91,16 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+svg #line { /*target the image with css*/
+  stroke: hsl(var(--line));
+}
+
+svg #area {
+  fill: hsl(var(--line));
+}
+
+svg #circle {
+  fill: hsl(var(--line));
 }

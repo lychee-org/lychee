@@ -15,6 +15,7 @@ import {
 import { AllRoundColl } from '@/models/AllRoundColl';
 import { UserThemeColl } from '@/models/UserThemeColl';
 import addRound from './addRound';
+import { RatingHistory } from '@/models/RatingHistory';
 
 export async function POST(req: NextRequest) {
   await dbConnect();
@@ -67,6 +68,7 @@ export async function POST(req: NextRequest) {
   // Update theme ratings.
   const themes = puzzle.Themes.split(' ');
   themes.forEach(async (theme) => {
+    const newTheme = !ratingMap.has(theme);
     const themeRating: Rating = ratingMap.get(theme) || getDefaultRating();
 
     if (success) {
@@ -92,6 +94,12 @@ export async function POST(req: NextRequest) {
       },
       { upsert: true } // Insert if not found.
     );
+
+    await RatingHistory.create({
+      username: user.username,
+      theme: theme,
+      rating: themeRating.rating,
+    });
   });
 
   return new Response(JSON.stringify(userRating), { status: 200 });
