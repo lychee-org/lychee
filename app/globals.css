@@ -93,6 +93,21 @@
   }
 }
 
+svg #axis {
+  color: hsl(var(--foreground));
+  opacity: 0.7;
+  font-weight: bold;
+  font-family: var('--font-inter'), sans-serif;
+}
+
+svg #labelText {
+  fill: hsl(var(--foreground));
+  opacity: 1;
+  font-weight: bold;
+  font-family: var('--font-inter'), sans-serif;
+  font-size: 10px;
+}
+
 svg #line { /*target the image with css*/
   stroke: hsl(var(--line));
 }

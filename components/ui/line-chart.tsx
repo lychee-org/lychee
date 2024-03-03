@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
-const MARGIN = { top: 15, right: 15, bottom: 20, left: 28 };
+const MARGIN = { top: 15, right: 16, bottom: 20, left: 28 };
 
 type Datapoint = { createdAt: Date; rating: number };
 
@@ -45,7 +45,7 @@ export const LineChart = ({
   const xScale = useMemo(() => {
     return d3.scaleTime().domain([start, end]).range([0, boundsWidth]);
   }, [data, width, start, end]);
-  console.log(xScale.ticks(), 'xScale')
+  console.log(xScale.ticks(), 'xScale');
 
   const formatMillisecond = d3.timeFormat('.%L'),
     formatSecond = d3.timeFormat(':%S'),
@@ -95,21 +95,39 @@ export const LineChart = ({
     svgElement
       .append('g')
       .attr('transform', 'translate(0,' + boundsHeight + ')')
-      .call(xAxisGenerator);
+      .call(xAxisGenerator)
+      .call((g) => g.select('.domain').attr('stroke-opacity', 0.5))
+      .call((g) =>
+        g
+          .selectAll('.tick line')
+          .attr('stroke-opacity', 0.5)
+          .attr('stroke-dasharray', '4,2')
+      )
+      .call((g) => g.selectAll('.tick text').attr('id', 'axis'));
 
-    const yAxisGenerator = d3.axisLeft(yScale).tickSize(-boundsWidth).ticks(3).tickFormat((d) => {
-      return Math.floor(d.valueOf()/1000) + 'k';
-  });
+    const yAxisGenerator = d3
+      .axisLeft(yScale)
+      .tickSize(-boundsWidth)
+      .ticks(3)
+      .tickFormat((d) => {
+        return Math.floor(d.valueOf() / 1000) + 'k';
+      });
     svgElement
       .append('g')
       .call(yAxisGenerator)
       .call((g) => g.select('.domain').remove())
       .call((g) =>
         g
-          .selectAll('.tick:not(:first-of-type) line')
+          .selectAll('.tick line')
           .attr('stroke-opacity', 0.2)
           .attr('stroke-dasharray', '4,2')
-      );
+      )
+      .call((g) =>
+      g
+        .selectAll('.tick:first-of-type line')
+        .attr('stroke-opacity', 0)
+    )
+      .call((g) => g.selectAll('.tick text').attr('id', 'axis'));
     // .call((g) => g.selectAll('.tick text').attr('x', 4).attr('dy', -4));
   }, [xScale, yScale, boundsWidth, boundsHeight]);
 
@@ -198,15 +216,20 @@ export const LineChart = ({
                 transform={`translate(${cursorPosition},${yScale(getClosestPoint(cursorPosition)?.rating)})`}
               >
                 <rect
-                  x={-15}
+                  x={-16}
                   y={-27.5}
-                  width={30}
+                  width={32}
                   height={20}
                   fill='#333'
-                  rx={4}
-                  ry={4}
+                  // rx={7}
+                  ry={10}
                 />
-                <text x={0} y={-14} textAnchor='middle' fill='#fff' fontSize={10} >
+                <text
+                  x={0}
+                  y={-14}
+                  textAnchor='middle'
+                  id='labelText'
+                >
                   {Math.round(getClosestPoint(cursorPosition)?.rating)}
                 </text>
               </g>
