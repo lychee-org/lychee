@@ -14,8 +14,8 @@ type FilterProps = {
 export default function Filter({ updateFilter }: FilterProps) {
   const sortByOpts = [
     {
-      value: 'alpha',
-      text: 'Alphabetical',
+      value: 'rating',
+      text: 'Rating',
     },
     {
       value: 'update',
@@ -26,8 +26,8 @@ export default function Filter({ updateFilter }: FilterProps) {
       text: 'Delta',
     },
     {
-      value: 'rating',
-      text: 'Rating',
+      value: 'alpha',
+      text: 'Alphabetical',
     },
   ];
   const directionsOpts = [
@@ -41,8 +41,8 @@ export default function Filter({ updateFilter }: FilterProps) {
     },
   ];
 
-  const [sortBy, setSortBy] = useState<SortBy>('alpha');
-  const [order, setOrder] = useState<Order>('asc');
+  const [sortBy, setSortBy] = useState<SortBy>('rating');
+  const [order, setOrder] = useState<Order>('desc');
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
