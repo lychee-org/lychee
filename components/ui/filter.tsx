@@ -47,7 +47,7 @@ export default function Filter({ updateFilter }: FilterProps) {
 
   useEffect(() => {
     updateFilter(sortBy, order, filter);
-  }, [sortBy, order, filter]);
+  }, [sortBy, order, filter, updateFilter]);
 
   return (
     <div className='flex gap-4 items-center'>
@@ -85,7 +85,7 @@ function Group({ options, value, onValueChange }: GroupProps) {
       className='flex p-1 gap-1 bg-secondary rounded-lg'
     >
       {options.map(({ text, value }) => (
-        <div>
+        <div key={value}>
           <RadioGroupItem id={value} value={value} className='peer sr-only' />
           <Label
             htmlFor={value}
