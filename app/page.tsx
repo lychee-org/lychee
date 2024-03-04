@@ -1,6 +1,6 @@
 import { validateRequest } from '@/lib/auth';
 import Unauthorized from './unauthorized';
-import Dashboard from './(dashboard)/dashboard-wrapper';
+import Dashboard from './(dashboard)/dashboard';
 
 export default async function Home() {
   const { user } = await validateRequest();
