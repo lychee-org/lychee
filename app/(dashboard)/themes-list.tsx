@@ -78,13 +78,11 @@ export default function ThemesList({ themes: themes_ }: ThemesListProps) {
                   </p>
                   <div className='flex items-center gap-1'>
                     <p className='text-xl'>{Math.round(delta)}</p>
-                    {
-                      delta > 0 ? (
-                        <ArrowTopRightIcon className='inline w-5 h-5 text-green-500'/>
-                      ) : (
-                        <ArrowBottomRightIcon className='inline w-5 h-5 text-red-500'/>
-                      )
-                    }
+                    {delta > 0 ? (
+                      <ArrowTopRightIcon className='inline w-5 h-5 text-green-500' />
+                    ) : (
+                      <ArrowBottomRightIcon className='inline w-5 h-5 text-red-500' />
+                    )}
                   </div>
                 </div>
               </div>

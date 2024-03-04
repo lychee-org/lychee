@@ -58,7 +58,10 @@ const calculateStreak = (ratings: RatingHistory[]) => {
     if (i === -1) {
       streak += ratings[0].rating - 1500;
       break;
-    } else if (streak == 0 || (ratings[i + 1].rating - ratings[i].rating) > 0 === streak > 0) {
+    } else if (
+      streak == 0 ||
+      ratings[i + 1].rating - ratings[i].rating > 0 === streak > 0
+    ) {
       streak += ratings[i + 1].rating - ratings[i].rating;
     } else {
       break;
