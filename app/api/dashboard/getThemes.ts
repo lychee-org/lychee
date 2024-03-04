@@ -7,7 +7,7 @@ type RatingHistory = {
   createdAt: Date;
 };
 
-type ThemeData = {
+export type ThemeData = {
   theme: string;
   ratings: RatingHistory[];
   rating: number;
