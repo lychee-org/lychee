@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import LineChartPeriod from '@/components/ui/line-chart-period';
@@ -9,28 +9,38 @@ import Filter, { Order, SortBy } from '@/components/ui/filter';
 import type { ThemeData } from '../api/dashboard/getThemes';
 
 type DashboardProps = {
-  themes: ThemeData[]
-}
+  themes: ThemeData[];
+};
 
 export default function Dashboard({ themes: themes_ }: DashboardProps) {
-  const [themes, setThemes] = useState<ThemeData[]>(themes_)
-  const updateFilter = async (sortBy: SortBy, order: Order, filter: string): Promise<void> => {
-    const filteredThemes = themes_.filter((theme) => theme.theme.toLowerCase().includes(filter));
+  const [themes, setThemes] = useState<ThemeData[]>(themes_);
+  const updateFilter = async (
+    sortBy: SortBy,
+    order: Order,
+    filter: string
+  ): Promise<void> => {
+    const filteredThemes = themes_.filter((theme) =>
+      theme.theme.toLowerCase().includes(filter)
+    );
 
-    console.log(themes_)
+    console.log(themes_);
 
     if (sortBy === 'rating') {
-      filteredThemes.sort((a, b) => a.rating - b.rating)
+      filteredThemes.sort((a, b) => a.rating - b.rating);
     } else if (sortBy == 'update') {
-      filteredThemes.sort((a, b) => a.ratings[a.ratings.length - 1].createdAt.getTime() - b.ratings[b.ratings.length - 1].createdAt.getTime())
+      filteredThemes.sort(
+        (a, b) =>
+          a.ratings[a.ratings.length - 1].createdAt.getTime() -
+          b.ratings[b.ratings.length - 1].createdAt.getTime()
+      );
     }
 
     if (order === 'desc') {
-      filteredThemes.reverse()
+      filteredThemes.reverse();
     }
 
     setThemes(filteredThemes);
-  }
+  };
 
   return (
     <>
