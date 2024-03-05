@@ -364,8 +364,8 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
       }}
       customSquareStyles={{
-        ...optionSquares,
         ...lastMoveHighlight(),
+        ...optionSquares,
         ...rightClickedSquares,
         ...interactedSquare,
       }}
