@@ -40,6 +40,8 @@
     --tablerow-divide: 0 0% 93%;
     --controller-dark: 0 0% 75%;
     --controller-light: 0 0% 70%;
+
+    --line: 142.1 76.2% 36.3%;
   }
 
   .dark {
@@ -77,6 +79,8 @@
     --tablerow-divide: 0 0% 15%;
     --controller-dark: 0 0% 10%;
     --controller-light: 0 0% 15%;
+
+    --line: 142.1 70.6% 45.3%;
   }
 }
 
@@ -87,4 +91,32 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+svg #axis {
+  color: hsl(var(--foreground));
+  opacity: 0.7;
+  font-weight: bold;
+  font-family: var('--font-inter'), sans-serif;
+}
+
+svg #labelText {
+  fill: hsl(var(--foreground));
+  opacity: 1;
+  font-weight: bold;
+  font-family: var('--font-inter'), sans-serif;
+  font-size: 10px;
+}
+
+svg #line {
+  /*target the image with css*/
+  stroke: hsl(var(--line));
+}
+
+svg #area {
+  fill: hsl(var(--line));
+}
+
+svg #circle {
+  fill: hsl(var(--line));
 }

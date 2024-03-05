@@ -30,6 +30,7 @@ export const fetchLichessRating = async (user: User): Promise<Rating> => {
 // Gets a user's rating from through the collection.
 // The user must have logged in once before - this function will throw an error if not.
 export const getExistingUserRating = async (user: User): Promise<Rating> => {
+  console.log('user', user);
   return RatingColl.findOne({ username: user.username }).then(
     async (result) => {
       if (result) {
