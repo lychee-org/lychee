@@ -107,31 +107,35 @@ const nextPuzzleRepetitions = async (
   return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
 };
 
-const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
-  getExistingUserRating(user).then(async (userRating) => {
-    // NB: The persisted rating map may contain irrelevant themes, but we don't
-    // want to include these for nextPuzzle / SM2, so we filter them out below.
-    const ratingMap = await getThemeRatings(user, true);
-    // TODO: Iterate to better handle repeat avoidance.
-    const exceptions: string[] = await getUserSolvedPuzzleIDs(user);
-    const puzzle = await nextPuzzleRepetitions(
-      userRating.rating,
-      0,
-      ratingMap,
-      exceptions
-    );
-    console.log(
-      `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
-    );
-    return {
-      puzzle: puzzle,
-      rating: {
-        rating: userRating.rating,
-        ratingDeviation: userRating.ratingDeviation,
-        volatility: userRating.volatility,
-        numberOfResults: userRating.numberOfResults,
-      },
-    };
-  });
+const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> => {
+  const p = await mongoose.connection.collection('testPuzzles').findOne({PuzzleId: "qcItA"});
+  return {puzzle: puzzleFromDocument(p), rating: {rating: 1500, ratingDeviation: 350, volatility: 0.06, numberOfResults: 0}};
+}
+  
+  // getExistingUserRating(user).then(async (userRating) => {
+  //   // NB: The persisted rating map may contain irrelevant themes, but we don't
+  //   // want to include these for nextPuzzle / SM2, so we filter them out below.
+  //   const ratingMap = await getThemeRatings(user, true);
+  //   // TODO: Iterate to better handle repeat avoidance.
+  //   const exceptions: string[] = await getUserSolvedPuzzleIDs(user);
+  //   const puzzle = await nextPuzzleRepetitions(
+  //     userRating.rating,
+  //     0,
+  //     ratingMap,
+  //     exceptions
+  //   );
+  //   console.log(
+  //     `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
+  //   );
+  //   return {
+  //     puzzle: puzzle,
+  //     rating: {
+  //       rating: userRating.rating,
+  //       ratingDeviation: userRating.ratingDeviation,
+  //       volatility: userRating.volatility,
+  //       numberOfResults: userRating.numberOfResults,
+  //     },
+  //   };
+  // });
 
 export default nextPuzzleFor;
