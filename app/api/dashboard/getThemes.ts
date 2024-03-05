@@ -1,6 +1,7 @@
 import { getThemeRatings } from '@/src/rating/getRating';
 import { User } from 'lucia';
 import { RatingHistory } from '@/models/RatingHistory';
+import * as d3 from 'd3';
 
 type RatingHistory = {
   rating: number;
@@ -34,11 +35,16 @@ export const getThemes = async (user: User) => {
   const data: ThemeData[] = [];
   for (let [k, v] of themeRatings) {
     if (k in ratingHistories) {
+      const streak = calculateStreak(ratingHistories[k]);
+      ratingHistories[k].unshift({
+        rating: 1500,
+        createdAt: d3.timeMinute.offset(ratingHistories[k][0].createdAt, -10),
+      });
       data.push({
         theme: k,
         ratings: ratingHistories[k],
         rating: v.rating,
-        delta: calculateStreak(ratingHistories[k]),
+        delta: streak,
         nb: v.numberOfResults,
       });
     }
