@@ -1,11 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans');
 
+.ui-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 3rem auto;
+}
+
 .chessboard-container {
   display: grid;
   place-self: center;
-  grid-template-columns: 70vh calc(60vw - 70vh - 1rem);
-  grid-gap: 1rem;
-  width: 70vw;
 }
 
 .chessboard {
@@ -17,22 +22,35 @@
   align-content: center;
 }
 
-.fromGameHeader {
-  font-family: 'Open Sans';
-  text-align: center;
-  line-height: 5vh;
-  font-size: 2vh;
-  height: 5vh;
-}
-
 .displayBox {
   display: flex;
   align-items: center;
   font-size: 2vh;
-  height: 27vh;
+  height: 100%;
+  flex: 1 1 auto;
 }
 
-.control-panel {
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-  height: 70vh;
+@media (min-width: 768px) {
+  .chessboard-container {
+    grid-template-columns: max(min(70vh, 40vw), 300px) calc(
+        60vw - max(min(70vh, 40vw), 300px) - 1rem
+      );
+    grid-gap: 1rem;
+    width: 70vw;
+  }
+
+  .fromGameHeader {
+    display: block;
+    font-family: 'Open Sans';
+    text-align: center;
+    line-height: 5vh;
+    font-size: 2vh;
+    height: 5vh;
+  }
+
+  .control-panel {
+    grid-column: 2;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    height: 70vh;
+  }
 }
