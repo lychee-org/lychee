@@ -48,9 +48,16 @@ export const getThemes = async (user: User) => {
 };
 
 export const ratingHistory = async (user: User) => {
-  const ratings = await RatingHistory.find({ username: user.username, theme: 'overall'});
-  return { ratings: ratings, rating: ratings[ratings.length - 1]?.rating, delta: calculateStreak(ratings)};
-}
+  const ratings = await RatingHistory.find({
+    username: user.username,
+    theme: 'overall',
+  });
+  return {
+    ratings: ratings,
+    rating: ratings[ratings.length - 1]?.rating,
+    delta: calculateStreak(ratings),
+  };
+};
 
 const calculateStreak = (ratings: RatingHistory[]) => {
   // calculate delta from rating histories by adding up the longest running streak going from last to first

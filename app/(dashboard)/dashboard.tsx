@@ -21,7 +21,7 @@ export default async function DashboardWrapper({ user }: { user: User }) {
             Track your progress over time.
           </p>
         </div>
-        
+
         <Card>
           <CardContent className='flex items-stretch h-48 gap-4 p-6'>
             <div className='flex flex-col items-center justify-center text-center w-48 gap-4'>

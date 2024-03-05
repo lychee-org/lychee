@@ -1,4 +1,8 @@
-import { ArrowBottomRightIcon, ArrowTopRightIcon, DashIcon } from '@radix-ui/react-icons';
+import {
+  ArrowBottomRightIcon,
+  ArrowTopRightIcon,
+  DashIcon,
+} from '@radix-ui/react-icons';
 import React from 'react';
 
 export default function Delta({ delta }: { delta: number }) {
