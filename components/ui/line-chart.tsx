@@ -47,7 +47,7 @@ export const LineChart = ({
       data.filter((d) => d.createdAt > start && d.createdAt <= end),
       (d) => d.rating
     ) as [number, number];
-    const padding = (max - min) ? (max - min) * 0.1 : 10;
+    const padding = max - min ? (max - min) * 0.1 : 10;
     min = Math.max(min - padding, 0);
     max = Math.min(max + padding, 4000);
     return d3.scaleLinear().domain([min, max]).range([boundsHeight, 0]);
@@ -115,13 +115,10 @@ export const LineChart = ({
       )
       .call((g) => g.selectAll('.tick text').attr('id', 'axis'));
 
-    const yAxisGenerator = d3
-      .axisLeft(yScale)
-      .tickSize(-boundsWidth)
-      .ticks(3)
-      // .tickFormat((d) => {
-      //   return Math.floor(d.valueOf() / 1000) + 'k';
-      // });
+    const yAxisGenerator = d3.axisLeft(yScale).tickSize(-boundsWidth).ticks(3);
+    // .tickFormat((d) => {
+    //   return Math.floor(d.valueOf() / 1000) + 'k';
+    // });
     svgElement
       .append('g')
       .call(yAxisGenerator)

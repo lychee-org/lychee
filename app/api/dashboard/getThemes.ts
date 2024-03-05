@@ -39,7 +39,7 @@ export const getThemes = async (user: User) => {
       ratingHistories[k].unshift({
         rating: 1500,
         createdAt: d3.timeMinute.offset(ratingHistories[k][0].createdAt, -10),
-      })
+      });
       data.push({
         theme: k,
         ratings: ratingHistories[k],
