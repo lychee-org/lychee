@@ -20,7 +20,7 @@ const DisplayBox = ({solved, lastMoveWrong, linePos, side, viewSolution}: {solve
     let solvedDiv = (<div className="icon-container">
                         <div className="icon-wrapper text-green-500">{correctIcon}</div>
                         <div className="text-wrapper">Amazing! You solved it</div>
-                    <button className="buttonstyle bg-controller-dark hover:bg-controller-light" onClick={getNextPuzzle}>Next Puzzle</button>
+                        <button className="buttonstyle bg-controller-dark hover:bg-controller-light" onClick={getNextPuzzle}>Next Puzzle</button>
                     </div>)
     let sideInfo = (<div className="icon-container"><div className="text-wrapper">Your turn: Find the best move for {side === "w" ? "white" : "black"}</div></div>) 
 

@@ -1,6 +1,7 @@
+/* DESKTOP VIEW */
 .control-button-bar {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     height: 5vh;
     width: 100%;
 }
@@ -10,7 +11,7 @@
     flex-direction: row;
     justify-content: center;
     height: 100%;
-    width: 25%;
+    width: 100%;
 }
 
 .control-bar-button-icon {
@@ -18,4 +19,50 @@
     flex-direction: column;
     justify-content: center;
     height: 100%;
+}
+
+.info-button {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .control-button-bar {
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    }
+
+    .info-button {
+        display: block;
+    }
+
+    .DialogOverlay {
+        position: fixed;
+        inset: 0;
+        background-color: var(--black-a9);
+    }
+
+    .DialogContent {
+        color: black;
+        background-color: white;
+        border-radius: 6px;
+        box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90vw;
+        max-width: 450px;
+        max-height: 85vh;
+        padding: 25px;
+        animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .DialogContent:focus {
+        outline: none;
+    }
+
+    .DialogX {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
 }

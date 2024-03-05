@@ -6,12 +6,13 @@ import { PuzzleContext, RatingHolder } from './puzzle-mode';
 import LoadingBoard from './loading-board';
 import React from 'react';
 import ChessboardWrapped from './chessboard-wrapped';
-import ControlButtonBar, { PlaybackControllerContext } from './controls/control-bar-button';
+import ControlButtonBar, { ExtraMobileInfoContext, PlaybackControllerContext } from './controls/control-bar-button';
 import MoveViewer, { MoveNavigationContext } from './controls/move-viewer';
 import { Puzzle } from '@/types/lichess-api';
 import "./puzzle-board-ui.css";
 import RatingComponent from './controls/rating';
 import DisplayBox from './controls/display-box';
+import { cn } from '@/lib/utils';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
@@ -183,34 +184,38 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   const lastMoveToHighlight: Move | undefined = game.history({ verbose: true }).find((_, i) => i === playbackPos - 1); 
 
   return (
-    <div className="chessboard-container">
-      <div className="chessboard">
-        <ChessboardWrapped
-          side={side}
-          fen={fen}
-          lastMove={lastMoveToHighlight}
-          interactive={interactive}
-          updateGame={interactive ? playerMoveCallback : (() => { })}
-          renderedCallback={rendered ? (() => { return; }) : renderedCallback}
-        />
-      </div>
-      <div className="control-panel">
-        <div className="rating-container bg-card"><RatingComponent rating={rating.rating} /></div>
-        <div className='move-viewer-container'>
-            <div className='fromGameHeader bg-controller hover:bg-controller-light'>Puzzle #{puzzle.PuzzleId}</div> 
+    <div className={cn("ui-wrapper")}>
+      <div className="chessboard-container">
+        <div className="chessboard">
+          <ChessboardWrapped
+            side={side}
+            fen={fen}
+            lastMove={lastMoveToHighlight}
+            interactive={interactive}
+            updateGame={interactive ? playerMoveCallback : (() => { })}
+            renderedCallback={rendered ? (() => { return; }) : renderedCallback}
+          />
+        </div>
+        <div className="control-panel">
+          <div className="rating-container bg-card"><RatingComponent rating={rating.rating} /></div>
+          <div className='move-viewer-container'> 
+            <div className='fromGameHeader bg-controller hover:bg-controller-light'>Puzzle #{puzzle.PuzzleId}</div>
             <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
               <MoveViewer />
-            </MoveNavigationContext.Provider> 
+            </MoveNavigationContext.Provider>
             <PlaybackControllerContext.Provider value={{firstMove, prevMove, nextMove, lastMove}}>
-              <ControlButtonBar />
+              <ExtraMobileInfoContext.Provider value={{puzzleId: puzzle.PuzzleId, rating: rating.rating}}>
+                <ControlButtonBar />
+              </ExtraMobileInfoContext.Provider>
             </PlaybackControllerContext.Provider>
+          </div>
+          <div className='displayBox bg-card'>
+            <DisplayBox lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} viewSolution={viewSolution}/>
+          </div>
         </div>
-        <div className='displayBox bg-card'>
-          <DisplayBox lastMoveWrong={lastMoveWrong} solved={solved} linePos={linePos} side={side} viewSolution={viewSolution}/>
-        </div>
+        <div>
+        </div>  
       </div>
-      <div>
-      </div>  
     </div>
   );
 };

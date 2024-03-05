@@ -20,7 +20,6 @@ const LoadingBoard = () => {
     filter: 'blur(5px)'
   } as React.CSSProperties;
   let relativeStyle = {position: 'relative', left: 0, top: 0, width: '100%', height: '100%'} as React.CSSProperties;
-  let absoluteStyle = {position: 'absolute', left: 0, top: 0, width: '100%', height: '100%'};
   return <div style={relativeStyle}>
     <div style={overlayStyle}>
       <Image src={emptyBoard} alt="Loading board" style={boardstyle} priority={true} />

@@ -326,8 +326,7 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({ side, fen, lastMo
       onMouseOutSquare={onMouseOutSquare}
       showPromotionDialog={showPromotion}
       customBoardStyle={{
-        borderRadius: '4px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+        borderRadius: '4px'
       }}
       customSquareStyles={{
         ...optionSquares,

@@ -1,27 +1,99 @@
-.move-viewer .moveChild.highlighted {
-  color: green;
-  font-weight: bold;
-  background-color: rgba(160, 255, 160, 1);
+@media (min-width: 768px) {
+  .move-viewer .moveChild.highlighted {
+    color: green;
+    font-weight: bold;
+    background-color: rgba(160, 255, 160, 1);
+  }
+  
+  .move-viewer {
+    width: 100%;
+    display: table;
+    table-layout: auto;
+    border-collapse: collapse;
+  }
+  
+  .scrollable-container {
+    display: block;
+    overflow-y: scroll;
+    height: 20vh;
+  }
+  
+  .moveChild {
+    width: 50%;
+    text-align: center;
+    border-left: none;
+  }
+  
+  .move-table-row {
+    height: max(min(5vh, 5vw), 18pt);
+    font-size: max(min(2vh, 2vw), 7pt);
+  }
+  
+  .mobile-move-viewer {
+    display: none;
+  }
 }
 
-.move-viewer {
-  width: 100%;
-  display: table;
-  table-layout: auto;
-  border-collapse: collapse;
-}
+@media (max-width: 768px) {
+  .scrollable-container {
+    display: none;
+  }
+  
+  .mobile-move-viewer {
+    position: relative;
+    width: 100%;
+    height: 2em;
+    overflow: clip;
+  }
 
-.scrollable-container {
-  overflow-y: scroll;
-  height: 20vh;
-}
+  .mobile-move-viewer-strip {
+    position: absolute;
+    right: 0;
+    height: 2em;
+    line-height: 2em;
+    padding-right: 10px;
+  }
 
-.moveChild {
-  width: 50%;
-  text-align: center;
-  border-left: none;
-}
+  .mobile-move-viewer-overlay {
+    position: absolute;
+    width: min(100%, 60vh);
+    height: 2em;
+    
+  }
 
-.move-table-row {
-  height: 40px
+  .mobileMoveNumbering {
+    margin: 5px;
+  }
+  .mobileMoveNumbering.highlighted, .mobileMoveChild.highlighted {
+    font-weight: bold;
+  }
+  .mobileMoveChild {
+    margin: 10px;
+  }
+
+  .dark .mobile-move-viewer-overlay {
+    background: linear-gradient(270deg, rgba(46, 46, 46, 0.00) 0%, rgba(25, 25, 25, 0.5) 63%, rgba(24, 24, 24, 0.70) 100%);
+  }
+
+  .dark .mobile-move-viewer {
+    background: linear-gradient(270deg, #191919 5.07%, rgba(38, 38, 38, 0.10) 50.07%, rgba(40, 40, 40, 0.00) 105.07%);
+  }
+  
+  .dark .mobileMoveNumbering.highlighted, .dark .mobileMoveChild.highlighted {
+    color: lightgreen;
+  }
+
+  .light .mobile-move-viewer-overlay {
+    background: linear-gradient(270deg, rgba(189, 189, 189, 0.00) 0%, rgba(168, 168, 168, 0.5) 63%, rgba(130, 130, 130, 0.70) 98%, rgba(100, 100, 100, 0.8) 100%);
+    filter: blur();
+  }
+
+  /* .light .mobile-move-viewer {
+    background: linear-gradient(270deg, #b9b9b9, 5.07%, rgba(165, 165, 165, 0.50) 50.07%, rgba(145, 145, 145, 0.20) 105.07%);
+  } */
+
+  .light .mobileMoveNumbering.highlighted, .light .mobileMoveChild.highlighted {
+    color: green;
+  }
+
 }
