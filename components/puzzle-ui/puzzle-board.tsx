@@ -149,7 +149,10 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
 
   useEffect(() => {
     if (inPlay && !interactive && linePos > 0) {
-      if (game.history({ verbose: true }).pop()?.lan !== line[linePos - 1])
+      if (
+        !game.isCheckmate() &&
+        game.history({ verbose: true }).pop()?.lan !== line[linePos - 1]
+      )
         setTimeout(undoWrongMove, 300);
       else if (linePos >= line.length) finishedGame();
       else return correctMove(); // there's a timeout here so we should return it
