@@ -31,10 +31,10 @@ export const LineChart = ({
   // Extend left and right of line graph
   const data = useMemo<Datapoint[]>(() => {
     const ans = [...data_];
-    if (ans[0].createdAt > start) {
+    if (!ans.length || ans[0].createdAt > start) {
       ans.unshift({ createdAt: start, rating: 1500 });
     }
-    ans.push({ createdAt: new Date(), rating: data_[data_.length - 1].rating });
+    ans.push({ createdAt: new Date(), rating: data_[data_.length - 1]?.rating || 1500 });
     return ans;
   }, [data_, start]);
 

@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Filter, { Order, SortBy } from '@/components/ui/filter';
 import type { ThemeData } from '../api/dashboard/getThemes';
 import { ArrowBottomRightIcon, ArrowTopRightIcon } from '@radix-ui/react-icons';
+import Delta from '@/components/ui/delta';
 
 type ThemesListProps = {
   themes: ThemeData[];
@@ -76,14 +77,7 @@ export default function ThemesList({ themes: themes_ }: ThemesListProps) {
                   <p className='text-xs text-muted-foreground tracking-tighter'>
                     Delta
                   </p>
-                  <div className='flex items-center gap-1'>
-                    <p className='text-xl'>{Math.round(delta)}</p>
-                    {delta > 0 ? (
-                      <ArrowTopRightIcon className='inline w-5 h-5 text-green-500' />
-                    ) : (
-                      <ArrowBottomRightIcon className='inline w-5 h-5 text-red-500' />
-                    )}
-                  </div>
+                  <Delta delta={delta} />
                 </div>
               </div>
             </div>

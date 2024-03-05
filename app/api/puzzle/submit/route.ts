@@ -58,6 +58,12 @@ export async function POST(req: NextRequest) {
     }
   );
 
+  await RatingHistory.create({
+    username: user.username,
+    theme: 'overall',
+    rating: userRating.rating,
+  });
+
   await addRound(user, puzzle);
 
   // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
