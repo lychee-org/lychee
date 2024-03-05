@@ -108,7 +108,7 @@ const nextPuzzleRepetitions = async (
 };
 
 const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> => {
-  const p = await mongoose.connection.collection('testPuzzles').findOne({PuzzleId: "qcItA"});
+  const p = await mongoose.connection.collection('testPuzzles').findOne({PuzzleId: "00TRo"});
   return {puzzle: puzzleFromDocument(p), rating: {rating: 1500, ratingDeviation: 350, volatility: 0.06, numberOfResults: 0}};
 }
   
