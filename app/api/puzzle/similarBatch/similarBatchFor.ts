@@ -6,7 +6,7 @@ import { AllRoundColl } from '@/models/AllRoundColl';
 import { LastBatchColl } from '@/models/LastBatch';
 import { getExistingUserRating } from '@/src/rating/getRating';
 import mongoose from 'mongoose';
-import similarity_distance from '@/src/similarity';
+import similarity_distance, { SENTINEL_DISTANCE } from '@/src/similarity';
 
 // Returns empty array if no last batch is found.
 const similarBatchFor = async (user: User): Promise<Puzzle[]> => {
@@ -32,12 +32,12 @@ const similarBatchFor = async (user: User): Promise<Puzzle[]> => {
   console.log(`Found ${candidates.length} candidates.`);
 
   const ret = lastBatch.map((puzzle) => {
-    let min_distance = Infinity, closest_puzzle = puzzle;
+    let min_distance = SENTINEL_DISTANCE, closest_puzzle = puzzle;
     candidates.forEach(candidate => {
       if (solvedSet.has(candidate.PuzzleId)) {
         return;
       }
-      const distance = similarity_distance(puzzle.hierarchy_tags, candidate.hierarchy_tags);
+      const distance = similarity_distance(puzzle.hierarchy_tags, candidate.hierarchy_tags, min_distance);
       if (distance < min_distance) {
         min_distance = distance;
         closest_puzzle = candidate;
