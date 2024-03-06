@@ -177,7 +177,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
       }
       stopTimer();
       setWrong(true);
-        const elapsed = time;
+      const elapsed = time;
       setSolved(true);
       setGaveUp(true);
 

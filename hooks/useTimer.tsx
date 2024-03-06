@@ -1,22 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-export default function useTimer(): [
-  number,
-  () => void,
-  () => void,
-] {
-  const [time, setTime] = useState(0)
-  const [paused, setPaused] = useState(false)
-  const [active, setActive] = useState(false)
+export default function useTimer(): [number, () => void, () => void] {
+  const [time, setTime] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
-    window.addEventListener("focus", onFocus);
-    window.addEventListener("blur", onBlur);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('blur', onBlur);
 
     // Specify how to clean up after this effect:
     return () => {
-      window.removeEventListener("focus", onFocus);
-      window.removeEventListener("blur", onBlur);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
     };
   }, []);
 
@@ -25,31 +21,31 @@ export default function useTimer(): [
 
     if (active && !paused) {
       interval = window.setInterval(() => {
-        setTime((time) => time + 1000)
-      }, 1000)
+        setTime((time) => time + 1000);
+      }, 1000);
     } else {
-      clearInterval(interval)
+      clearInterval(interval);
     }
     return () => {
-      clearInterval(interval)
-    }
-  }, [active, paused])
+      clearInterval(interval);
+    };
+  }, [active, paused]);
 
   const onFocus = () => {
-    setPaused(false)
-  }
+    setPaused(false);
+  };
 
   const onBlur = () => {
-    setPaused(true)
-  }
+    setPaused(true);
+  };
 
   const stop = () => {
-    setActive(false)
-  }
+    setActive(false);
+  };
 
   const start = () => {
-    setTime(0)
-    setActive(true)
-  }
-  return [time, start, stop]
+    setTime(0);
+    setActive(true);
+  };
+  return [time, start, stop];
 }
