@@ -199,7 +199,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
         <div className="control-panel">
           <div className="rating-container bg-card"><RatingComponent rating={rating.rating} /></div>
           <div className='move-viewer-container'> 
-            <div className='fromGameHeader bg-controller hover:bg-controller-light'>Puzzle #{puzzle.PuzzleId}</div>
+            <div className='fromGameHeader bg-controller hover:bg-controller-light'><a href={`https://lichess.org/training/${puzzle.PuzzleId}`}>Puzzle #{puzzle.PuzzleId}</a></div>
             <MoveNavigationContext.Provider value={{currentIndex: playbackPos, moves: game.history(), side}}>
               <MoveViewer />
             </MoveNavigationContext.Provider>

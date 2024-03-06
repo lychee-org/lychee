@@ -43,7 +43,7 @@ const MobileInformationDialog = () => {
       <Dialog.Content className="DialogContent">
         {/* <Dialog.Title>Overview</Dialog.Title>
         <Dialog.Description>Description</Dialog.Description> */}
-        Current Puzzle ID: #{puzzleId}
+        Current Puzzle ID: <u><a href={`https://lichess.org/training/${puzzleId}`}>#{puzzleId}</a></u>
         <br/>
         Your rating: { rating > 0 ? Math.round(rating) : "?" }
         <Dialog.Close className="DialogX"><Cross2Icon /></Dialog.Close>
