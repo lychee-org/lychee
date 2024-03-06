@@ -101,7 +101,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
       const timeout = setTimeout(botMove, 400);
       return () => clearTimeout(timeout);
     }
-  });
+  }, [linePos, rendered]);
 
   // bot move
   function botMove() {
@@ -165,7 +165,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
       else return correctMove(); // there's a timeout here so we should return it
       return;
     }
-  });
+  }, [linePos]);
 
   if (!puzzle) return <LoadingBoard />;
 
