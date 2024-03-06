@@ -160,26 +160,14 @@ const nextPuzzleFor = async (
           const similarPuzzles = await computeSimilarityCache(puzzleToReview);
           const instanceCreated = {  
             puzzleId: puzzleToReview.PuzzleId,
-            cache: similarPuzzles, 
+            cache: similarPuzzles
           }
           await SimilarityColl.create(instanceCreated);
           instance = instanceCreated;
         } 
         similarPuzzleId = await findSimilarUndoPuzzle(instance, user.username);
-        // if (instance) {
-        //   instance = instance as SimilarityInstance;
-        //   similarPuzzleId = await findSimilarUndoPuzzle(instance, user.username);
-        // } else {
-        //   const similarPuzzles = await computeSimilarityCache(puzzleToReview);
-        //   instance = {  
-        //     puzzleId: puzzleToReview.PuzzleId,
-        //     cache: similarPuzzles, 
-        //   }
-        //   await SimilarityColl.create(instance);
-        //   similarPuzzleId = await findSimilarUndoPuzzle(instance, user.username);
-        // }
-        let similarPuzzle: Puzzle | undefined = await findPuzzlebyId(similarPuzzleId);
         
+        let similarPuzzle: Puzzle | undefined;
         if (similarPuzzleId == "Whole cache has been solved.") {
           [similarPuzzle] = await similarBatchForCompromised(
             user.username,
@@ -189,6 +177,7 @@ const nextPuzzleFor = async (
             MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
           );
         } else {
+          similarPuzzle = await findPuzzlebyId(similarPuzzleId);
           similarPuzzle = similarPuzzle as Puzzle;
         }
         

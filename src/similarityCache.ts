@@ -30,7 +30,7 @@ export const findSimilarityInstance = async (
     puzzleId: String
   ): Promise<Puzzle | undefined> => {
     const p = await mongoose.connection.collection('testPuzzles').findOne({
-      PuzzleId: { PuzzleId: puzzleId },
+      PuzzleId: puzzleId,
       },
     );
    
