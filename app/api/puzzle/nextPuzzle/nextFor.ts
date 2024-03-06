@@ -11,6 +11,8 @@ import { ActivePuzzleColl } from '@/models/ActivePuzzle';
 import { booleanWithProbability } from '@/lib/utils';
 import { nextLeitnerReview } from '@/src/LeitnerIntance';
 import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
+import { computeSimilarityCache, findSimilarityInstance, SimilarityInstance } from '@/src/similarityCache';
+import { SimilarityColl } from '@/models/SimilarityColl';
 
 const MAX_REPS: number = 20;
 const MAX_COMPROMISE: number = 3;
@@ -113,7 +115,7 @@ const nextPuzzleRepetitions = async (
   }
   return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
 };
-
+ 
 const nextPuzzleFor = async (
   user: User,
   woodpecker: boolean = false
@@ -149,13 +151,40 @@ const nextPuzzleFor = async (
         console.log(
           `Worked! Puzzle Id: ${puzzleToReview.PuzzleId} from Leitner, tags: ${puzzleToReview.hierarchy_tags}`
         );
-        const [similarPuzzle] = await similarBatchForCompromised(
-          user.username,
-          [puzzleToReview],
-          clampRating(rating.rating),
-          exceptions,
-          MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
-        );
+        
+        
+        let instance: SimilarityInstance | undefined = await findSimilarityInstance(puzzleToReview.PuzzleId);
+        if (instance) {
+          instance = instance as SimilarityInstance;
+          if(instance.cache.length != 0) {
+            const similarPuzzle = instance.cache[0];
+          } else {
+            const similarPuzzles = await computeSimilarityCache(puzzleToReview);
+            instance.cache = similarPuzzles;
+            await SimilarityColl.updateOne({ puzzleId: puzzleToReview.PuzzleId }, instance);
+          }
+        } else {
+          await SimilarityColl.create({
+            puzzleId: puzzleToReview.PuzzleId,
+            cache: [],
+          });
+        }
+
+
+
+
+
+
+
+
+
+        // const [similarPuzzle] = await similarBatchForCompromised(
+        //   user.username,
+        //   [puzzleToReview],
+        //   clampRating(rating.rating),
+        //   exceptions,
+        //   MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
+        // );
         console.log(
           `Got similar puzzle with tags ${similarPuzzle.hierarchy_tags} and line ${similarPuzzle.Moves}`
         );
