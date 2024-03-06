@@ -102,8 +102,8 @@ export const similarBatchForCompromised = async (
   });
 
   if (persist) {
-  // Persist in both LastBatch and AllRound.
-  // TODO: persist in Round, if we eventually use Round.
+    // Persist in both LastBatch and AllRound.
+    // TODO: persist in Round, if we eventually use Round.
     console.log(`Persisting ${solvedArray} for ${username}...`);
     await AllRoundColl.updateOne(
       { username: username },
