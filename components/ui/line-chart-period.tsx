@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useRef, useState } from 'react';
+import React, { memo, useCallback, useRef, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { LineChart } from './line-chart';
@@ -13,7 +13,7 @@ type LineChartPeriodProps = {
   theme: string;
 };
 
-export default function LineChartPeriod({ data, theme }: LineChartPeriodProps) {
+function LineChartPeriod({ data, theme }: LineChartPeriodProps) {
   const [period, setPeriod] = useState('1d');
   const container = useRef(null);
   const { width, height } = useDimensions(container);
@@ -50,10 +50,7 @@ export default function LineChartPeriod({ data, theme }: LineChartPeriodProps) {
         defaultValue='1d'
         className='flex gap-2 justify-center'
         value={period}
-        onValueChange={(v) => {
-          console.log('hehellweo', v);
-          setPeriod(v);
-        }}
+        onValueChange={setPeriod}
       >
         <Chip text='1H' value='1h' theme={theme} />
         <Chip text='1D' value='1d' theme={theme} />
@@ -94,3 +91,5 @@ function Chip({
     </div>
   );
 }
+
+export default memo(LineChartPeriod)

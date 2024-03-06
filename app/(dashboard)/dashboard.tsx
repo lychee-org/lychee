@@ -3,7 +3,6 @@ import { User } from 'lucia';
 import { getThemes, ratingHistory } from '../api/dashboard/getThemes';
 import ThemesList from './themes-list';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowBottomRightIcon, ArrowTopRightIcon } from '@radix-ui/react-icons';
 import LineChartPeriod from '@/components/ui/line-chart-period';
 import Delta from '@/components/ui/delta';
 
@@ -11,7 +10,7 @@ export default async function DashboardWrapper({ user }: { user: User }) {
   const themes = await getThemes(user);
   const { ratings, rating, delta } = await ratingHistory(user);
   return (
-    <div className='h-svh flex flex-col items-center pt-12'>
+    <div className='min-h-svh flex flex-col items-center py-12'>
       <div className='flex flex-col max-w-3xl w-full items-stretch gap-8'>
         <div className='space-y-2'>
           <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center'>
