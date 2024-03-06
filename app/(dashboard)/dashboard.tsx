@@ -2,13 +2,19 @@ import React from 'react';
 import { User } from 'lucia';
 import { getThemes, ratingHistory } from '../api/dashboard/getThemes';
 import ThemesList from './themes-list';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import LineChartPeriod from '@/components/ui/line-chart-period';
 import Delta from '@/components/ui/delta';
+import { ScrollBar, ScrollArea } from '@/components/ui/scroll-area';
+import { getRecentGroups } from '../api/dashboard/recentGroups';
+import { capitalize, toGroup } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 export default async function DashboardWrapper({ user }: { user: User }) {
-  const themes = await getThemes(user);
+  const [themes, missing] = await getThemes(user);
   const { ratings, rating, delta } = await ratingHistory(user);
+  const groups = await getRecentGroups(user.username);
   return (
     <div className='min-h-svh flex flex-col items-center py-12'>
       <div className='flex flex-col max-w-3xl w-full items-stretch gap-8'>
@@ -20,7 +26,6 @@ export default async function DashboardWrapper({ user }: { user: User }) {
             Track your progress over time.
           </p>
         </div>
-
         <Card>
           <CardContent className='flex items-stretch h-48 gap-4 p-6'>
             <div className='flex flex-col items-center justify-center text-center w-48 gap-4'>
@@ -48,10 +53,46 @@ export default async function DashboardWrapper({ user }: { user: User }) {
           </CardContent>
         </Card>
 
+        {groups.length > 0 && (<div>
+          <p className='font-bold mb-2 tracking-tighest text-secondary-foreground'>
+            Your recent groups
+          </p>
+          <div>
+            <ScrollArea className='whitespace-nowrap rounded-md border'>
+              <div className='flex w-max space-x-4 p-4'>
+                {groups.map((group) => {
+                  const themes = toGroup(group.groupId);
+                  return (
+                    <Link href={`puzzle/group/${group.groupId}`}>
+                      <Card className='max-w-64 hover:bg-muted/30'>
+                        <CardContent className='p-2'>
+                          <p className='text-xs font-bold tracking-tighter text-center pb-1'>
+                            {themes.length} themes(s)
+                          </p>
+                          <div className='flex gap-1 w-100 overflow-hidden'>
+                            {themes.map((theme) => {
+                              return (
+                                <Badge variant={'outline'}>
+                                  {capitalize(theme).toLowerCase()}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  );
+                })}
+              </div>
+              <ScrollBar orientation='horizontal' />
+            </ScrollArea>
+          </div>
+        </div>)}
+
         <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center'>
           Themes
         </h1>
-        <ThemesList themes={themes} />
+        <ThemesList themes={themes} missing={missing} />
       </div>
     </div>
   );
