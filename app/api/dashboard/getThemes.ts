@@ -18,7 +18,9 @@ export type ThemeData = {
   nb: number;
 };
 
-export const getThemes = async (user: User): Promise<[ThemeData[], string[]]> => {
+export const getThemes = async (
+  user: User
+): Promise<[ThemeData[], string[]]> => {
   const themeRatings = await getThemeRatings(user, true);
   const ratings = await RatingHistory.find({ username: user.username });
 
@@ -53,7 +55,9 @@ export const getThemes = async (user: User): Promise<[ThemeData[], string[]]> =>
   }
 
   // add themes that have no ratings after filtering fromm irrelevant themes
-  const missed = allThemes.filter(isIrrelevant).filter((theme) => !(theme in themeRatings) || !(theme in ratingHistories));
+  const missed = allThemes
+    .filter(isIrrelevant)
+    .filter((theme) => !(theme in themeRatings) || !(theme in ratingHistories));
 
   return [data, missed];
 };

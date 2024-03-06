@@ -53,41 +53,43 @@ export default async function DashboardWrapper({ user }: { user: User }) {
           </CardContent>
         </Card>
 
-        {groups.length > 0 && (<div>
-          <p className='font-bold mb-2 tracking-tighest text-secondary-foreground'>
-            Your recent groups
-          </p>
+        {groups.length > 0 && (
           <div>
-            <ScrollArea className='whitespace-nowrap rounded-md border'>
-              <div className='flex w-max space-x-4 p-4'>
-                {groups.map((group) => {
-                  const themes = toGroup(group.groupId);
-                  return (
-                    <Link href={`puzzle/group/${group.groupId}`}>
-                      <Card className='max-w-64 hover:bg-muted/30'>
-                        <CardContent className='p-2'>
-                          <p className='text-xs font-bold tracking-tighter text-center pb-1'>
-                            {themes.length} themes(s)
-                          </p>
-                          <div className='flex gap-1 w-100 overflow-hidden'>
-                            {themes.map((theme) => {
-                              return (
-                                <Badge variant={'outline'}>
-                                  {capitalize(theme).toLowerCase()}
-                                </Badge>
-                              );
-                            })}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  );
-                })}
-              </div>
-              <ScrollBar orientation='horizontal' />
-            </ScrollArea>
+            <p className='font-bold mb-2 tracking-tighest text-secondary-foreground'>
+              Your recent groups
+            </p>
+            <div>
+              <ScrollArea className='whitespace-nowrap rounded-md border'>
+                <div className='flex w-max space-x-4 p-4'>
+                  {groups.map((group) => {
+                    const themes = toGroup(group.groupId);
+                    return (
+                      <Link href={`puzzle/group/${group.groupId}`}>
+                        <Card className='max-w-64 hover:bg-muted/30'>
+                          <CardContent className='p-2'>
+                            <p className='text-xs font-bold tracking-tighter text-center pb-1'>
+                              {themes.length} themes(s)
+                            </p>
+                            <div className='flex gap-1 w-100 overflow-hidden'>
+                              {themes.map((theme) => {
+                                return (
+                                  <Badge variant={'outline'}>
+                                    {capitalize(theme).toLowerCase()}
+                                  </Badge>
+                                );
+                              })}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    );
+                  })}
+                </div>
+                <ScrollBar orientation='horizontal' />
+              </ScrollArea>
+            </div>
           </div>
-        </div>)}
+        )}
 
         <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center'>
           Themes

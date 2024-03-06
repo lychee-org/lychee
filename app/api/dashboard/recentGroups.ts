@@ -21,4 +21,4 @@ export const addRecentGroup = async (
     { lastUsed: new Date() },
     { upsert: true }
   );
-}
+};
