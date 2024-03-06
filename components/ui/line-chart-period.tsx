@@ -92,4 +92,4 @@ function Chip({
   );
 }
 
-export default memo(LineChartPeriod)
+export default memo(LineChartPeriod);
