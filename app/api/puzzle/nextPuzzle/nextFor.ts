@@ -154,7 +154,8 @@ const nextPuzzleFor = async (
           [puzzleToReview],
           clampRating(rating.rating),
           exceptions,
-          MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
+          MIN_CANDIDATES, // TODO: Increase this, or maybe start compromise at 3 instead, to use wider similarity radius? Unsure.
+          false
         );
         console.log(
           `Got similar puzzle with tags ${similarPuzzle.hierarchy_tags} and line ${similarPuzzle.Moves}`

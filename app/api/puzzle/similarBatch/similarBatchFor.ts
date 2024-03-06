@@ -30,6 +30,7 @@ export const similarBatchForCompromised = async (
   clampedRating: number,
   solvedArray: string[],
   minBatchFactor: number = 2,
+  persist: boolean = true,
   compromise: number = INITIAL_COMPROMISE
 ): Promise<Puzzle[]> => {
   // TODO: Handle no puzzles here.
@@ -100,19 +101,20 @@ export const similarBatchForCompromised = async (
     return closest_puzzle;
   });
 
+  if (persist) {
   // Persist in both LastBatch and AllRound.
   // TODO: persist in Round, if we eventually use Round.
-  console.log(`Persisting ${solvedArray} for ${username}...`);
-  await AllRoundColl.updateOne(
-    { username: username },
-    { $set: { solved: solvedArray } }
-  );
-  await LastBatchColl.updateOne(
-    { username: username },
-    { batch: ret },
-    { upsert: true }
-  );
-
+    console.log(`Persisting ${solvedArray} for ${username}...`);
+    await AllRoundColl.updateOne(
+      { username: username },
+      { $set: { solved: solvedArray } }
+    );
+    await LastBatchColl.updateOne(
+      { username: username },
+      { batch: ret },
+      { upsert: true }
+    );
+  }
   return ret;
 };
 
