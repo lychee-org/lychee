@@ -3,6 +3,9 @@ import { Puzzle } from '../types/lichess-api';
 //import { puzzleFromDocument } from "../app/api/puzzle/nextPuzzle/nextFor";
 import similarity_distance from '../src/similarity';
 import { SimilarityColl } from '../models/SimilarityColl';
+import { AllRoundColl } from "@/models/AllRoundColl";
+
+const cache_size = 5;
 
 const puzzleFromDocument = (document: any): Puzzle => {
     let { _id: _, ...rest } = document;
@@ -23,16 +26,16 @@ export const findSimilarityInstance = async (
     return similarityInstance ? { puzzleId: similarityInstance.puzzleId, cache: similarityInstance.cache } : undefined;
   };
 
-// const findPuzzlebyId = async (
-//     puzzleId: String
-//   ): Promise<Puzzle | undefined> => {
-//     const p = await mongoose.connection.collection('testPuzzles').findOne({
-//       PuzzleId: { PuzzleId: puzzleId },
-//       },
-//     );
+  export const findPuzzlebyId = async (
+    puzzleId: String
+  ): Promise<Puzzle | undefined> => {
+    const p = await mongoose.connection.collection('testPuzzles').findOne({
+      PuzzleId: { PuzzleId: puzzleId },
+      },
+    );
    
-//     return puzzleFromDocument(p);
-// };
+    return puzzleFromDocument(p);
+};
 
 export const computeSimilarityCache = async(
     puzzle: Puzzle
@@ -45,22 +48,29 @@ export const computeSimilarityCache = async(
     
     let distanceList = allPuzzles.map(p => [p.PuzzleId, similarity_distance(p.hierarchy_tags,  puzzle.hierarchy_tags)]);
     distanceList.sort((a, b) => (a[1] as number) - (b[1] as number));
-    distanceList = distanceList.slice(0, 5);
+    distanceList = distanceList.slice(0, cache_size);
     const similarityCache = distanceList.map(e => e[0])
     
     return similarityCache as String[];
 }
 
-// export const updateSimlarity = async (
-// 	puzzle: Puzzle
-//   ): Promise<void> => {
-//     await SimilarityColl.create({
-//         puzzleId: "00008",
-//         cache: []
-//       });
-//     const c: SimilarityInstance = {puzzleId: "00008", cache: await computeSimilarityCache(puzzle)}
-// 	SimilarityColl.updateOne({puzzleId: "00008"}, c)
-//   }
+export const findSimilarUndoPuzzle = async(
+  instance: SimilarityInstance,
+  userName : String
+): Promise<String> => {
+    const cache = instance.cache
+    const curUser = await AllRoundColl.findOne({username : userName});
+    const solved = curUser.solved;
+    for (let i = 0; i < cache.length; i++) {
+      const curPuzzleId = cache[i];
+      if (solved.includes(curPuzzleId)) {
+        continue;
+      } else {
+        return curPuzzleId;
+      }
+    }
+    return "Whole cache has been solved.";
+}
 
 
 

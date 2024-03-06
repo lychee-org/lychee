@@ -11,8 +11,9 @@ import { ActivePuzzleColl } from '@/models/ActivePuzzle';
 import { booleanWithProbability } from '@/lib/utils';
 import { nextLeitnerReview } from '@/src/LeitnerIntance';
 import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
-import { computeSimilarityCache, findSimilarityInstance, SimilarityInstance } from '@/src/similarityCache';
+import { computeSimilarityCache, findSimilarityInstance, SimilarityInstance, findSimilarUndoPuzzle } from '@/src/similarityCache';
 import { SimilarityColl } from '@/models/SimilarityColl';
+import { findPuzzlebyId } from '@/src/similarityCache';
 
 const MAX_REPS: number = 20;
 const MAX_COMPROMISE: number = 3;
@@ -151,40 +152,46 @@ const nextPuzzleFor = async (
         console.log(
           `Worked! Puzzle Id: ${puzzleToReview.PuzzleId} from Leitner, tags: ${puzzleToReview.hierarchy_tags}`
         );
-        
-        
+        // Find the corresponding record in Similarity table.
         let instance: SimilarityInstance | undefined = await findSimilarityInstance(puzzleToReview.PuzzleId);
-        if (instance) {
-          instance = instance as SimilarityInstance;
-          if(instance.cache.length != 0) {
-            const similarPuzzle = instance.cache[0];
-          } else {
-            const similarPuzzles = await computeSimilarityCache(puzzleToReview);
-            instance.cache = similarPuzzles;
-            await SimilarityColl.updateOne({ puzzleId: puzzleToReview.PuzzleId }, instance);
-          }
-        } else {
-          await SimilarityColl.create({
+        let similarPuzzleId: String;
+
+        if (!instance) {
+          const similarPuzzles = await computeSimilarityCache(puzzleToReview);
+          const instanceCreated = {  
             puzzleId: puzzleToReview.PuzzleId,
-            cache: [],
-          });
+            cache: similarPuzzles, 
+          }
+          await SimilarityColl.create(instanceCreated);
+          instance = instanceCreated;
+        } 
+        similarPuzzleId = await findSimilarUndoPuzzle(instance, user.username);
+        // if (instance) {
+        //   instance = instance as SimilarityInstance;
+        //   similarPuzzleId = await findSimilarUndoPuzzle(instance, user.username);
+        // } else {
+        //   const similarPuzzles = await computeSimilarityCache(puzzleToReview);
+        //   instance = {  
+        //     puzzleId: puzzleToReview.PuzzleId,
+        //     cache: similarPuzzles, 
+        //   }
+        //   await SimilarityColl.create(instance);
+        //   similarPuzzleId = await findSimilarUndoPuzzle(instance, user.username);
+        // }
+        let similarPuzzle: Puzzle | undefined = await findPuzzlebyId(similarPuzzleId);
+        
+        if (similarPuzzleId == "Whole cache has been solved.") {
+          [similarPuzzle] = await similarBatchForCompromised(
+            user.username,
+            [puzzleToReview],
+            clampRating(rating.rating),
+            exceptions,
+            MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
+          );
+        } else {
+          similarPuzzle = similarPuzzle as Puzzle;
         }
-
-
-
-
-
-
-
-
-
-        // const [similarPuzzle] = await similarBatchForCompromised(
-        //   user.username,
-        //   [puzzleToReview],
-        //   clampRating(rating.rating),
-        //   exceptions,
-        //   MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
-        // );
+        
         console.log(
           `Got similar puzzle with tags ${similarPuzzle.hierarchy_tags} and line ${similarPuzzle.Moves}`
         );
