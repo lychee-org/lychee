@@ -152,35 +152,14 @@ const nextPuzzleFor = async (
         console.log(
           `Worked! Puzzle Id: ${puzzleToReview.PuzzleId} from Leitner, tags: ${puzzleToReview.hierarchy_tags}`
         );
-        // Find the corresponding record in Similarity table.
-        let instance: SimilarityInstance | undefined = await findSimilarityInstance(puzzleToReview.PuzzleId);
-        let similarPuzzleId: String;
-
-        if (!instance) {
-          const similarPuzzles = await computeSimilarityCache(puzzleToReview);
-          const instanceCreated = {  
-            puzzleId: puzzleToReview.PuzzleId,
-            cache: similarPuzzles
-          }
-          await SimilarityColl.create(instanceCreated);
-          instance = instanceCreated;
-        } 
-        similarPuzzleId = await findSimilarUndoPuzzle(instance, user.username);
-        
-        let similarPuzzle: Puzzle | undefined;
-        if (similarPuzzleId == "Whole cache has been solved.") {
-          [similarPuzzle] = await similarBatchForCompromised(
-            user.username,
-            [puzzleToReview],
-            clampRating(rating.rating),
-            exceptions,
-            MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
-          );
-        } else {
-          similarPuzzle = await findPuzzlebyId(similarPuzzleId);
-          similarPuzzle = similarPuzzle as Puzzle;
-        }
-        
+        const [similarPuzzle] = await similarBatchForCompromised(
+          user.username,
+          [puzzleToReview],
+          clampRating(rating.rating),
+          exceptions,
+          MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
+        );
+      
         console.log(
           `Got similar puzzle with tags ${similarPuzzle.hierarchy_tags} and line ${similarPuzzle.Moves}`
         );
