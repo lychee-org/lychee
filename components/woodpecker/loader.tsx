@@ -1,11 +1,12 @@
 'use client';
 
 import { Puzzle } from "@/types/lichess-api";
-import { RatingHolder, wrapperStyle } from "../puzzle-ui/puzzle-mode";
+import { RatingHolder } from "../puzzle-ui/puzzle-mode";
 import { CSSProperties, useState } from "react";
 import WoodPeckerMode from "./woodpecker-mode";
 import WoodLoadingBoard from "./loading";
 import './loader.css';
+import { cn } from "@/lib/utils";
 
 interface Props {
   rating: RatingHolder
@@ -73,7 +74,7 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
     puzzles.length === 0 ?
       <div style={colWrapperStyle as CSSProperties}>
         <WoodLoadingBoard />
-        <div style={wrapperStyle as CSSProperties}>
+        <div className={cn("flex", "justify-center")}>
           <button className="buttonstylec bg-controller-dark hover:bg-controller-light" onClick={newBatch}>New Batch</button>
           <button className="buttonstylec bg-controller-dark hover:bg-controller-light" onClick={similarReview}>Similar Review</button>
           <button className="buttonstylec bg-controller-dark hover:bg-controller-light" onClick={sameReview}>Identical Review</button>
