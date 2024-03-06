@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import sm2RandomThemeFromRatingMap from '../../../../src/sm2';
 import frequentiallyRandomTheme, { isIrrelevant } from './themeGenerator';
 import Rating from '@/src/rating/GlickoV2Rating';
+import { ActivePuzzleColl } from '@/models/ActivePuzzle';
 
 const MAX_REPS = 20;
 const MAX_COMPROMISE = 3;
@@ -107,8 +108,29 @@ const nextPuzzleRepetitions = async (
   return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
 };
 
-const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
+const nextPuzzleFor = async (
+  user: User,
+  checkActive: boolean = true,
+  makeActive: boolean = true
+): Promise<PuzzleWithUserRating> =>
   getExistingUserRating(user).then(async (userRating) => {
+    const rating = {
+      rating: userRating.rating,
+      ratingDeviation: userRating.ratingDeviation,
+      volatility: userRating.volatility,
+      numberOfResults: userRating.numberOfResults,
+    };
+
+    if (checkActive) {
+      const activePuzzle = await ActivePuzzleColl.findOne({
+        username: user.username,
+      });
+      if (activePuzzle) {
+        return { puzzle: JSON.parse(activePuzzle.puzzle) as Puzzle, 
+          rating: rating };
+        }
+    }
+
     // NB: The persisted rating map may contain irrelevant themes, but we don't
     // want to include these for nextPuzzle / SM2, so we filter them out below.
     const ratingMap = await getThemeRatings(user, true);
@@ -123,14 +145,18 @@ const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
     console.log(
       `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
     );
+
+    if (makeActive) {
+      await ActivePuzzleColl.updateOne(
+        { username: user.username },
+        { username: user.username, puzzle: JSON.stringify(puzzle), isReview: false },
+        { upsert: true }
+      )
+    }
+
     return {
       puzzle: puzzle,
-      rating: {
-        rating: userRating.rating,
-        ratingDeviation: userRating.ratingDeviation,
-        volatility: userRating.volatility,
-        numberOfResults: userRating.numberOfResults,
-      },
+      rating: rating,
     };
   });
 
