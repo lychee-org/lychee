@@ -1,5 +1,5 @@
-import { Puzzle } from "@/types/lichess-api";
-import mongoose, { Schema } from "mongoose";
+import { Puzzle } from '@/types/lichess-api';
+import mongoose, { Schema } from 'mongoose';
 
 const leitnerSchema = new Schema({
   username: { type: String, required: true },

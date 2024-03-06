@@ -126,9 +126,11 @@ const nextPuzzleFor = async (
         username: user.username,
       });
       if (activePuzzle) {
-        return { puzzle: JSON.parse(activePuzzle.puzzle) as Puzzle, 
-          rating: rating };
-        }
+        return {
+          puzzle: JSON.parse(activePuzzle.puzzle) as Puzzle,
+          rating: rating,
+        };
+      }
     }
 
     // NB: The persisted rating map may contain irrelevant themes, but we don't
@@ -149,9 +151,13 @@ const nextPuzzleFor = async (
     if (makeActive) {
       await ActivePuzzleColl.updateOne(
         { username: user.username },
-        { username: user.username, puzzle: JSON.stringify(puzzle), isReview: false },
+        {
+          username: user.username,
+          puzzle: JSON.stringify(puzzle),
+          isReview: false,
+        },
         { upsert: true }
-      )
+      );
     }
 
     return {

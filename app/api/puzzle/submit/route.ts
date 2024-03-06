@@ -59,7 +59,9 @@ export async function POST(req: NextRequest) {
   }
 
   // Delete active puzzle, as it is solved.
-  const activePuzzle = await ActivePuzzleColl.findOneAndDelete({ username: user.username });
+  const activePuzzle = await ActivePuzzleColl.findOneAndDelete({
+    username: user.username,
+  });
 
   // Scale the user's rating.
   if (activePuzzle.isReview) {
@@ -110,7 +112,7 @@ export async function POST(req: NextRequest) {
         new GameResult(getPuzzleRating(puzzle), themeRating)
       );
     }
-    
+
     if (activePuzzle.isReview) {
       scaleRatingDelta(oldRating, themeRating);
     }
