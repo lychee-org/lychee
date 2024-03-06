@@ -10,3 +10,7 @@ export function capitalize(s: string) {
   s = s.replace(/([A-Z])/g, ' $1');
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+export const booleanWithProbability = (probability: number): boolean => {
+  return Math.random() < probability;
+};

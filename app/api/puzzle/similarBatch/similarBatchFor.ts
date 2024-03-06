@@ -24,11 +24,12 @@ import similarity_distance from '@/src/similarity';
 const INITIAL_COMPROMISE = 2;
 const MAX_COMPROMISE = 4;
 
-const similarBatchForCompromised = async (
+export const similarBatchForCompromised = async (
   username: string,
   lastBatch: Puzzle[],
   clampedRating: number,
   solvedArray: string[],
+  minBatchFactor: number = 2,
   compromise: number = INITIAL_COMPROMISE
 ): Promise<Puzzle[]> => {
   // TODO: Handle no puzzles here.
@@ -58,7 +59,10 @@ const similarBatchForCompromised = async (
   console.log(`Found ${candidates.length} candidates.`);
   // If number of candidates is too small, let's increase the compromise factor.
   // TODO: Do this if similar puzzles are not sufficiently similar instead?
-  if (compromise < MAX_COMPROMISE && candidates.length < 2 * lastBatch.length) {
+  if (
+    compromise < MAX_COMPROMISE &&
+    candidates.length < minBatchFactor * lastBatch.length
+  ) {
     return await similarBatchForCompromised(
       username,
       lastBatch,

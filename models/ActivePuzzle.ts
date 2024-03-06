@@ -4,6 +4,7 @@ const activePuzzleSchema = new Schema({
   username: String,
   puzzle: String,
   isReview: Boolean,
+  reviewee: String, // Original puzzle, if it's a similar one. TODO: Redundancy with above.
 });
 
 // Index on username for fast lookups.

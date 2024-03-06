@@ -15,6 +15,7 @@ import { UserThemeColl } from '@/models/UserThemeColl';
 import addRound from './addRound';
 import { RatingHistory } from '@/models/RatingHistory';
 import { ActivePuzzleColl } from '@/models/ActivePuzzle';
+import { updateLeitner } from '@/src/LeitnerIntance';
 
 const REVIEW_SCALING_FACTOR = 0.7;
 
@@ -65,9 +66,9 @@ export async function POST(req: NextRequest) {
 
   // Scale the user's rating.
   if (activePuzzle.isReview) {
-    console.log(`New rating without scaling: ${userRating}`);
+    console.log(`New rating without scaling: ${userRating.rating}`);
     scaleRatingDelta(prv_.rating, userRating);
-    console.log(`New rating with scaling: ${userRating}`);
+    console.log(`New rating with scaling: ${userRating.rating}`);
   }
 
   // Update user's rating.
@@ -91,10 +92,15 @@ export async function POST(req: NextRequest) {
 
   await addRound(user, puzzle);
 
+  const reviewee = activePuzzle.isReview
+    ? (JSON.parse(activePuzzle.reviewee) as Puzzle)
+    : puzzle;
+  await updateLeitner(user, reviewee, success);
+
   // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
   // persist in the DB, as this information is useful for dashboard analysitcs.
   const ratingMap = await getThemeRatings(user, false);
-  console.log(ratingMap);
+  // console.log(ratingMap);
 
   // Update theme ratings.
   const themes = puzzle.Themes.split(' ');
