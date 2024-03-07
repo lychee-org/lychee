@@ -88,6 +88,7 @@ const nextPuzzleForThemeAndRating = async (
 };
 
 const nextPuzzleRepetitions = async (
+  username: string,
   rating: number,
   reps: number,
   ratingMap: Map<string, Rating>,
@@ -101,7 +102,7 @@ const nextPuzzleRepetitions = async (
   // Otherwise, let's run probabilistic SM2 on the rating map.
   const useSpacedRep = ratingMap.has(theme);
   if (useSpacedRep) {
-    theme = sm2RandomThemeFromRatingMap(ratingMap);
+    theme = await sm2RandomThemeFromRatingMap(username, ratingMap);
   }
   const p = await nextPuzzleForThemeAndRating(theme, rating, exceptions);
   if (p) {
@@ -115,7 +116,7 @@ const nextPuzzleRepetitions = async (
     );
     return p;
   }
-  return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
+  return await nextPuzzleRepetitions(username, rating, reps + 1, ratingMap, exceptions);
 };
 
 const nextThemedPuzzlesForRepetitions = async (
@@ -266,6 +267,7 @@ const nextPuzzleFor = async (
     // want to include these for nextPuzzle / SM2, so we filter them out below.
     const ratingMap = await getThemeRatings(user, true);
     const puzzle = await nextPuzzleRepetitions(
+      user.username,
       rating.rating,
       0,
       ratingMap,

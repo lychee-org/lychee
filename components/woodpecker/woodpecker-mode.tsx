@@ -25,7 +25,8 @@ const WoodPeckerMode: React.FC<WoodpeckerModeProps> = ({
 
   const submitNextPuzzle = (
     _success: boolean,
-    _prv: RatingHolder
+    _prv: RatingHolder,
+    _t: number
   ): Promise<RatingHolder> => Promise.resolve(_prv);
 
   const getNextPuzzle = () => {

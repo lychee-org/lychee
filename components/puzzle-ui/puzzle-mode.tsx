@@ -27,7 +27,8 @@ export const wrapperStyle = {
 export const PuzzleContext = React.createContext({
   submitNextPuzzle: (
     _success: boolean,
-    _prv: RatingHolder
+    _prv: RatingHolder,
+    t: number
   ): Promise<RatingHolder> => {
     throw new Error();
   },
@@ -53,7 +54,8 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   // submit the puzzle success/failure to the server
   const submitNextPuzzle = (
     success: boolean,
-    prv: RatingHolder
+    prv: RatingHolder,
+    t: number
   ): Promise<RatingHolder> =>
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
@@ -62,6 +64,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
         success_: success,
         prv_: prv,
         themeGroupStr: [],
+        time: t,
       }),
     })
       .then((response) => response.text())
