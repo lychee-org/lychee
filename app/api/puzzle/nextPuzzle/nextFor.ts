@@ -18,7 +18,7 @@ import { findPuzzlebyId } from '@/src/similarityCache';
 const MAX_REPS: number = 20;
 const MAX_COMPROMISE: number = 3;
 
-const LEITNER_PROBABILITY: number = 0.8; // TODO: Decrease this.
+const LEITNER_PROBABILITY: number = 0.2;
 const MIN_CANDIDATES: number = 10; // TODO: Increase this.
 
 export type PuzzleWithUserRating = {
@@ -157,7 +157,8 @@ const nextPuzzleFor = async (
           [puzzleToReview],
           clampRating(rating.rating),
           exceptions,
-          MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
+          MIN_CANDIDATES, // TODO: Increase this, or maybe start compromise at 3 instead, to use wider similarity radius? Unsure.
+          false
         );
       
         console.log(

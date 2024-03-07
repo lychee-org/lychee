@@ -1,7 +1,10 @@
-import { getThemeRatings } from '@/src/rating/getRating';
+import { getExistingUserRating, getThemeRatings } from '@/src/rating/getRating';
 import { User } from 'lucia';
 import { RatingHistory } from '@/models/RatingHistory';
 import * as d3 from 'd3';
+import { isIrrelevant } from '../puzzle/nextPuzzle/themeGenerator';
+import { allThemes } from '@/lib/utils';
+import { InitRatingColl } from '@/models/InitRatingColl';
 
 type RatingHistory = {
   rating: number;
@@ -16,7 +19,9 @@ export type ThemeData = {
   nb: number;
 };
 
-export const getThemes = async (user: User) => {
+export const getThemes = async (
+  user: User
+): Promise<[ThemeData[], string[]]> => {
   const themeRatings = await getThemeRatings(user, true);
   const ratings = await RatingHistory.find({ username: user.username });
 
@@ -35,11 +40,11 @@ export const getThemes = async (user: User) => {
   const data: ThemeData[] = [];
   for (let [k, v] of themeRatings) {
     if (k in ratingHistories) {
-      const streak = calculateStreak(ratingHistories[k]);
       ratingHistories[k].unshift({
         rating: 1500,
         createdAt: d3.timeMinute.offset(ratingHistories[k][0].createdAt, -10),
       });
+      const streak = calculateStreak(ratingHistories[k]);
       data.push({
         theme: k,
         ratings: ratingHistories[k],
@@ -50,17 +55,34 @@ export const getThemes = async (user: User) => {
     }
   }
 
-  return data;
+  // add themes that have no ratings after filtering fromm irrelevant themes
+  const missed = allThemes
+    .filter(isIrrelevant)
+    .filter((theme) => !(theme in themeRatings) || !(theme in ratingHistories));
+
+  return [data, missed];
 };
 
 export const ratingHistory = async (user: User) => {
+  const userRating = await getExistingUserRating(user);
+  const initRating =
+    (await InitRatingColl.findOne({ username: user.username })) || 1500;
   const ratings = await RatingHistory.find({
     username: user.username,
     theme: 'overall',
   });
+  const firstRating =
+    initRating.rating || ratings[0]?.rating || userRating.rating;
+  ratings.unshift({
+    rating: firstRating,
+    createdAt: d3.timeMinute.offset(
+      ratings[0]?.rating || new Date(Date.now()),
+      -10
+    ),
+  });
   return {
     ratings: ratings,
-    rating: ratings[ratings.length - 1]?.rating,
+    rating: userRating.rating,
     delta: calculateStreak(ratings),
   };
 };
@@ -72,7 +94,8 @@ const calculateStreak = (ratings: RatingHistory[]) => {
   // }
   let streak = 0;
 
-  for (let i = ratings.length - 2; i >= -1; i--) {
+  for (let i = ratings.length - 2; i >= 0; i--) {
+    // case not needed anymore
     if (i === -1) {
       streak += ratings[0].rating - 1500;
       break;
