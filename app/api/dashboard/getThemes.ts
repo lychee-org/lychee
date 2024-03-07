@@ -1,4 +1,4 @@
-import { getThemeRatings } from '@/src/rating/getRating';
+import { getExistingUserRating, getThemeRatings } from '@/src/rating/getRating';
 import { User } from 'lucia';
 import { RatingHistory } from '@/models/RatingHistory';
 import * as d3 from 'd3';
@@ -35,7 +35,6 @@ export const getThemes = async (user: User) => {
   const data: ThemeData[] = [];
   for (let [k, v] of themeRatings) {
     if (k in ratingHistories) {
-      const streak = calculateStreak(ratingHistories[k]);
       ratingHistories[k].unshift({
         rating: 1500,
         createdAt: d3.timeMinute.offset(ratingHistories[k][0].createdAt, -10),
@@ -45,6 +44,7 @@ export const getThemes = async (user: User) => {
         ratings: ratingHistories[k],
         rating: v.rating,
         delta: streak,
+      const streak = calculateStreak(ratingHistories[k]);
         nb: v.numberOfResults,
       });
     }
@@ -60,14 +60,22 @@ export const ratingHistory = async (user: User) => {
   });
   return {
     ratings: ratings,
-    rating: ratings[ratings.length - 1]?.rating,
+    rating: userRating.rating,
     delta: calculateStreak(ratings),
   };
 };
+  const userRating = await getExistingUserRating(user);
+  const initRating =
+    (await InitRatingColl.findOne({ username: user.username })) || 1500;
 
 const calculateStreak = (ratings: RatingHistory[]) => {
   // calculate delta from rating histories by adding up the longest running streak going from last to first
   // if (ratings.length === 1) {
+  const firstRating = initRating.rating || ratings[0]?.rating || userRating.rating;
+  ratings.unshift({
+    rating: firstRating,
+    createdAt: d3.timeMinute.offset(ratings[0]?.rating || new Date(Date.now()), -10),
+  });
   //   return ratings[0].rating - 1500;
   // }
   let streak = 0;
