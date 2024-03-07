@@ -15,7 +15,7 @@ import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
 const MAX_REPS: number = 20;
 const MAX_COMPROMISE: number = 3;
 
-const LEITNER_PROBABILITY: number = 0.8; // TODO: Decrease this.
+const LEITNER_PROBABILITY: number = 0.2;
 const MIN_CANDIDATES: number = 10; // TODO: Increase this.
 
 export type PuzzleWithUserRating = {
