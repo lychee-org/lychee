@@ -8,8 +8,8 @@ const themedLeitnerSchema = new Schema({
   groupID: String,
 });
 
-// Index on username for fast lookups.
-themedLeitnerSchema.index({ username: 1 }, { unique: true });
+// Index on username and groupID for fast lookups.
+themedLeitnerSchema.index({ username: 1, groupID: 1 }, { unique: true });
 
 export const ThemedLeitnerColl =
   mongoose.models.ThemedLeitner ||

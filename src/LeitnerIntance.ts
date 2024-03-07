@@ -140,6 +140,7 @@ export const updateThemedLeitner = async (
   if (!leitner) {
     if (!correct) {
       // We should initialise a default Leitner instance with this puzzle in Box A.
+      console.log("Creating themed Leiitner");
       await ThemedLeitnerColl.create({
         username: user.username,
         boxA: [puzzle],
@@ -161,7 +162,7 @@ export const updateThemedLeitner = async (
     `After update: boxA = ${leitner.boxA.map((puzzle) => puzzle.PuzzleId)}, boxB = ${leitner.boxB.map((puzzle) => puzzle.PuzzleId)}`
   );
   await ThemedLeitnerColl.updateOne(
-    { username: user.username },
-    { ...leitner, groupID: groupID }
+    { username: user.username, groupID: groupID },
+    { boxA: leitner.boxA, boxB: leitner.boxB }
   );
 };

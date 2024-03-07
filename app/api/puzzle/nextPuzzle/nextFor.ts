@@ -203,16 +203,30 @@ const nextPuzzleFor = async (
           `Got similar puzzle with tags ${similarPuzzle.hierarchy_tags} and line ${similarPuzzle.Moves}`
         );
         // TODO: If puzzle == similar puzzle or no similar puzzle?
-        await ActivePuzzleColl.updateOne(
-          { username: user.username },
-          {
-            username: user.username,
-            puzzle: JSON.stringify(similarPuzzle),
-            isReview: true,
-            reviewee: JSON.stringify(puzzleToReview),
-          },
-          { upsert: true }
-        );
+        if (group) {
+          await ActivePuzzleColl.updateOne(
+            { username: user.username },
+            {
+              username: user.username,
+              puzzle: JSON.stringify(similarPuzzle),
+              isReview: true,
+              reviewee: JSON.stringify(puzzleToReview),
+              groupID: group,
+            },
+            { upsert: true }
+          );
+        } else {
+          await ActivePuzzleColl.updateOne(
+            { username: user.username },
+            {
+              username: user.username,
+              puzzle: JSON.stringify(similarPuzzle),
+              isReview: true,
+              reviewee: JSON.stringify(puzzleToReview),
+            },
+            { upsert: true }
+          );
+        }
         return {
           puzzle: similarPuzzle,
           rating: rating,
