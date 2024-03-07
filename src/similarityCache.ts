@@ -54,7 +54,13 @@ export const computeSimilarityCache = async(
         throw new Error("cant get all puzzles from testPuzzles")
     }
     
-    let distanceList = allPuzzles.map(p => [p.PuzzleId, similarity_distance(p.hierarchy_tags,  puzzle.hierarchy_tags)]);
+    let memo = new Map<String, number>();
+    let distanceList = allPuzzles.map(p => {
+      if (memo.has(p.hierarchy_tags)) return [p.PuzzleId, memo.get(p.hierarchy_tags)];
+      const distance = similarity_distance(p.hierarchy_tags, puzzle.hierarchy_tags);
+      memo.set(p.hierarchy_tags, distance);
+      return [p.PuzzleId, distance];
+    });
     distanceList.sort((a, b) => (a[1] as number) - (b[1] as number));
     distanceList = distanceList.slice(0, cache_size);
     const similarityCache = distanceList.map(e => e[0])
