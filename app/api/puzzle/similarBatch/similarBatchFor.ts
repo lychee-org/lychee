@@ -33,48 +33,76 @@ export const similarBatchForCompromised = async (
   solvedArray: string[],
   minBatchFactor: number = 2,
   compromise: number = INITIAL_COMPROMISE
+): Promise<Puzzle[]> => {  
+  const candidates = await preprocessing(username, lastBatch, clampedRating, solvedArray, minBatchFactor, compromise);
+  
+  const ret = await Promise.all(lastBatch.map(async (puzzle) => {
+    let instance: SimilarityInstance | undefined = await findSimilarityInstance(puzzle.PuzzleId);
+    let similarPuzzleId: String;
+
+    if (!instance) {
+      const similarPuzzles = await computeSimilarityCache(puzzle);
+      const instanceCreated = {
+        puzzleId: puzzle.PuzzleId,
+        cache: similarPuzzles
+      }
+      await SimilarityColl.create(instanceCreated);
+      instance = instanceCreated;
+    }
+    similarPuzzleId = await findSimilarUndoPuzzle(instance, username);
+
+    if (similarPuzzleId == "Whole cache has been solved.") {
+      return similarBatchForCompromisedHelper(username, puzzle, solvedArray, candidates);
+    } else {
+      return (await findPuzzlebyId(similarPuzzleId)) as Puzzle;
+    }
+  }));
+
+  console.log(`Persisting ${solvedArray} for ${username}...`);
+  await AllRoundColl.updateOne(
+    { username: username },
+    { $set: { solved: solvedArray } }
+  );
+  await LastBatchColl.updateOne(
+    { username: username },
+    { batch: ret },
+    { upsert: true }
+  );
+  return ret;
+};
+
+
+
+const preprocessing = async (
+  username: string,
+  lastBatch: Puzzle[],
+  clampedRating: number,
+  solvedArray: string[],
+  minBatchFactor: number = 2,
+  compromise: number = INITIAL_COMPROMISE
 ): Promise<Puzzle[]> => {
-  // TODO: Handle no puzzles here.
-  let puzzleToReview = lastBatch[0];
-  let instance: SimilarityInstance | undefined = await findSimilarityInstance(puzzleToReview.PuzzleId);
-  let similarPuzzleId: String;
-
-  if (!instance) {
-    const similarPuzzles = await computeSimilarityCache(puzzleToReview);
-    const instanceCreated = {  
-      puzzleId: puzzleToReview.PuzzleId,
-      cache: similarPuzzles
-    }
-    await SimilarityColl.create(instanceCreated);
-    instance = instanceCreated;
-  } 
-
-  similarPuzzleId = await findSimilarUndoPuzzle(instance, username);
-  
-  if (similarPuzzleId == "Whole cache has been solved.") {
-    if (compromise == MAX_COMPROMISE) {
+  //TODO: Handle no puzzles here.
+  if (compromise == MAX_COMPROMISE) {
       console.log('Maximum compromise reached in similar batch retrieval.');
-    }
-  
-    const radius = radiusForRating(clampedRating, compromise);
-    console.log(`Radius for ${clampedRating} is ${radius}.`);
-  
-    // For efficiency, let's compute all non-solved puzzles in the radius.
-    // Observe that the solved array should update to avoid repeats in
-    // the batch. We will handle this manually later.
-    const candidates = (
-      await mongoose.connection
-        .collection('testPuzzles')
-        .find({
-          PuzzleId: { $nin: solvedArray },
-          Rating: {
-            $gt: clampedRating - radius,
-            $lt: clampedRating + radius,
-          },
-        })
-        .toArray()
-    ).map(puzzleFromDocument);
-  
+  }
+  const radius = radiusForRating(clampedRating, compromise);
+  console.log(`Radius for ${clampedRating} is ${radius}.`);
+  // For efficiency, let's compute all non-solved puzzles in the radius.
+  // Observe that the solved array should update to avoid repeats in
+  // the batch. We will handle this manually later.
+  const candidates = (
+    await mongoose.connection
+      .collection('testPuzzles')
+      .find({
+        PuzzleId: { $nin: solvedArray },
+        Rating: {
+          $gt: clampedRating - radius,
+          $lt: clampedRating + radius,
+        },
+      })
+      .toArray()
+  ).map(puzzleFromDocument);
+
     console.log(`Found ${candidates.length} candidates.`);
     // If number of candidates is too small, let's increase the compromise factor.
     // TODO: Do this if similar puzzles are not sufficiently similar instead?
@@ -82,59 +110,50 @@ export const similarBatchForCompromised = async (
       compromise < MAX_COMPROMISE &&
       candidates.length < minBatchFactor * lastBatch.length
     ) {
-      return await similarBatchForCompromised(
+      return await preprocessing(
         username,
         lastBatch,
         clampedRating,
         solvedArray,
         compromise + 1
       );
+    } else return candidates;
+};
+
+
+
+
+const similarBatchForCompromisedHelper = (
+  username: string,
+  singlePuzzle: Puzzle,
+  solvedArray: string[],
+  candidates: Puzzle[]
+): Puzzle => {
+  const solvedSet = new Set(solvedArray);
+  let min_distance = Infinity,
+  closest_puzzle = singlePuzzle;
+  candidates.forEach((candidate) => {
+    if (solvedSet.has(candidate.PuzzleId)) {
+      return;
     }
-  
-    const solvedSet = new Set(solvedArray);
-    const ret = lastBatch.map((puzzle) => {
-      let min_distance = Infinity,
-        closest_puzzle = puzzle;
-      candidates.forEach((candidate) => {
-        if (solvedSet.has(candidate.PuzzleId)) {
-          return;
-        }
-        const distance = similarity_distance(
-          puzzle.hierarchy_tags,
-          candidate.hierarchy_tags
-        );
-        if (distance < min_distance) {
-          min_distance = distance;
-          closest_puzzle = candidate;
-        }
-      });
-      console.log(
-        `Found ${closest_puzzle.hierarchy_tags} for ${puzzle.hierarchy_tags} with distance ${min_distance}`
-      );
-      solvedSet.add(closest_puzzle.PuzzleId);
-      solvedArray.push(closest_puzzle.PuzzleId); // Let's write to rounds in one go later.
-  
-      // TODO: If closest puzzle is sufficiently far away (which may be determined by `min_distance`),
-      // we should prefer repeating the puzzle (instead of providing a very un-"similar" puzzle).
-      return closest_puzzle;
-    });
-  
-    // Persist in both LastBatch and AllRound.
-    // TODO: persist in Round, if we eventually use Round.
-    console.log(`Persisting ${solvedArray} for ${username}...`);
-    await AllRoundColl.updateOne(
-      { username: username },
-      { $set: { solved: solvedArray } }
+    const distance = similarity_distance(
+      singlePuzzle.hierarchy_tags,
+      candidate.hierarchy_tags
     );
-    await LastBatchColl.updateOne(
-      { username: username },
-      { batch: ret },
-      { upsert: true }
-    );
-    return ret;    
-  } else {
-    return [(await findPuzzlebyId(similarPuzzleId)) as Puzzle];
-  }
+    if (distance < min_distance) {
+      min_distance = distance;
+      closest_puzzle = candidate;
+    }
+  });
+  console.log(
+    `Found ${closest_puzzle.hierarchy_tags} for ${singlePuzzle.hierarchy_tags} with distance ${min_distance}`
+  );
+  solvedSet.add(closest_puzzle.PuzzleId);
+  solvedArray.push(closest_puzzle.PuzzleId); // Let's write to rounds in one go later.
+
+  // TODO: If closest puzzle is sufficiently far away (which may be determined by `min_distance`),
+  // we should prefer repeating the puzzle (instead of providing a very un-"similar" puzzle).
+  return closest_puzzle;
 };
 
 // Returns empty array if no last batch is found.
