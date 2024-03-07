@@ -66,9 +66,9 @@ export async function POST(req: NextRequest) {
   const activePuzzle = await ActivePuzzleColl.findOneAndDelete({
     username: user.username,
   });
-  
+
   if (!activePuzzle) {
-    throw new Error("No active puzzle found - something is wrong!");
+    throw new Error('No active puzzle found - something is wrong!');
   }
 
   // Scale the user's rating.
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
   const reviewee = activePuzzle.isReview
     ? (JSON.parse(activePuzzle.reviewee) as Puzzle)
     : puzzle;
-  
+
   if (group) {
     await updateThemedLeitner(user, reviewee, success, group);
   } else {

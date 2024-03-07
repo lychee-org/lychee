@@ -31,7 +31,7 @@ export const PuzzleContext = React.createContext({
   ): Promise<RatingHolder> => {
     throw new Error();
   },
-  getNextPuzzle: () => { },
+  getNextPuzzle: () => {},
 });
 
 const PuzzleMode: React.FC<PuzzleModeProps> = ({
@@ -51,7 +51,12 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   ): Promise<RatingHolder> =>
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
-      body: JSON.stringify({ puzzle_: puzzle, success_: success, prv_: prv, themeGroupStr: [] }),
+      body: JSON.stringify({
+        puzzle_: puzzle,
+        success_: success,
+        prv_: prv,
+        themeGroupStr: [],
+      }),
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as RatingHolder);

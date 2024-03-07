@@ -34,7 +34,12 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
   ): Promise<RatingHolder> =>
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
-      body: JSON.stringify({ puzzle_: puzzle, success_: success, prv_: prv, themeGroupStr: group }),
+      body: JSON.stringify({
+        puzzle_: puzzle,
+        success_: success,
+        prv_: prv,
+        themeGroupStr: group,
+      }),
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as RatingHolder);

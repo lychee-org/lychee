@@ -140,7 +140,7 @@ export const updateThemedLeitner = async (
   if (!leitner) {
     if (!correct) {
       // We should initialise a default Leitner instance with this puzzle in Box A.
-      console.log("Creating themed Leiitner");
+      console.log('Creating themed Leiitner');
       await ThemedLeitnerColl.create({
         username: user.username,
         boxA: [puzzle],
