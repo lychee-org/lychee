@@ -4,6 +4,8 @@ import { Puzzle } from '../types/lichess-api';
 import similarity_distance from '../src/similarity';
 import { SimilarityColl } from '../models/SimilarityColl';
 import { AllRoundColl } from "@/models/AllRoundColl";
+import { getExistingUserRatingByName } from "./rating/getRating";
+import { clampRating } from "@/app/api/puzzle/nextPuzzle/nextFor";
 
 const cache_size = 5;
 
@@ -38,9 +40,17 @@ export const findSimilarityInstance = async (
 };
 
 export const computeSimilarityCache = async(
-    puzzle: Puzzle
+    puzzle: Puzzle,
+    username: string,
+    radius: number
     ): Promise<Array<String>> => {
-    const allPuzzles = (await mongoose.connection.collection('testPuzzles').find().toArray()).map(puzzleFromDocument);
+    const rating = await getExistingUserRatingByName(username);
+    const allPuzzles = (await mongoose.connection.collection('testPuzzles').find({
+      Rating: {
+        $gt: clampRating(rating.rating) - radius,
+        $lt: clampRating(rating.rating) + radius,
+      },
+    }).toArray()).map(puzzleFromDocument);
     
     if(!allPuzzles) {
         throw new Error("cant get all puzzles from testPuzzles")
