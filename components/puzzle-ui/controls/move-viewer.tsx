@@ -55,7 +55,7 @@ const MoveViewer = () => {
     return moves.slice(0, currentMove + 1).map((move, i) => {
       if (i % 2 === 0)
         return (
-          <React.Fragment>
+          <React.Fragment key={`mobile-move-viewer-item-${i}`}>
             <span
               className={cn(
                 'mobileMoveNumbering',
@@ -76,7 +76,7 @@ const MoveViewer = () => {
         );
       else {
         return (
-          <span
+          <span key={`mobile-move-viewer-item-${i}`}
             className={cn(
               'mobileMoveChild',
               i === currentMove ? 'highlighted' : ''
