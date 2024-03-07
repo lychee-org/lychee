@@ -60,6 +60,7 @@
   .chessboard {
     min-height: 300px;
     min-width: 300px;
+    width: max(min(70vh, 40vw), 300px);
     height: min(70vh, 40vw);
     border-radius: 4px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);

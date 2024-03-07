@@ -23,6 +23,7 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
 }) => {
   const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
   const [rating, setRating] = useState<RatingHolder>(initialRating);
+  const [loading, setLoading] = useState(false);
 
   // TODO: Handle when no more puzzles!
 
@@ -47,6 +48,7 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
 
   // get the next puzzle
   const getNextPuzzle = () => {
+    setLoading(true);
     fetch(`/api/puzzle/nextPuzzle`, {
       method: 'POST',
       body: JSON.stringify({ themeGroupStr: group }),
@@ -56,12 +58,13 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
       .then((response) => {
         setPuzzle(response.puzzle);
         setRating(response.rating);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
     <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-      <PuzzleBoard puzzle={puzzle} initialRating={rating} />
+      <PuzzleBoard puzzle={puzzle} initialRating={rating} loading={loading} />
     </PuzzleContext.Provider>
   );
 };
