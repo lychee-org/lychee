@@ -32,7 +32,7 @@ export const LineChart = ({
   const data = useMemo<Datapoint[]>(() => {
     const ans = [...data_];
     if (!ans.length || ans[0].createdAt > start) {
-      ans.unshift({ createdAt: start, rating: 1500 });
+      ans.unshift({ createdAt: start, rating: ans[0].rating });
     }
     ans.push({
       createdAt: new Date(),

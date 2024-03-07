@@ -8,6 +8,7 @@ import { LichessUser } from '@/types/lichess-api';
 import { fetchLichessRating } from '@/src/rating/getRating';
 import { RatingColl } from '@/models/RatingColl';
 import { AllRoundColl } from '@/models/AllRoundColl';
+import { InitRatingColl } from '@/models/InitRatingColl';
 
 export async function GET(request: Request): Promise<Response> {
   await dbConnect();
@@ -80,6 +81,10 @@ export async function GET(request: Request): Promise<Response> {
       ratingDeviation: userRating.ratingDeviation,
       volatility: userRating.volatility,
       numberOfResults: userRating.numberOfResults,
+    });
+    await InitRatingColl.create({
+      username: user.username,
+      rating: userRating.rating,
     });
 
     // Initialise user rounds.
