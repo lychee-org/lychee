@@ -35,14 +35,12 @@ export const similarBatchForCompromised = async (
   compromise: number = INITIAL_COMPROMISE
 ): Promise<Puzzle[]> => {  
   const candidates = await preprocessing(username, lastBatch, clampedRating, solvedArray, minBatchFactor, compromise);
-  const radius = radiusForRating(clampedRating, compromise);
-
   const ret = await Promise.all(lastBatch.map(async (puzzle) => {
     let instance: SimilarityInstance | undefined = await findSimilarityInstance(puzzle.PuzzleId);
     let similarPuzzleId: String;
 
     if (!instance) {
-      const similarPuzzles = await computeSimilarityCache(puzzle, username, radius);
+      const similarPuzzles = await computeSimilarityCache(puzzle, username);
       const instanceCreated = {
         puzzleId: puzzle.PuzzleId,
         cache: similarPuzzles
@@ -71,8 +69,6 @@ export const similarBatchForCompromised = async (
   );
   return ret;
 };
-
-
 
 const preprocessing = async (
   username: string,

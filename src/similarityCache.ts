@@ -41,14 +41,14 @@ export const findSimilarityInstance = async (
 
 export const computeSimilarityCache = async(
     puzzle: Puzzle,
-    username: string,
-    radius: number
+    username: string
     ): Promise<Array<String>> => {
+    const radius = 300;
     const rating = await getExistingUserRatingByName(username);
     const allPuzzles = (await mongoose.connection.collection('testPuzzles').find({
       Rating: {
-        $gt: clampRating(rating.rating) - radius,
-        $lt: clampRating(rating.rating) + radius,
+        $gt: puzzle.Rating - radius,
+        $lt: puzzle.Rating + radius,
       },
     }).toArray()).map(puzzleFromDocument);
     
