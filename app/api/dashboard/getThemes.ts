@@ -71,10 +71,14 @@ export const ratingHistory = async (user: User) => {
 const calculateStreak = (ratings: RatingHistory[]) => {
   // calculate delta from rating histories by adding up the longest running streak going from last to first
   // if (ratings.length === 1) {
-  const firstRating = initRating.rating || ratings[0]?.rating || userRating.rating;
+  const firstRating =
+    initRating.rating || ratings[0]?.rating || userRating.rating;
   ratings.unshift({
     rating: firstRating,
-    createdAt: d3.timeMinute.offset(ratings[0]?.rating || new Date(Date.now()), -10),
+    createdAt: d3.timeMinute.offset(
+      ratings[0]?.rating || new Date(Date.now()),
+      -10
+    ),
   });
   //   return ratings[0].rating - 1500;
   // }
