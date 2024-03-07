@@ -1,13 +1,12 @@
 'use client';
 
 import { Puzzle } from '@/types/lichess-api';
-import { RatingHolder, wrapperStyle } from '../puzzle-ui/puzzle-mode';
+import { RatingHolder } from '../puzzle-ui/puzzle-mode';
 import { CSSProperties, useState } from 'react';
 import WoodPeckerMode from './woodpecker-mode';
 import WoodLoadingBoard from './loading';
 import './loader.css';
-
-const WOODPECKER_BATCH_SIZE: number = 2;
+import { cn } from '@/lib/utils';
 
 interface Props {
   rating: RatingHolder;
@@ -34,8 +33,7 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
     // TODO: which of these do we want to do on (1) now, (2) mode completion, (3) puzzle completion?
     // (Should just be the callback to WoodPeckerMode for (2), and submitNextPuzzle within the mode for (3))
     await fetch(`/api/puzzle/nextBatch`, {
-      method: 'POST',
-      body: JSON.stringify({ batchSize: WOODPECKER_BATCH_SIZE }),
+      method: 'GET',
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as Puzzle[])
@@ -65,7 +63,7 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
   const similarReview = async () => {
     // This will find similar puzzles, persisting them in AllRound and in LastBatch.
     await fetch(`/api/puzzle/similarBatch`, {
-      method: 'POST',
+      method: 'GET',
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as Puzzle[])
@@ -84,7 +82,7 @@ const WoodpeckerLoader: React.FC<Props> = ({ rating }) => {
   return puzzles.length === 0 ? (
     <div style={colWrapperStyle as CSSProperties}>
       <WoodLoadingBoard />
-      <div style={wrapperStyle as CSSProperties}>
+      <div className={cn('flex', 'justify-center')}>
         <button
           className='buttonstylec bg-controller-dark hover:bg-controller-light'
           onClick={newBatch}

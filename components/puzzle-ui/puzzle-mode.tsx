@@ -16,14 +16,6 @@ export interface PuzzleModeProps {
   initialRating: RatingHolder;
 }
 
-export const wrapperStyle = {
-  width: '60vw',
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  margin: '3rem auto',
-};
-
 export const PuzzleContext = React.createContext({
   submitNextPuzzle: (
     _success: boolean,
@@ -82,11 +74,9 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   };
 
   return (
-    <div style={wrapperStyle as CSSProperties}>
-      <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-        <PuzzleBoard puzzle={puzzle} initialRating={rating} />
-      </PuzzleContext.Provider>
-    </div>
+    <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
+      <PuzzleBoard puzzle={puzzle} initialRating={rating} />
+    </PuzzleContext.Provider>
   );
 };
 
