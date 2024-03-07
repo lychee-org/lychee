@@ -7,9 +7,16 @@ import mongoose from 'mongoose';
 import sm2RandomThemeFromRatingMap from '../../../../src/sm2';
 import frequentiallyRandomTheme, { isIrrelevant } from './themeGenerator';
 import Rating from '@/src/rating/GlickoV2Rating';
+import { ActivePuzzleColl } from '@/models/ActivePuzzle';
+import { booleanWithProbability } from '@/lib/utils';
+import { nextLeitnerReview } from '@/src/LeitnerIntance';
+import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
 
-const MAX_REPS = 20;
-const MAX_COMPROMISE = 3;
+const MAX_REPS: number = 20;
+const MAX_COMPROMISE: number = 3;
+
+const LEITNER_PROBABILITY: number = 0.2;
+const MIN_CANDIDATES: number = 10; // TODO: Increase this.
 
 export type PuzzleWithUserRating = {
   puzzle: Puzzle;
@@ -107,15 +114,75 @@ const nextPuzzleRepetitions = async (
   return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
 };
 
-const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
+const nextPuzzleFor = async (
+  user: User,
+  woodpecker: boolean = false
+): Promise<PuzzleWithUserRating> =>
   getExistingUserRating(user).then(async (userRating) => {
+    const rating = {
+      rating: userRating.rating,
+      ratingDeviation: userRating.ratingDeviation,
+      volatility: userRating.volatility,
+      numberOfResults: userRating.numberOfResults,
+    };
+
+    if (!woodpecker) {
+      const activePuzzle = await ActivePuzzleColl.findOne({
+        username: user.username,
+      });
+      if (activePuzzle) {
+        console.log('Found active puzzle');
+        return {
+          puzzle: JSON.parse(activePuzzle.puzzle) as Puzzle,
+          rating: rating,
+        };
+      }
+    }
+
+    // TODO: Iterate to better handle repeat avoidance.
+    const exceptions: string[] = await getUserSolvedPuzzleIDs(user);
+
+    if (!woodpecker && booleanWithProbability(LEITNER_PROBABILITY)) {
+      console.log('Trying to use Leitner...');
+      const puzzleToReview = await nextLeitnerReview(user);
+      if (puzzleToReview) {
+        console.log(
+          `Worked! Puzzle Id: ${puzzleToReview.PuzzleId} from Leitner, tags: ${puzzleToReview.hierarchy_tags}`
+        );
+        const [similarPuzzle] = await similarBatchForCompromised(
+          user.username,
+          [puzzleToReview],
+          clampRating(rating.rating),
+          exceptions,
+          MIN_CANDIDATES, // TODO: Increase this, or maybe start compromise at 3 instead, to use wider similarity radius? Unsure.
+          false
+        );
+        console.log(
+          `Got similar puzzle with tags ${similarPuzzle.hierarchy_tags} and line ${similarPuzzle.Moves}`
+        );
+        // TODO: If puzzle == similar puzzle or no similar puzzle?
+        await ActivePuzzleColl.updateOne(
+          { username: user.username },
+          {
+            username: user.username,
+            puzzle: JSON.stringify(similarPuzzle),
+            isReview: true,
+            reviewee: JSON.stringify(puzzleToReview),
+          },
+          { upsert: true }
+        );
+        return {
+          puzzle: similarPuzzle,
+          rating: rating,
+        };
+      }
+    }
+
     // NB: The persisted rating map may contain irrelevant themes, but we don't
     // want to include these for nextPuzzle / SM2, so we filter them out below.
     const ratingMap = await getThemeRatings(user, true);
-    // TODO: Iterate to better handle repeat avoidance.
-    const exceptions: string[] = await getUserSolvedPuzzleIDs(user);
     const puzzle = await nextPuzzleRepetitions(
-      userRating.rating,
+      rating.rating,
       0,
       ratingMap,
       exceptions
@@ -123,14 +190,22 @@ const nextPuzzleFor = async (user: User): Promise<PuzzleWithUserRating> =>
     console.log(
       `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
     );
+
+    if (!woodpecker) {
+      await ActivePuzzleColl.updateOne(
+        { username: user.username },
+        {
+          username: user.username,
+          puzzle: JSON.stringify(puzzle),
+          isReview: false,
+        },
+        { upsert: true }
+      );
+    }
+
     return {
       puzzle: puzzle,
-      rating: {
-        rating: userRating.rating,
-        ratingDeviation: userRating.ratingDeviation,
-        volatility: userRating.volatility,
-        numberOfResults: userRating.numberOfResults,
-      },
+      rating: rating,
     };
   });
 

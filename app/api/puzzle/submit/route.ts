@@ -6,16 +6,30 @@ import RatingCalculator from '@/src/rating/RatingCalculator';
 import { Puzzle } from '@/types/lichess-api';
 import { NextRequest } from 'next/server';
 import { RatingColl } from '../../../../models/RatingColl';
-import { RoundColl } from '@/models/RoundColl';
 import {
   getDefaultRating,
   getPuzzleRating,
   getThemeRatings,
 } from '@/src/rating/getRating';
-import { AllRoundColl } from '@/models/AllRoundColl';
 import { UserThemeColl } from '@/models/UserThemeColl';
 import addRound from './addRound';
 import { RatingHistory } from '@/models/RatingHistory';
+import { ActivePuzzleColl } from '@/models/ActivePuzzle';
+import { updateLeitner } from '@/src/LeitnerIntance';
+
+const REVIEW_SCALING_FACTOR = 0.7;
+
+// If the puzzle was a review, we scale the rating change by 70%.
+// We apply this both to user's overrall rating and to theme ratings.
+// TODO: This also reduces rating decrease for failed reviews (the idea being
+// not to penalise a user being bad at something), but one can argue that
+// we should be harsher instead on a failed review.
+// TODO: Should we scale the rating deviation and volatility as well? Not
+// sure how safe it is to solely scale the rating.
+const scaleRatingDelta = (oldRating: number, newGlicko: Rating): void => {
+  const delta = newGlicko.rating - oldRating;
+  newGlicko.rating = oldRating + REVIEW_SCALING_FACTOR * delta;
+};
 
 export async function POST(req: NextRequest) {
   await dbConnect();
@@ -45,6 +59,18 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Delete active puzzle, as it is solved.
+  const activePuzzle = await ActivePuzzleColl.findOneAndDelete({
+    username: user.username,
+  });
+
+  // Scale the user's rating.
+  if (activePuzzle.isReview) {
+    console.log(`New rating without scaling: ${userRating.rating}`);
+    scaleRatingDelta(prv_.rating, userRating);
+    console.log(`New rating with scaling: ${userRating.rating}`);
+  }
+
   // Update user's rating.
   await RatingColl.updateOne(
     { username: user.username },
@@ -66,16 +92,21 @@ export async function POST(req: NextRequest) {
 
   await addRound(user, puzzle);
 
+  const reviewee = activePuzzle.isReview
+    ? (JSON.parse(activePuzzle.reviewee) as Puzzle)
+    : puzzle;
+  await updateLeitner(user, reviewee, success);
+
   // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
   // persist in the DB, as this information is useful for dashboard analysitcs.
   const ratingMap = await getThemeRatings(user, false);
-  console.log(ratingMap);
+  // console.log(ratingMap);
 
   // Update theme ratings.
   const themes = puzzle.Themes.split(' ');
   themes.forEach(async (theme) => {
-    const newTheme = !ratingMap.has(theme);
     const themeRating: Rating = ratingMap.get(theme) || getDefaultRating();
+    const oldRating: number = themeRating.rating;
 
     if (success) {
       new RatingCalculator().updateRatings(
@@ -86,6 +117,10 @@ export async function POST(req: NextRequest) {
       new RatingCalculator().updateRatings(
         new GameResult(getPuzzleRating(puzzle), themeRating)
       );
+    }
+
+    if (activePuzzle.isReview) {
+      scaleRatingDelta(oldRating, themeRating);
     }
 
     await UserThemeColl.updateOne(

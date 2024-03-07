@@ -14,6 +14,11 @@ export function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+export const booleanWithProbability = (probability: number): boolean => {
+  return Math.random() < probability;
+};
+
+// TODO: Reduce duplication here.
 export const allThemes = [
   'advancedPawn',
   'advantage',

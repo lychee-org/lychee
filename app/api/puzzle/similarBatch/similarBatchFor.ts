@@ -24,11 +24,13 @@ import similarity_distance from '@/src/similarity';
 const INITIAL_COMPROMISE = 2;
 const MAX_COMPROMISE = 4;
 
-const similarBatchForCompromised = async (
+export const similarBatchForCompromised = async (
   username: string,
   lastBatch: Puzzle[],
   clampedRating: number,
   solvedArray: string[],
+  minBatchFactor: number = 2,
+  persist: boolean = true,
   compromise: number = INITIAL_COMPROMISE
 ): Promise<Puzzle[]> => {
   // TODO: Handle no puzzles here.
@@ -58,7 +60,10 @@ const similarBatchForCompromised = async (
   console.log(`Found ${candidates.length} candidates.`);
   // If number of candidates is too small, let's increase the compromise factor.
   // TODO: Do this if similar puzzles are not sufficiently similar instead?
-  if (compromise < MAX_COMPROMISE && candidates.length < 2 * lastBatch.length) {
+  if (
+    compromise < MAX_COMPROMISE &&
+    candidates.length < minBatchFactor * lastBatch.length
+  ) {
     return await similarBatchForCompromised(
       username,
       lastBatch,
@@ -96,19 +101,20 @@ const similarBatchForCompromised = async (
     return closest_puzzle;
   });
 
-  // Persist in both LastBatch and AllRound.
-  // TODO: persist in Round, if we eventually use Round.
-  console.log(`Persisting ${solvedArray} for ${username}...`);
-  await AllRoundColl.updateOne(
-    { username: username },
-    { $set: { solved: solvedArray } }
-  );
-  await LastBatchColl.updateOne(
-    { username: username },
-    { batch: ret },
-    { upsert: true }
-  );
-
+  if (persist) {
+    // Persist in both LastBatch and AllRound.
+    // TODO: persist in Round, if we eventually use Round.
+    console.log(`Persisting ${solvedArray} for ${username}...`);
+    await AllRoundColl.updateOne(
+      { username: username },
+      { $set: { solved: solvedArray } }
+    );
+    await LastBatchColl.updateOne(
+      { username: username },
+      { batch: ret },
+      { upsert: true }
+    );
+  }
   return ret;
 };
 

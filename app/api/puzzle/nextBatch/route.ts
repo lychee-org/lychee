@@ -17,7 +17,9 @@ export async function POST(req: NextRequest) {
   const { batchSize } = await req.json();
   const puzzles = new Array<Puzzle>();
   for (let i = 0; i < batchSize; i++) {
-    const { puzzle } = await nextPuzzleFor(user);
+    // We shouldn't mark as active, since then whole batch will be the same.
+    // TODO: Same batch on refresh?
+    const { puzzle } = await nextPuzzleFor(user, true);
     await addRound(user, puzzle);
     puzzles.push(puzzle);
   }
