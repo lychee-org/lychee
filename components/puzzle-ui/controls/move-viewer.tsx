@@ -76,7 +76,8 @@ const MoveViewer = () => {
         );
       else {
         return (
-          <span key={`mobile-move-viewer-item-${i}`}
+          <span
+            key={`mobile-move-viewer-item-${i}`}
             className={cn(
               'mobileMoveChild',
               i === currentMove ? 'highlighted' : ''
