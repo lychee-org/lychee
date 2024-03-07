@@ -34,6 +34,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   /** PUZZLE CODE */
   const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
   const [rating, setRating] = useState<RatingHolder>(initialRating);
+  const [loading, setLoading] = useState(false);
 
   // TODO: Handle when no more puzzles!
   useEffect(() => {
@@ -64,6 +65,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
 
   // get the next puzzle
   const getNextPuzzle = () => {
+    setLoading(true);
     fetch(`/api/puzzle/nextPuzzle`, {
       method: 'POST',
       body: JSON.stringify({ themeGroupStr: [] }),
@@ -73,12 +75,13 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
       .then((response) => {
         setPuzzle(response.puzzle);
         setRating(response.rating);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
     <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-      <PuzzleBoard puzzle={puzzle} initialRating={rating} />
+      <PuzzleBoard puzzle={puzzle} initialRating={rating} loading={loading} />
     </PuzzleContext.Provider>
   );
 };

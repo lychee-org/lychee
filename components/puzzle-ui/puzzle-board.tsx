@@ -20,9 +20,14 @@ import { cn } from '@/lib/utils';
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
   initialRating: RatingHolder;
+  loading: boolean;
 }
 // set its props to be the puzzle object
-const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
+const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
+  puzzle,
+  initialRating,
+  loading,
+}) => {
   const { submitNextPuzzle: submitPuzzle, getNextPuzzle } =
     useContext(PuzzleContext);
   const line = puzzle?.Moves.split(' ') ?? [];
@@ -211,9 +216,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     .find((_, i) => i === playbackPos - 1);
 
   return (
-    <div className={cn('ui-wrapper')}>
-      <div className='chessboard-container'>
-        <div className='chessboard'>
+    <div className='flex flex-col items-center py-4 md:py-12'>
+      <div className='flex flex-col w-full gap-1 md:gap-4 px-4 max-w-md md:flex-row md:max-w-5xl md:justify-center'>
+        <div className='flex-1 md:max-w-xl'>
           <ChessboardWrapped
             side={side}
             fen={fen}
@@ -229,14 +234,12 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
             }
           />
         </div>
-        <div className='control-panel flex flex-col'>
+        <div className='flex-none shrink-0 md:w-80 space-y-1 md:space-y-4'>
           <div className='bg-muted text-center p-2 rounded-md font-mono tracking-widest'>
             {new Date(time).toISOString().substring(14, 19)}
           </div>
-          <div className='rating-container bg-card'>
-            <RatingComponent rating={rating.rating} />
-          </div>
-          <div className='move-viewer-container'>
+          <RatingComponent rating={rating.rating} />
+          <div className='move-viewer-container rounded-lg overflow-hidden'>
             <div className='fromGameHeader bg-controller hover:bg-controller-light'>
               Puzzle #{puzzle.PuzzleId}
             </div>
@@ -251,8 +254,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
               <ControlButtonBar />
             </PlaybackControllerContext.Provider>
           </div>
-          <div className='displayBox bg-card'>
+          <div className='flex items-center bg-controller rounded-lg p-4'>
             <DisplayBox
+              loading={loading}
               gaveUp={gaveUp}
               lastMoveWrong={lastMoveWrong}
               solved={solved}
@@ -262,7 +266,6 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
             />
           </div>
         </div>
-        <div></div>
       </div>
     </div>
   );

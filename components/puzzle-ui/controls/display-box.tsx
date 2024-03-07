@@ -1,9 +1,11 @@
 import { CrossCircledIcon, CheckCircledIcon } from '@radix-ui/react-icons';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { PuzzleContext } from '../puzzle-mode';
 import './display-box.css';
+import { Button } from '@/components/ui/button';
 
 const DisplayBox = ({
+  loading,
   gaveUp,
   solved,
   lastMoveWrong,
@@ -11,9 +13,10 @@ const DisplayBox = ({
   side,
   viewSolution,
 }: {
-  gaveUp: Boolean;
-  solved: Boolean;
-  lastMoveWrong: Boolean;
+  loading: boolean;
+  gaveUp: boolean;
+  solved: boolean;
+  lastMoveWrong: boolean;
   linePos: number;
   side: string;
   viewSolution: () => void;
@@ -26,12 +29,9 @@ const DisplayBox = ({
     <div className='icon-container'>
       <div className='icon-wrapper text-red-500 text'>{wrongIcon}</div>
       <div className='text-wrapper'>Sorry, that&apos;s not it...</div>
-      <button
-        className='buttonstyle bg-controller-dark hover:bg-controller-light'
-        onClick={viewSolution}
-      >
+      <Button variant={'secondary'} onClick={viewSolution}>
         View Solution
-      </button>
+      </Button>
     </div>
   );
   let correctDiv = (
@@ -44,18 +44,16 @@ const DisplayBox = ({
     <div className='icon-container'>
       <div className='icon-wrapper text-green-500'>{correctIcon}</div>
       <div className='text-wrapper'>Amazing! You solved it</div>
-      <button
-        className='buttonstyle bg-controller-dark hover:bg-controller-light'
-        onClick={getNextPuzzle}
-      >
-        Next Puzzle
-      </button>
+      <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>
+        {loading ? 'Loading...' : 'Next Puzzle'}
+      </Button>
     </div>
   );
   let sideInfo = (
     <div className='icon-container'>
-      <div className='text-wrapper'>
-        Your turn: Find the best move for {side === 'w' ? 'white' : 'black'}
+      <div className='font-bold'>Your turn</div>
+      <div className=''>
+        Find the best move for {side === 'w' ? 'white' : 'black'}
       </div>
     </div>
   );
@@ -63,12 +61,9 @@ const DisplayBox = ({
     <div className='icon-container'>
       <div className='icon-wrapper text-yellow-500'>{wrongIcon}</div>
       <div className='text-wrapper'>Here is the correct solution</div>
-      <button
-        className='buttonstyle bg-controller-dark hover:bg-controller-light'
-        onClick={getNextPuzzle}
-      >
-        Next Puzzle
-      </button>
+      <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>
+        {loading ? 'Loading...' : 'Next Puzzle'}
+      </Button>
     </div>
   );
 
