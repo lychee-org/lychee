@@ -39,12 +39,12 @@ export const getThemes = async (user: User) => {
         rating: 1500,
         createdAt: d3.timeMinute.offset(ratingHistories[k][0].createdAt, -10),
       });
+      const streak = calculateStreak(ratingHistories[k]);
       data.push({
         theme: k,
         ratings: ratingHistories[k],
         rating: v.rating,
         delta: streak,
-      const streak = calculateStreak(ratingHistories[k]);
         nb: v.numberOfResults,
       });
     }
