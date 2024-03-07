@@ -11,7 +11,7 @@ export type RatingHolder = {
   numberOfResults: number;
 };
 
-interface PuzzleModeProps {
+export interface PuzzleModeProps {
   initialPuzzle: Puzzle;
   initialRating: RatingHolder;
 }
@@ -59,7 +59,8 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   // get the next puzzle
   const getNextPuzzle = () => {
     fetch(`/api/puzzle/nextPuzzle`, {
-      method: 'GET',
+      method: 'POST',
+      body: JSON.stringify({ themeGroupStr: [] }),
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as PuzzleWithUserRating)

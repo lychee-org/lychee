@@ -9,7 +9,10 @@ import frequentiallyRandomTheme, { isIrrelevant } from './themeGenerator';
 import Rating from '@/src/rating/GlickoV2Rating';
 import { ActivePuzzleColl } from '@/models/ActivePuzzle';
 import { booleanWithProbability, toGroupId } from '@/lib/utils';
-import { nextLeitnerReview, nextThemedLeitnerReview } from '@/src/LeitnerIntance';
+import {
+  nextLeitnerReview,
+  nextThemedLeitnerReview,
+} from '@/src/LeitnerIntance';
 import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
 import { assert } from 'console';
 
@@ -130,8 +133,13 @@ const nextThemedPuzzlesForRepetitions = async (
     console.log(`Found grouped theme ${theme} after ${reps} reps.`);
     return p;
   }
-  return await nextThemedPuzzlesForRepetitions(rating, reps + 1, themeGroup, expceptions);
-}
+  return await nextThemedPuzzlesForRepetitions(
+    rating,
+    reps + 1,
+    themeGroup,
+    expceptions
+  );
+};
 
 const nextPuzzleFor = async (
   user: User,
@@ -152,7 +160,10 @@ const nextPuzzleFor = async (
         username: user.username,
       });
       if (activePuzzle) {
-        if ((group && activePuzzle.groupID !== group) || (!group && activePuzzle.groupID)) {
+        if (
+          (group && activePuzzle.groupID !== group) ||
+          (!group && activePuzzle.groupID)
+        ) {
           // TODO: Maybe preserve previous active puzzle? But we need to be
           // careful in case this mode solves that puzzle, then back in
           // normal mode user solves puzzle again - then errors!
@@ -173,7 +184,9 @@ const nextPuzzleFor = async (
 
     if (!woodpecker && booleanWithProbability(LEITNER_PROBABILITY)) {
       console.log('Trying to use Leitner...');
-      const puzzleToReview = group ? await nextThemedLeitnerReview(user, group) : await nextLeitnerReview(user);
+      const puzzleToReview = group
+        ? await nextThemedLeitnerReview(user, group)
+        : await nextLeitnerReview(user);
       if (puzzleToReview) {
         console.log(
           `Worked! Puzzle Id: ${puzzleToReview.PuzzleId} from Leitner, tags: ${puzzleToReview.hierarchy_tags}`
@@ -208,7 +221,12 @@ const nextPuzzleFor = async (
     }
 
     if (group) {
-      const puzzle = await nextThemedPuzzlesForRepetitions(rating.rating, 0, themeGroup, exceptions);
+      const puzzle = await nextThemedPuzzlesForRepetitions(
+        rating.rating,
+        0,
+        themeGroup,
+        exceptions
+      );
       console.log(
         `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
       );

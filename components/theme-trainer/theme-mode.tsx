@@ -5,45 +5,61 @@ import React, { CSSProperties, useState } from 'react';
 import PuzzleBoard from '../puzzle-ui/puzzle-board';
 import {
   PuzzleContext,
+  PuzzleModeProps,
   RatingHolder,
   wrapperStyle,
 } from '../puzzle-ui/puzzle-mode';
+import { PuzzleWithUserRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
 
-interface WoodpeckerModeProps {
-  initialPuzzles: Puzzle[];
+interface ThemeModeProps {
+  initialPuzzle: Puzzle;
   initialRating: RatingHolder;
-  callback: () => void;
+  group: string[];
 }
 
-const WoodPeckerMode: React.FC<WoodpeckerModeProps> = ({
-  initialPuzzles,
+const ThemeMode: React.FC<ThemeModeProps> = ({
+  initialPuzzle,
   initialRating,
-  callback,
+  group,
 }) => {
-  const [puzzle, setPuzzle] = useState<Puzzle | undefined>(initialPuzzles[0]);
-  const [puzzles, setPuzzles] = useState<Puzzle[]>(initialPuzzles);
+  const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
+  const [rating, setRating] = useState<RatingHolder>(initialRating);
 
+  // TODO: Handle when no more puzzles!
+
+  // submit the puzzle success/failure to the server
   const submitNextPuzzle = (
-    _success: boolean,
-    _prv: RatingHolder
-  ): Promise<RatingHolder> => Promise.resolve(_prv);
+    success: boolean,
+    prv: RatingHolder
+  ): Promise<RatingHolder> =>
+    fetch(`/api/puzzle/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ puzzle_: puzzle, success_: success, prv_: prv }),
+    })
+      .then((response) => response.text())
+      .then((s) => JSON.parse(s) as RatingHolder);
 
+  // get the next puzzle
   const getNextPuzzle = () => {
-    if (puzzles.length === 1) {
-      callback();
-      return;
-    }
-    setPuzzle(puzzles[1]);
-    setPuzzles(puzzles.slice(1));
+    fetch(`/api/puzzle/nextPuzzle`, {
+      method: 'POST',
+      body: JSON.stringify({ themeGroupStr: group }),
+    })
+      .then((response) => response.text())
+      .then((s) => JSON.parse(s) as PuzzleWithUserRating)
+      .then((response) => {
+        setPuzzle(response.puzzle);
+        setRating(response.rating);
+      });
   };
 
   return (
     <div style={wrapperStyle as CSSProperties}>
       <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-        <PuzzleBoard puzzle={puzzle} initialRating={initialRating} />
+        <PuzzleBoard puzzle={puzzle} initialRating={rating} />
       </PuzzleContext.Provider>
     </div>
   );
 };
 
-export default WoodPeckerMode;
+export default ThemeMode;
