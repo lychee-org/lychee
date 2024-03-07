@@ -1,54 +1,31 @@
 'use client';
+
 import { Puzzle } from '@/types/lichess-api';
-import React, { CSSProperties, useState, useEffect } from 'react';
-import PuzzleBoard from './puzzle-board';
+import React, { CSSProperties, useState } from 'react';
+import PuzzleBoard from '../puzzle-ui/puzzle-board';
+import {
+  PuzzleContext,
+  PuzzleModeProps,
+  RatingHolder,
+  wrapperStyle,
+} from '../puzzle-ui/puzzle-mode';
 import { PuzzleWithUserRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
 
-export type RatingHolder = {
-  rating: number;
-  ratingDeviation: number;
-  volatility: number;
-  numberOfResults: number;
-};
-
-export interface PuzzleModeProps {
+interface ThemeModeProps {
   initialPuzzle: Puzzle;
   initialRating: RatingHolder;
+  group: string[];
 }
 
-export const wrapperStyle = {
-  width: '60vw',
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  margin: '3rem auto',
-};
-
-export const PuzzleContext = React.createContext({
-  submitNextPuzzle: (
-    _success: boolean,
-    _prv: RatingHolder
-  ): Promise<RatingHolder> => {
-    throw new Error();
-  },
-  getNextPuzzle: () => {},
-});
-
-const PuzzleMode: React.FC<PuzzleModeProps> = ({
+const ThemeMode: React.FC<ThemeModeProps> = ({
   initialPuzzle,
   initialRating,
+  group,
 }) => {
-  /** PUZZLE CODE */
   const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
   const [rating, setRating] = useState<RatingHolder>(initialRating);
 
   // TODO: Handle when no more puzzles!
-  useEffect(() => {
-    fetch(`/api/puzzle/computeBatch`, {
-      method: 'POST',
-      body: JSON.stringify({ puzzleId: puzzle.PuzzleId }),
-    }).then(() => console.log('Computed similarity cachee of last puzzle'));
-  }, [puzzle]);
 
   // submit the puzzle success/failure to the server
   const submitNextPuzzle = (
@@ -61,7 +38,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
         puzzle_: puzzle,
         success_: success,
         prv_: prv,
-        themeGroupStr: [],
+        themeGroupStr: group,
       }),
     })
       .then((response) => response.text())
@@ -71,7 +48,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   const getNextPuzzle = () => {
     fetch(`/api/puzzle/nextPuzzle`, {
       method: 'POST',
-      body: JSON.stringify({ themeGroupStr: [] }),
+      body: JSON.stringify({ themeGroupStr: group }),
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as PuzzleWithUserRating)
@@ -90,4 +67,4 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   );
 };
 
-export default PuzzleMode;
+export default ThemeMode;

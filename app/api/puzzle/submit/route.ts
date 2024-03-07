@@ -15,7 +15,8 @@ import { UserThemeColl } from '@/models/UserThemeColl';
 import addRound from './addRound';
 import { RatingHistory } from '@/models/RatingHistory';
 import { ActivePuzzleColl } from '@/models/ActivePuzzle';
-import { updateLeitner } from '@/src/LeitnerIntance';
+import { updateLeitner, updateThemedLeitner } from '@/src/LeitnerIntance';
+import { toGroupId } from '@/lib/utils';
 
 const REVIEW_SCALING_FACTOR = 0.7;
 
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
   if (!user) {
     return new Response('Unauthorized', { status: 401 });
   }
-  const { puzzle_, success_, prv_ } = await req.json();
+  const { puzzle_, success_, prv_, themeGroupStr } = await req.json();
 
   const puzzle = puzzle_ as Puzzle;
   const success = success_ as boolean;
@@ -48,6 +49,8 @@ export async function POST(req: NextRequest) {
     prv_.volatility,
     prv_.numberOfResults
   );
+  const themeGroup = themeGroupStr as string[];
+  const group = themeGroup.length > 0 ? toGroupId(themeGroup) : undefined;
 
   if (success) {
     new RatingCalculator().updateRatings(
@@ -63,6 +66,10 @@ export async function POST(req: NextRequest) {
   const activePuzzle = await ActivePuzzleColl.findOneAndDelete({
     username: user.username,
   });
+
+  if (!activePuzzle) {
+    throw new Error('No active puzzle found - something is wrong!');
+  }
 
   // Scale the user's rating.
   if (activePuzzle.isReview) {
@@ -95,7 +102,12 @@ export async function POST(req: NextRequest) {
   const reviewee = activePuzzle.isReview
     ? (JSON.parse(activePuzzle.reviewee) as Puzzle)
     : puzzle;
-  await updateLeitner(user, reviewee, success);
+
+  if (group) {
+    await updateThemedLeitner(user, reviewee, success, group);
+  } else {
+    await updateLeitner(user, reviewee, success);
+  }
 
   // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
   // persist in the DB, as this information is useful for dashboard analysitcs.
