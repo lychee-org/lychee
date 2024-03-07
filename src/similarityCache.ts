@@ -7,7 +7,7 @@ import { AllRoundColl } from "@/models/AllRoundColl";
 import { getExistingUserRatingByName } from "./rating/getRating";
 import { clampRating } from "@/app/api/puzzle/nextPuzzle/nextFor";
 
-const cache_size = 5;
+const cache_size = 30;
 
 const puzzleFromDocument = (document: any): Puzzle => {
     let { _id: _, ...rest } = document;
@@ -40,11 +40,9 @@ export const findSimilarityInstance = async (
 };
 
 export const computeSimilarityCache = async(
-    puzzle: Puzzle,
-    username: string
+    puzzle: Puzzle
     ): Promise<Array<String>> => {
     const radius = 300;
-    const rating = await getExistingUserRatingByName(username);
     const allPuzzles = (await mongoose.connection.collection('testPuzzles').find({
       Rating: {
         $gt: puzzle.Rating - radius,

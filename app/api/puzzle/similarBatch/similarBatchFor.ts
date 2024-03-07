@@ -40,7 +40,7 @@ export const similarBatchForCompromised = async (
     let similarPuzzleId: String;
 
     if (!instance) {
-      const similarPuzzles = await computeSimilarityCache(puzzle, username);
+      const similarPuzzles = await computeSimilarityCache(puzzle);
       const instanceCreated = {
         puzzleId: puzzle.PuzzleId,
         cache: similarPuzzles

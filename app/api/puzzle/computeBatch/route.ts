@@ -26,7 +26,11 @@ export async function POST(req: NextRequest) {
           puzzleId: puzzleId,
           cache: similarPuzzles
         }
-        await SimilarityColl.create(instanceCreated);
+        await SimilarityColl.updateOne(
+          {puzzleId: puzzleId},
+          instanceCreated,
+          {upsert: true}
+        );
       }
     }
 
