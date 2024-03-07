@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
       },
       { upsert: true } // Insert if not found.
     );
-    
+
     const moves = puzzle.Moves.split(' ').length / 2;
     console.log(`\t\tTime per move : ${t / moves}`);
 

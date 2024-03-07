@@ -85,24 +85,35 @@ const proportionallyRandomTheme = (elos: Map<string, number>): string => {
   return ans!;
 };
 
-const sm2RandomThemeFromRatingMap = async (usernname: string, oldElos: Map<string, Rating>): Promise<string> => {
+const sm2RandomThemeFromRatingMap = async (
+  usernname: string,
+  oldElos: Map<string, Rating>
+): Promise<string> => {
   const result = new Map<string, RatingHolder>();
   // console.log(usernname, oldElos);
   for (const [theme, v] of oldElos) {
-  // oldElos.forEach((v, theme) => {
-    const entry = await TimeThemeColl.findOne({ username: usernname, theme: theme });
+    // oldElos.forEach((v, theme) => {
+    const entry = await TimeThemeColl.findOne({
+      username: usernname,
+      theme: theme,
+    });
     if (entry) {
       let t = entry.time;
       console.log(theme, t);
       t = Math.min(t, 45);
-      console.log(`old rating: ${v.rating}`)
-      v.rating = (1 + ((45 - t) / 45) / 6) * v.rating;
-      console.log(`new rating: ${v.rating}`)
+      console.log(`old rating: ${v.rating}`);
+      v.rating = (1 + (45 - t) / 45 / 6) * v.rating;
+      console.log(`new rating: ${v.rating}`);
     }
-    const ratingCopy = { rating: v.rating, ratingDeviation: v.ratingDeviation, volatility: v.volatility, numberOfResults: v.numberOfResults };
+    const ratingCopy = {
+      rating: v.rating,
+      ratingDeviation: v.ratingDeviation,
+      volatility: v.volatility,
+      numberOfResults: v.numberOfResults,
+    };
     // console.log(theme, v);
     result.set(theme, ratingCopy);
-  };
+  }
   console.log(result);
   return proportionallyRandomTheme(applySm2(result));
 };

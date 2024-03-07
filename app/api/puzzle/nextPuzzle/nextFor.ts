@@ -116,7 +116,13 @@ const nextPuzzleRepetitions = async (
     );
     return p;
   }
-  return await nextPuzzleRepetitions(username, rating, reps + 1, ratingMap, exceptions);
+  return await nextPuzzleRepetitions(
+    username,
+    rating,
+    reps + 1,
+    ratingMap,
+    exceptions
+  );
 };
 
 const nextThemedPuzzlesForRepetitions = async (
