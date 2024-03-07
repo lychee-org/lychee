@@ -4,12 +4,14 @@ import { PuzzleContext } from '../puzzle-mode';
 import './display-box.css';
 
 const DisplayBox = ({
+  gaveUp,
   solved,
   lastMoveWrong,
   linePos,
   side,
   viewSolution,
 }: {
+  gaveUp: Boolean;
   solved: Boolean;
   lastMoveWrong: Boolean;
   linePos: number;
@@ -57,10 +59,26 @@ const DisplayBox = ({
       </div>
     </div>
   );
+  let gaveUpDiv = (
+    <div className='icon-container'>
+      <div className='icon-wrapper text-yellow-500'>{wrongIcon}</div>
+      <div className='text-wrapper'>Here is the correct solution</div>
+      <button
+        className='buttonstyle bg-controller-dark hover:bg-controller-light'
+        onClick={getNextPuzzle}
+      >
+        Next Puzzle
+      </button>
+    </div>
+  );
 
   let guideText;
   if (solved) {
-    guideText = solvedDiv;
+    if (gaveUp) {
+      guideText = gaveUpDiv;
+    } else {
+      guideText = solvedDiv;
+    }
   } else if (lastMoveWrong) {
     guideText = wrongDiv;
   } else if (linePos < 3) guideText = sideInfo;
