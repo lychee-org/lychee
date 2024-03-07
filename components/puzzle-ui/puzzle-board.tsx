@@ -15,6 +15,7 @@ import './puzzle-board-ui.css';
 import RatingComponent from './controls/rating';
 import DisplayBox from './controls/display-box';
 import useTimer from '@/hooks/useTimer';
+import { cn } from '@/lib/utils';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
@@ -210,57 +211,59 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     .find((_, i) => i === playbackPos - 1);
 
   return (
-    <div className='chessboard-container'>
-      <div className='chessboard'>
-        <ChessboardWrapped
-          side={side}
-          fen={fen}
-          lastMove={lastMoveToHighlight}
-          interactive={interactive}
-          updateGame={interactive ? playerMoveCallback : () => {}}
-          renderedCallback={
-            rendered
-              ? () => {
-                  return;
-                }
-              : renderedCallback
-          }
-        />
-      </div>
-      <div className='control-panel flex flex-col'>
-        <div className='bg-muted text-center p-2 rounded-md font-mono tracking-widest'>
-          {new Date(time).toISOString().substring(14, 19)}
-        </div>
-        <div className='rating-container bg-card'>
-          <RatingComponent rating={rating.rating} />
-        </div>
-        <div className='move-viewer-container'>
-          <div className='fromGameHeader bg-controller hover:bg-controller-light'>
-            Puzzle #{puzzle.PuzzleId}
-          </div>
-          <MoveNavigationContext.Provider
-            value={{ currentIndex: playbackPos, moves: game.history(), side }}
-          >
-            <MoveViewer />
-          </MoveNavigationContext.Provider>
-          <PlaybackControllerContext.Provider
-            value={{ firstMove, prevMove, nextMove, lastMove }}
-          >
-            <ControlButtonBar />
-          </PlaybackControllerContext.Provider>
-        </div>
-        <div className='displayBox bg-card'>
-          <DisplayBox
-            gaveUp={gaveUp}
-            lastMoveWrong={lastMoveWrong}
-            solved={solved}
-            linePos={linePos}
+    <div className={cn("ui-wrapper")}>
+      <div className='chessboard-container'>
+        <div className='chessboard'>
+          <ChessboardWrapped
             side={side}
-            viewSolution={viewSolution}
+            fen={fen}
+            lastMove={lastMoveToHighlight}
+            interactive={interactive}
+            updateGame={interactive ? playerMoveCallback : () => {}}
+            renderedCallback={
+              rendered
+                ? () => {
+                    return;
+                  }
+                : renderedCallback
+            }
           />
         </div>
+        <div className='control-panel flex flex-col'>
+          <div className='bg-muted text-center p-2 rounded-md font-mono tracking-widest'>
+            {new Date(time).toISOString().substring(14, 19)}
+          </div>
+          <div className='rating-container bg-card'>
+            <RatingComponent rating={rating.rating} />
+          </div>
+          <div className='move-viewer-container'>
+            <div className='fromGameHeader bg-controller hover:bg-controller-light'>
+              Puzzle #{puzzle.PuzzleId}
+            </div>
+            <MoveNavigationContext.Provider
+              value={{ currentIndex: playbackPos, moves: game.history(), side }}
+            >
+              <MoveViewer />
+            </MoveNavigationContext.Provider>
+            <PlaybackControllerContext.Provider
+              value={{ firstMove, prevMove, nextMove, lastMove }}
+            >
+              <ControlButtonBar />
+            </PlaybackControllerContext.Provider>
+          </div>
+          <div className='displayBox bg-card'>
+            <DisplayBox
+              gaveUp={gaveUp}
+              lastMoveWrong={lastMoveWrong}
+              solved={solved}
+              linePos={linePos}
+              side={side}
+              viewSolution={viewSolution}
+            />
+          </div>
+        </div>
+        <div></div>
       </div>
-      <div></div>
     </div>
   );
 };
