@@ -2,6 +2,8 @@ import { getExistingUserRating, getThemeRatings } from '@/src/rating/getRating';
 import { User } from 'lucia';
 import { RatingHistory } from '@/models/RatingHistory';
 import * as d3 from 'd3';
+import { isIrrelevant } from '../puzzle/nextPuzzle/themeGenerator';
+import { allThemes } from '@/lib/utils';
 
 type RatingHistory = {
   rating: number;
@@ -16,7 +18,9 @@ export type ThemeData = {
   nb: number;
 };
 
-export const getThemes = async (user: User) => {
+export const getThemes = async (
+  user: User
+): Promise<[ThemeData[], string[]]> => {
   const themeRatings = await getThemeRatings(user, true);
   const ratings = await RatingHistory.find({ username: user.username });
 
@@ -50,7 +54,12 @@ export const getThemes = async (user: User) => {
     }
   }
 
-  return data;
+  // add themes that have no ratings after filtering fromm irrelevant themes
+  const missed = allThemes
+    .filter(isIrrelevant)
+    .filter((theme) => !(theme in themeRatings) || !(theme in ratingHistories));
+
+  return [data, missed];
 };
 
 export const ratingHistory = async (user: User) => {
