@@ -64,7 +64,7 @@ export default async function DashboardWrapper({ user }: { user: User }) {
                   {groups.map((group) => {
                     const themes = toGroup(group.groupId);
                     return (
-                      <Link href={`puzzle/group/${group.groupId}`}>
+                      <Link key={group.groupId} href={`puzzle/group/${group.groupId}`}>
                         <Card className='max-w-64 hover:bg-muted/30'>
                           <CardContent className='p-2'>
                             <p className='text-xs font-bold tracking-tighter text-center pb-1'>
@@ -73,7 +73,7 @@ export default async function DashboardWrapper({ user }: { user: User }) {
                             <div className='flex gap-1 w-100 overflow-hidden'>
                               {themes.map((theme) => {
                                 return (
-                                  <Badge variant={'outline'}>
+                                  <Badge key={theme} variant={'outline'}>
                                     {capitalize(theme).toLowerCase()}
                                   </Badge>
                                 );

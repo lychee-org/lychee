@@ -4,6 +4,7 @@ import { RatingHistory } from '@/models/RatingHistory';
 import * as d3 from 'd3';
 import { isIrrelevant } from '../puzzle/nextPuzzle/themeGenerator';
 import { allThemes } from '@/lib/utils';
+import { InitRatingColl } from '@/models/InitRatingColl';
 
 type RatingHistory = {
   rating: number;
@@ -43,12 +44,12 @@ export const getThemes = async (
         rating: 1500,
         createdAt: d3.timeMinute.offset(ratingHistories[k][0].createdAt, -10),
       });
+      const streak = calculateStreak(ratingHistories[k]);
       data.push({
         theme: k,
         ratings: ratingHistories[k],
         rating: v.rating,
         delta: streak,
-      const streak = calculateStreak(ratingHistories[k]);
         nb: v.numberOfResults,
       });
     }
@@ -63,9 +64,17 @@ export const getThemes = async (
 };
 
 export const ratingHistory = async (user: User) => {
+  const userRating = await getExistingUserRating(user);
+  const initRating =
+    (await InitRatingColl.findOne({ username: user.username })) || 1500;
   const ratings = await RatingHistory.find({
     username: user.username,
     theme: 'overall',
+  });
+  const firstRating = initRating.rating || ratings[0]?.rating || userRating.rating;
+  ratings.unshift({
+    rating: firstRating,
+    createdAt: d3.timeMinute.offset(ratings[0]?.rating || new Date(Date.now()), -10),
   });
   return {
     ratings: ratings,
@@ -73,23 +82,16 @@ export const ratingHistory = async (user: User) => {
     delta: calculateStreak(ratings),
   };
 };
-  const userRating = await getExistingUserRating(user);
-  const initRating =
-    (await InitRatingColl.findOne({ username: user.username })) || 1500;
 
 const calculateStreak = (ratings: RatingHistory[]) => {
   // calculate delta from rating histories by adding up the longest running streak going from last to first
   // if (ratings.length === 1) {
-  const firstRating = initRating.rating || ratings[0]?.rating || userRating.rating;
-  ratings.unshift({
-    rating: firstRating,
-    createdAt: d3.timeMinute.offset(ratings[0]?.rating || new Date(Date.now()), -10),
-  });
   //   return ratings[0].rating - 1500;
   // }
   let streak = 0;
 
-  for (let i = ratings.length - 2; i >= -1; i--) {
+  for (let i = ratings.length - 2; i >= 0; i--) {
+    // case not needed anymore
     if (i === -1) {
       streak += ratings[0].rating - 1500;
       break;

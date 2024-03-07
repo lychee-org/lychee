@@ -199,7 +199,7 @@ export default function ThemesList({
             <div className='flex gap-1 flex-wrap justify-center'>
               {selected.map((theme) => {
                 return (
-                  <Badge variant={'outline'} onClick={() => handleClick(theme)}>
+                  <Badge key={theme} variant={'outline'} onClick={() => handleClick(theme)}>
                     {capitalize(theme).toLowerCase()}
                   </Badge>
                 );

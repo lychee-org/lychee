@@ -17,7 +17,7 @@ export default async function Group({ params }: { params: { group: string } }) {
   return (
     <div>
       {group.map((theme) => {
-        return <div>{theme}</div>;
+        return <div key={theme}>{theme}</div>;
       })}
     </div>
   );
