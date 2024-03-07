@@ -6,7 +6,7 @@ import PuzzleBoard from '../puzzle-ui/puzzle-board';
 import {
   PuzzleContext,
   PuzzleModeProps,
-  RatingHolder
+  RatingHolder,
 } from '../puzzle-ui/puzzle-mode';
 import { PuzzleWithUserRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
 

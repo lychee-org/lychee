@@ -36,7 +36,11 @@ const WoodPeckerMode: React.FC<WoodpeckerModeProps> = ({
 
   return (
     <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-      <PuzzleBoard puzzle={puzzle} initialRating={initialRating} loading={false} />
+      <PuzzleBoard
+        puzzle={puzzle}
+        initialRating={initialRating}
+        loading={false}
+      />
     </PuzzleContext.Provider>
   );
 };

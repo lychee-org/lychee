@@ -23,7 +23,11 @@ interface PuzzleBoardProps {
   loading: boolean;
 }
 // set its props to be the puzzle object
-const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating, loading }) => {
+const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
+  puzzle,
+  initialRating,
+  loading,
+}) => {
   const { submitNextPuzzle: submitPuzzle, getNextPuzzle } =
     useContext(PuzzleContext);
   const line = puzzle?.Moves.split(' ') ?? [];

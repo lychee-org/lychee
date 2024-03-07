@@ -19,26 +19,28 @@ export default function Navbar({ user }: NavbarProps) {
           Lychee_
         </Link>
       </div>
-      <div className='m-8 text-sm underline font-mono block sm:hidden'><a href='/trainer'>Trainer</a></div>
+      <div className='m-8 text-sm underline font-mono block sm:hidden'>
+        <a href='/trainer'>Trainer</a>
+      </div>
       <div className='flex-grow'></div>
       <AuthButton user={user} className='block sm:hidden' />
       <ModeToggler className='block sm:hidden' />
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild className='hidden sm:block'>
-          <button className="IconButton" aria-label="Menu">
+          <button className='IconButton' aria-label='Menu'>
             <HamburgerMenuIcon />
           </button>
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content className="DropdownMenuContent" sideOffset={5}>
-            <DropdownMenu.Item className="bg-background hover:bg-foreground hover:text-background">
+          <DropdownMenu.Content className='DropdownMenuContent' sideOffset={5}>
+            <DropdownMenu.Item className='bg-background hover:bg-foreground hover:text-background'>
               <Link href='/trainer'>Trainer</Link>
             </DropdownMenu.Item>
-            <DropdownMenu.Item className="bg-background">
+            <DropdownMenu.Item className='bg-background'>
               <AuthButton user={user} className='' />
             </DropdownMenu.Item>
-            <DropdownMenu.Item className="bg-background">
+            <DropdownMenu.Item className='bg-background'>
               <ModeToggler className='' />
             </DropdownMenu.Item>
           </DropdownMenu.Content>

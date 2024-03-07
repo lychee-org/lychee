@@ -29,7 +29,9 @@ const DisplayBox = ({
     <div className='icon-container'>
       <div className='icon-wrapper text-red-500 text'>{wrongIcon}</div>
       <div className='text-wrapper'>Sorry, that&apos;s not it...</div>
-      <Button variant={'secondary'} onClick={viewSolution}>View Solution</Button>
+      <Button variant={'secondary'} onClick={viewSolution}>
+        View Solution
+      </Button>
     </div>
   );
   let correctDiv = (
@@ -42,20 +44,26 @@ const DisplayBox = ({
     <div className='icon-container'>
       <div className='icon-wrapper text-green-500'>{correctIcon}</div>
       <div className='text-wrapper'>Amazing! You solved it</div>
-      <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>{ loading ? 'Loading...' : 'Next Puzzle' }</Button>
+      <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>
+        {loading ? 'Loading...' : 'Next Puzzle'}
+      </Button>
     </div>
   );
   let sideInfo = (
     <div className='icon-container'>
       <div className='font-bold'>Your turn</div>
-      <div className=''>Find the best move for {side === 'w' ? 'white' : 'black'}</div>
+      <div className=''>
+        Find the best move for {side === 'w' ? 'white' : 'black'}
+      </div>
     </div>
   );
   let gaveUpDiv = (
     <div className='icon-container'>
       <div className='icon-wrapper text-yellow-500'>{wrongIcon}</div>
       <div className='text-wrapper'>Here is the correct solution</div>
-      <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>{ loading ? 'Loading...' : 'Next Puzzle' }</Button>
+      <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>
+        {loading ? 'Loading...' : 'Next Puzzle'}
+      </Button>
     </div>
   );
 
