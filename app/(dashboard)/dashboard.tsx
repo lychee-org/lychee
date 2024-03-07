@@ -64,7 +64,10 @@ export default async function DashboardWrapper({ user }: { user: User }) {
                   {groups.map((group) => {
                     const themes = toGroup(group.groupId);
                     return (
-                      <Link key={group.groupId} href={`puzzle/group/${group.groupId}`}>
+                      <Link
+                        key={group.groupId}
+                        href={`puzzle/group/${group.groupId}`}
+                      >
                         <Card className='max-w-64 hover:bg-muted/30'>
                           <CardContent className='p-2'>
                             <p className='text-xs font-bold tracking-tighter text-center pb-1'>

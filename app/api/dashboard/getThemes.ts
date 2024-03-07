@@ -71,10 +71,14 @@ export const ratingHistory = async (user: User) => {
     username: user.username,
     theme: 'overall',
   });
-  const firstRating = initRating.rating || ratings[0]?.rating || userRating.rating;
+  const firstRating =
+    initRating.rating || ratings[0]?.rating || userRating.rating;
   ratings.unshift({
     rating: firstRating,
-    createdAt: d3.timeMinute.offset(ratings[0]?.rating || new Date(Date.now()), -10),
+    createdAt: d3.timeMinute.offset(
+      ratings[0]?.rating || new Date(Date.now()),
+      -10
+    ),
   });
   return {
     ratings: ratings,
