@@ -6,8 +6,7 @@ import PuzzleBoard from '../puzzle-ui/puzzle-board';
 import {
   PuzzleContext,
   PuzzleModeProps,
-  RatingHolder,
-  wrapperStyle,
+  RatingHolder
 } from '../puzzle-ui/puzzle-mode';
 import { PuzzleWithUserRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
 
@@ -59,11 +58,9 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
   };
 
   return (
-    <div style={wrapperStyle as CSSProperties}>
-      <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-        <PuzzleBoard puzzle={puzzle} initialRating={rating} />
-      </PuzzleContext.Provider>
-    </div>
+    <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
+      <PuzzleBoard puzzle={puzzle} initialRating={rating} />
+    </PuzzleContext.Provider>
   );
 };
 
