@@ -11,7 +11,12 @@ import { ActivePuzzleColl } from '@/models/ActivePuzzle';
 import { booleanWithProbability } from '@/lib/utils';
 import { nextLeitnerReview } from '@/src/LeitnerIntance';
 import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
-import { computeSimilarityCache, findSimilarityInstance, SimilarityInstance, findSimilarUndoPuzzle } from '@/src/similarityCache';
+import {
+  computeSimilarityCache,
+  findSimilarityInstance,
+  SimilarityInstance,
+  findSimilarUndoPuzzle,
+} from '@/src/similarityCache';
 import { SimilarityColl } from '@/models/SimilarityColl';
 import { findPuzzlebyId } from '@/src/similarityCache';
 
@@ -116,7 +121,7 @@ const nextPuzzleRepetitions = async (
   }
   return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
 };
- 
+
 const nextPuzzleFor = async (
   user: User,
   woodpecker: boolean = false
@@ -159,7 +164,7 @@ const nextPuzzleFor = async (
           exceptions,
           MIN_CANDIDATES // TODO: Increase this, or maybe start compromise at 2 instead, to use wider similarity radius? Unsure.
         );
-      
+
         console.log(
           `Got similar puzzle with tags ${similarPuzzle.hierarchy_tags} and line ${similarPuzzle.Moves}`
         );

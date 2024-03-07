@@ -42,7 +42,9 @@ export const getExistingUserRating = async (user: User): Promise<Rating> =>
     throw new Error('User not present in rating collection.');
   });
 
-  export const getExistingUserRatingByName = async (username: string): Promise<Rating> =>
+export const getExistingUserRatingByName = async (
+  username: string
+): Promise<Rating> =>
   RatingColl.findOne({ username: username }).then(async (result) => {
     if (result) {
       return new Rating(

@@ -43,15 +43,12 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   const [rating, setRating] = useState<RatingHolder>(initialRating);
 
   // TODO: Handle when no more puzzles!
-  useEffect(
-    ()=>{
-      fetch(`/api/puzzle/computeBatch`, {
-        method: 'POST',
-        body: JSON.stringify({puzzleId: puzzle.PuzzleId})
-      }).then(()=>console.log("Computed similarity cachee of last puzzle"));
-    },
-    [puzzle]
-  )
+  useEffect(() => {
+    fetch(`/api/puzzle/computeBatch`, {
+      method: 'POST',
+      body: JSON.stringify({ puzzleId: puzzle.PuzzleId }),
+    }).then(() => console.log('Computed similarity cachee of last puzzle'));
+  }, [puzzle]);
 
   // submit the puzzle success/failure to the server
   const submitNextPuzzle = (

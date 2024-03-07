@@ -12,7 +12,13 @@ import { LastBatchColl } from '@/models/LastBatch';
 import { getExistingUserRating } from '@/src/rating/getRating';
 import mongoose from 'mongoose';
 import similarity_distance from '@/src/similarity';
-import { SimilarityInstance, findSimilarityInstance, computeSimilarityCache, findSimilarUndoPuzzle, findPuzzlebyId} from '@/src/similarityCache';
+import {
+  SimilarityInstance,
+  findSimilarityInstance,
+  computeSimilarityCache,
+  findSimilarUndoPuzzle,
+  findPuzzlebyId,
+} from '@/src/similarityCache';
 import { SimilarityColl } from '@/models/SimilarityColl';
 
 // TODO: A bit of conflict here; in theory we want a large number of puzzle candidates,
@@ -33,29 +39,44 @@ export const similarBatchForCompromised = async (
   solvedArray: string[],
   minBatchFactor: number = 2,
   compromise: number = INITIAL_COMPROMISE
-): Promise<Puzzle[]> => {  
-  const candidates = await preprocessing(username, lastBatch, clampedRating, solvedArray, minBatchFactor, compromise);
-  const ret = await Promise.all(lastBatch.map(async (puzzle) => {
-    let instance: SimilarityInstance | undefined = await findSimilarityInstance(puzzle.PuzzleId);
-    let similarPuzzleId: String;
+): Promise<Puzzle[]> => {
+  const candidates = await preprocessing(
+    username,
+    lastBatch,
+    clampedRating,
+    solvedArray,
+    minBatchFactor,
+    compromise
+  );
+  const ret = await Promise.all(
+    lastBatch.map(async (puzzle) => {
+      let instance: SimilarityInstance | undefined =
+        await findSimilarityInstance(puzzle.PuzzleId);
+      let similarPuzzleId: String;
 
-    if (!instance) {
-      const similarPuzzles = await computeSimilarityCache(puzzle);
-      const instanceCreated = {
-        puzzleId: puzzle.PuzzleId,
-        cache: similarPuzzles
+      if (!instance) {
+        const similarPuzzles = await computeSimilarityCache(puzzle);
+        const instanceCreated = {
+          puzzleId: puzzle.PuzzleId,
+          cache: similarPuzzles,
+        };
+        await SimilarityColl.create(instanceCreated);
+        instance = instanceCreated;
       }
-      await SimilarityColl.create(instanceCreated);
-      instance = instanceCreated;
-    }
-    similarPuzzleId = await findSimilarUndoPuzzle(instance, username);
+      similarPuzzleId = await findSimilarUndoPuzzle(instance, username);
 
-    if (similarPuzzleId == "Whole cache has been solved.") {
-      return similarBatchForCompromisedHelper(username, puzzle, solvedArray, candidates);
-    } else {
-      return (await findPuzzlebyId(similarPuzzleId)) as Puzzle;
-    }
-  }));
+      if (similarPuzzleId == 'Whole cache has been solved.') {
+        return similarBatchForCompromisedHelper(
+          username,
+          puzzle,
+          solvedArray,
+          candidates
+        );
+      } else {
+        return (await findPuzzlebyId(similarPuzzleId)) as Puzzle;
+      }
+    })
+  );
 
   console.log(`Persisting ${solvedArray} for ${username}...`);
   await AllRoundColl.updateOne(
@@ -80,7 +101,7 @@ const preprocessing = async (
 ): Promise<Puzzle[]> => {
   //TODO: Handle no puzzles here.
   if (compromise == MAX_COMPROMISE) {
-      console.log('Maximum compromise reached in similar batch retrieval.');
+    console.log('Maximum compromise reached in similar batch retrieval.');
   }
   const radius = radiusForRating(clampedRating, compromise);
   console.log(`Radius for ${clampedRating} is ${radius}.`);
@@ -100,25 +121,22 @@ const preprocessing = async (
       .toArray()
   ).map(puzzleFromDocument);
 
-    console.log(`Found ${candidates.length} candidates.`);
-    // If number of candidates is too small, let's increase the compromise factor.
-    // TODO: Do this if similar puzzles are not sufficiently similar instead?
-    if (
-      compromise < MAX_COMPROMISE &&
-      candidates.length < minBatchFactor * lastBatch.length
-    ) {
-      return await preprocessing(
-        username,
-        lastBatch,
-        clampedRating,
-        solvedArray,
-        compromise + 1
-      );
-    } else return candidates;
+  console.log(`Found ${candidates.length} candidates.`);
+  // If number of candidates is too small, let's increase the compromise factor.
+  // TODO: Do this if similar puzzles are not sufficiently similar instead?
+  if (
+    compromise < MAX_COMPROMISE &&
+    candidates.length < minBatchFactor * lastBatch.length
+  ) {
+    return await preprocessing(
+      username,
+      lastBatch,
+      clampedRating,
+      solvedArray,
+      compromise + 1
+    );
+  } else return candidates;
 };
-
-
-
 
 const similarBatchForCompromisedHelper = (
   username: string,
@@ -128,7 +146,7 @@ const similarBatchForCompromisedHelper = (
 ): Puzzle => {
   const solvedSet = new Set(solvedArray);
   let min_distance = 1_000_000,
-  closest_puzzle = singlePuzzle;
+    closest_puzzle = singlePuzzle;
   candidates.forEach((candidate) => {
     if (solvedSet.has(candidate.PuzzleId)) {
       return;

@@ -91,14 +91,20 @@ export const orderedDistanceDP = (a: Tag[][], b: Tag[][]): number => {
   return table[rows][columns];
 };
 
-const distanceTags = (a: Tag[][], b: Tag[][], min_distance?: number): number => {
+const distanceTags = (
+  a: Tag[][],
+  b: Tag[][],
+  min_distance?: number
+): number => {
   const ud = unorderedDistance(a, b);
   if (ud > (min_distance ?? SENTINEL_DISTANCE) / 2) return SENTINEL_DISTANCE;
   return ud + orderedDistanceDP(a.slice(0, -1), b.slice(0, -1));
-}
+};
 
-
-const similarity_distance = (s1: string, s2: string, min_distance?: number): number =>
-  distanceTags(parseTags(s1), parseTags(s2), min_distance);
+const similarity_distance = (
+  s1: string,
+  s2: string,
+  min_distance?: number
+): number => distanceTags(parseTags(s1), parseTags(s2), min_distance);
 
 export default similarity_distance;
