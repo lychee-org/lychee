@@ -69,7 +69,7 @@ export const LineChart = ({
       formatYear = d3.timeFormat('%Y');
 
     function multiFormat(date: Date | d3.NumberValue, i: number) {
-      if (i % 2 === 0) return '';
+      // if (i % 2 === 0) return '';
       if (date instanceof Date) {
         return (
           d3.timeSecond(date) < date
@@ -225,8 +225,8 @@ export const LineChart = ({
                   y={-27.5}
                   width={32}
                   height={20}
-                  fill='#333'
                   // rx={7}
+                  id='labelRect'
                   ry={10}
                 />
                 <text x={0} y={-14} textAnchor='middle' id='labelText'>

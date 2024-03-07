@@ -6,9 +6,11 @@ import AuthButton from '@/components/auth/auth-button';
 import ModeToggler from './mode-toggle';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { HamburgerMenuIcon } from '@radix-ui/react-icons';
+import { User } from 'lucia';
+import { Button } from './button';
 
 type NavbarProps = {
-  user: any;
+  user: User | null;
 };
 
 export default function Navbar({ user }: NavbarProps) {
@@ -19,9 +21,31 @@ export default function Navbar({ user }: NavbarProps) {
           Lychee_
         </Link>
       </div>
-      <div className='m-8 text-sm underline font-mono block sm:hidden'>
-        <a href='/trainer'>Trainer</a>
-      </div>
+      {user !== null && (
+        <>
+          <div className='ml-8 text-sm underline font-mono block sm:hidden'>
+            <Link href='/'>
+              <Button
+                className='flex-row p-2 font-mono w-full underline'
+                variant='ghost'
+              >
+                Dashboard
+              </Button>
+            </Link>
+          </div>
+          <div className='text-sm underline font-mono block sm:hidden'>
+            <Link href='/trainer'>
+              <Button
+                className='flex-row p-2 font-mono w-full underline'
+                variant='ghost'
+              >
+                Trainer
+              </Button>
+            </Link>
+          </div>
+        </>
+      )}
+
       <div className='flex-grow'></div>
       <AuthButton user={user} className='block sm:hidden' />
       <ModeToggler className='block sm:hidden' />
@@ -34,14 +58,21 @@ export default function Navbar({ user }: NavbarProps) {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content className='DropdownMenuContent' sideOffset={5}>
-            <DropdownMenu.Item className='bg-background hover:bg-foreground hover:text-background'>
-              <Link href='/trainer'>Trainer</Link>
+            <DropdownMenu.Item className='bg-background w-full'>
+              <Link href='/trainer'>
+                <Button
+                  className='flex-row p-2 font-mono w-full'
+                  variant='ghost'
+                >
+                  Trainer
+                </Button>
+              </Link>
             </DropdownMenu.Item>
-            <DropdownMenu.Item className='bg-background'>
+            <DropdownMenu.Item className='bg-background w-full'>
               <AuthButton user={user} className='' />
             </DropdownMenu.Item>
-            <DropdownMenu.Item className='bg-background'>
-              <ModeToggler className='' />
+            <DropdownMenu.Item className='bg-background w-full'>
+              <ModeToggler className='w-full' />
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
