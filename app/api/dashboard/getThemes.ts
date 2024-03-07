@@ -64,9 +64,9 @@ export const ratingHistory = async (user: User) => {
     delta: calculateStreak(ratings),
   };
 };
-  const userRating = await getExistingUserRating(user);
-  const initRating =
-    (await InitRatingColl.findOne({ username: user.username })) || 1500;
+const userRating = await getExistingUserRating(user);
+const initRating =
+  (await InitRatingColl.findOne({ username: user.username })) || 1500;
 
 const calculateStreak = (ratings: RatingHistory[]) => {
   // calculate delta from rating histories by adding up the longest running streak going from last to first
