@@ -8,9 +8,10 @@ import sm2RandomThemeFromRatingMap from '../../../../src/sm2';
 import frequentiallyRandomTheme, { isIrrelevant } from './themeGenerator';
 import Rating from '@/src/rating/GlickoV2Rating';
 import { ActivePuzzleColl } from '@/models/ActivePuzzle';
-import { booleanWithProbability } from '@/lib/utils';
-import { nextLeitnerReview } from '@/src/LeitnerIntance';
+import { booleanWithProbability, toGroupId } from '@/lib/utils';
+import { nextLeitnerReview, nextThemedLeitnerReview } from '@/src/LeitnerIntance';
 import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
+import { assert } from 'console';
 
 const MAX_REPS: number = 20;
 const MAX_COMPROMISE: number = 3;
@@ -114,9 +115,28 @@ const nextPuzzleRepetitions = async (
   return await nextPuzzleRepetitions(rating, reps + 1, ratingMap, exceptions);
 };
 
+const nextThemedPuzzlesForRepetitions = async (
+  rating: number,
+  reps: number,
+  themeGroup: string[],
+  expceptions: any
+): Promise<Puzzle> => {
+  if (reps == MAX_REPS) {
+    throw new Error('Maximum repetitions reached during puzzle selection');
+  }
+  const theme = themeGroup[Math.floor(Math.random() * themeGroup.length)];
+  const p = await nextPuzzleForThemeAndRating(theme, rating, expceptions);
+  if (p) {
+    console.log(`Found grouped theme ${theme} after ${reps} reps.`);
+    return p;
+  }
+  return await nextThemedPuzzlesForRepetitions(rating, reps + 1, themeGroup, expceptions);
+}
+
 const nextPuzzleFor = async (
   user: User,
-  woodpecker: boolean = false
+  woodpecker: boolean = false,
+  themeGroup: string[] = []
 ): Promise<PuzzleWithUserRating> =>
   getExistingUserRating(user).then(async (userRating) => {
     const rating = {
@@ -125,17 +145,26 @@ const nextPuzzleFor = async (
       volatility: userRating.volatility,
       numberOfResults: userRating.numberOfResults,
     };
+    const group = themeGroup.length > 0 ? toGroupId(themeGroup) : undefined;
 
     if (!woodpecker) {
       const activePuzzle = await ActivePuzzleColl.findOne({
         username: user.username,
       });
       if (activePuzzle) {
-        console.log('Found active puzzle');
-        return {
-          puzzle: JSON.parse(activePuzzle.puzzle) as Puzzle,
-          rating: rating,
-        };
+        if ((group && activePuzzle.groupID !== group) || (!group && activePuzzle.groupID)) {
+          // TODO: Maybe preserve previous active puzzle? But we need to be
+          // careful in case this mode solves that puzzle, then back in
+          // normal mode user solves puzzle again - then errors!
+          console.log('Deleting different active puzzle');
+          await ActivePuzzleColl.deleteOne({ username: user.username });
+        } else {
+          console.log('Found active puzzle');
+          return {
+            puzzle: JSON.parse(activePuzzle.puzzle) as Puzzle,
+            rating: rating,
+          };
+        }
       }
     }
 
@@ -144,7 +173,7 @@ const nextPuzzleFor = async (
 
     if (!woodpecker && booleanWithProbability(LEITNER_PROBABILITY)) {
       console.log('Trying to use Leitner...');
-      const puzzleToReview = await nextLeitnerReview(user);
+      const puzzleToReview = group ? await nextThemedLeitnerReview(user, group) : await nextLeitnerReview(user);
       if (puzzleToReview) {
         console.log(
           `Worked! Puzzle Id: ${puzzleToReview.PuzzleId} from Leitner, tags: ${puzzleToReview.hierarchy_tags}`
@@ -176,6 +205,28 @@ const nextPuzzleFor = async (
           rating: rating,
         };
       }
+    }
+
+    if (group) {
+      const puzzle = await nextThemedPuzzlesForRepetitions(rating.rating, 0, themeGroup, exceptions);
+      console.log(
+        `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
+      );
+      assert(!woodpecker);
+      await ActivePuzzleColl.updateOne(
+        { username: user.username },
+        {
+          username: user.username,
+          puzzle: JSON.stringify(puzzle),
+          isReview: false,
+          groupID: group,
+        },
+        { upsert: true }
+      );
+      return {
+        puzzle: puzzle,
+        rating: rating,
+      };
     }
 
     // NB: The persisted rating map may contain irrelevant themes, but we don't

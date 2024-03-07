@@ -1,5 +1,6 @@
 import { booleanWithProbability } from '@/lib/utils';
 import { LeitnerColl } from '@/models/LeitnerColl';
+import { ThemedLeitnerColl } from '@/models/ThemedLeitnerColl';
 import { Puzzle } from '@/types/lichess-api';
 import { User } from 'lucia';
 
@@ -10,6 +11,20 @@ interface LeitnerInstance {
   boxA: Array<Puzzle>;
   boxB: Array<Puzzle>;
 }
+
+const findThemedLeitner = async (
+  user: User,
+  groupID: string
+): Promise<LeitnerInstance | undefined> => {
+  const leitner = await ThemedLeitnerColl.findOne({
+    username: user.username,
+    groupID: groupID,
+  });
+  if (!leitner) {
+    return undefined;
+  }
+  return { boxA: leitner.boxA, boxB: leitner.boxB };
+};
 
 const findLeitner = async (
   user: User
@@ -73,6 +88,17 @@ export const nextLeitnerReview = async (
   return nextPuzzle(leitner);
 };
 
+export const nextThemedLeitnerReview = async (
+  user: User,
+  groupID: string
+): Promise<Puzzle | undefined> => {
+  const leitner = await findThemedLeitner(user, groupID);
+  if (!leitner) {
+    return undefined;
+  }
+  return nextPuzzle(leitner);
+};
+
 export const updateLeitner = async (
   user: User,
   puzzle: Puzzle,
@@ -102,4 +128,40 @@ export const updateLeitner = async (
     `After update: boxA = ${leitner.boxA.map((puzzle) => puzzle.PuzzleId)}, boxB = ${leitner.boxB.map((puzzle) => puzzle.PuzzleId)}`
   );
   await LeitnerColl.updateOne({ username: user.username }, leitner);
+};
+
+export const updateThemedLeitner = async (
+  user: User,
+  puzzle: Puzzle,
+  correct: boolean,
+  groupID: string
+): Promise<void> => {
+  const leitner = await findThemedLeitner(user, groupID);
+  if (!leitner) {
+    if (!correct) {
+      // We should initialise a default Leitner instance with this puzzle in Box A.
+      await ThemedLeitnerColl.create({
+        username: user.username,
+        boxA: [puzzle],
+        boxB: [],
+        groupID: groupID,
+      });
+    }
+    return;
+  }
+  console.log(
+    `Before update: boxA = ${leitner.boxA.map((puzzle) => puzzle.PuzzleId)}, boxB = ${leitner.boxB.map((puzzle) => puzzle.PuzzleId)}`
+  );
+  if (correct) {
+    updateCorrect(leitner, puzzle);
+  } else {
+    updateIncorrect(leitner, puzzle);
+  }
+  console.log(
+    `After update: boxA = ${leitner.boxA.map((puzzle) => puzzle.PuzzleId)}, boxB = ${leitner.boxB.map((puzzle) => puzzle.PuzzleId)}`
+  );
+  await ThemedLeitnerColl.updateOne(
+    { username: user.username },
+    { ...leitner, groupID: groupID }
+  );
 };
