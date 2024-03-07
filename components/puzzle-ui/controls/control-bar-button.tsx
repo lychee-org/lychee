@@ -37,6 +37,7 @@ const ControlBarButton = React.forwardRef(
     );
   }
 );
+ControlBarButton.displayName = 'ControlBarButton';
 
 export const PlaybackControllerContext = React.createContext({
   firstMove: () => {},
