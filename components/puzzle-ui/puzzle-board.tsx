@@ -211,7 +211,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     .find((_, i) => i === playbackPos - 1);
 
   return (
-    <div className={cn("ui-wrapper")}>
+    <div className={cn('ui-wrapper')}>
       <div className='chessboard-container'>
         <div className='chessboard'>
           <ChessboardWrapped
