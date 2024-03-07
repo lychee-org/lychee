@@ -25,17 +25,15 @@ export const tagDistance = (a: Tag, b: Tag): number => {
   const aSplit = a.split(':');
   const bSplit = b.split(':');
   const minLength = Math.min(aSplit.length, bSplit.length);
-  let count: number = 0;
   for (let i = 0; i < minLength; i++) {
     if (aSplit[i] != bSplit[i]) {
       return 1 / 2 ** i;
     }
-    count += 1;
   }
   if (aSplit.length == bSplit.length) {
     return 0;
   }
-  return 1 / 2 ** count;
+  return 1 / 2 ** minLength;
 };
 
 // const tagListDistance = (a: Tag[], b: Tag[]): number => {

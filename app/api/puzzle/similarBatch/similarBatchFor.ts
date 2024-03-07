@@ -121,18 +121,74 @@ export const similarBatchForCompromised = async (
 // Returns empty array if no last batch is found.
 const similarBatchFor = async (user: User): Promise<Puzzle[]> => {
   const lastBatch = await lastBatchFor(user);
-  const batchSize = lastBatch.length;
-  if (batchSize === 0) {
-    return lastBatch; // Exit early.
+
+  // const batchSize = lastBatch.length;
+  // if (batchSize === 0) {
+  //   return lastBatch; // Exit early.
+  // }
+  // const { rating } = await getExistingUserRating(user);
+  // const solvedArray = await getUserSolvedPuzzleIDs(user);
+  // return await similarBatchForCompromised(
+  //   user.username,
+  //   lastBatch,
+  //   clampRating(rating),
+  //   solvedArray
+  // );
+
+  const puzzles = (
+    await mongoose.connection.collection('testPuzzles').find().toArray()
+  ).map(puzzleFromDocument);
+  let n = puzzles.length;
+  // let same = 0;
+  let ans = 0, min_opts = 10000000, tot = 0;
+  const m: Map<number, number> = new Map();
+
+  n = 2000
+  console.time('doSomething')
+
+  for (let i = 0; i < n; ++i) {
+    let cur = 0;
+    let a: Array<number> = [];
+    for (let j = 0; j < n; ++j) {
+      if (j == i) continue;
+      if (puzzles[i].Rating - 300 < puzzles[j].Rating && puzzles[j].Rating < puzzles[i].Rating + 100) {
+        // The space separated list of themes for puzzle[i] must have one word in common with the
+        // space separeted list of themes for puzzle[j]:
+        const themes_i = puzzles[i].Themes.split(' ');
+        const themes_j = puzzles[j].Themes.split(' ');
+        if (themes_i.some((theme) => themes_j.includes(theme))) {
+          ans++;
+          cur++;
+          tot += similarity_distance(puzzles[i].hierarchy_tags, puzzles[j].hierarchy_tags);
+          // a.push(similarity_distance(puzzles[i].hierarchy_tags, puzzles[j].hierarchy_tags));
+        }
+      }
+      // ans += similarity_distance(puzzles[i].hierarchy_tags, puzzles[j].hierarchy_tags);
+      // if (puzzles[i].hierarchy_tags === puzzles[j].hierarchy_tags) {
+        // same++;
+      // }
+    }
+    // a.sort((x, y) => (x as number) - (y as number));
+    // const len = Math.min(a.length, 10);
+    // // Increment len in m:
+    // m.set(len, (m.get(len) || 0) + 1);
+    // if (i % 100 === 0) {
+    //   // console.log(a.length);
+    //   // console.log(a);
+    //   console.log(i, a.slice(0, 10));
+    // }
+    // if (cur === 0) {
+    //   console.log(puzzles[i].Themes);
+    // }
+    min_opts = Math.min(min_opts, cur);
   }
-  const { rating } = await getExistingUserRating(user);
-  const solvedArray = await getUserSolvedPuzzleIDs(user);
-  return await similarBatchForCompromised(
-    user.username,
-    lastBatch,
-    clampRating(rating),
-    solvedArray
-  );
+
+  console.timeEnd('doSomething')
+
+  console.log(n, ans, min_opts, tot);
+  // console.log(m);
+
+  return lastBatch;
 };
 
 export default similarBatchFor;
