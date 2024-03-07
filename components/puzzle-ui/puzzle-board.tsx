@@ -14,6 +14,7 @@ import { Puzzle } from '@/types/lichess-api';
 import './puzzle-board-ui.css';
 import RatingComponent from './controls/rating';
 import DisplayBox from './controls/display-box';
+import useTimer from '@/hooks/useTimer';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
@@ -45,6 +46,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   // user's rating
   const [rating, setRating] = useState<RatingHolder>(initialRating);
 
+  // timer/stopwatch
+  const [time, startTimer, stopTimer] = useTimer();
+
   // calculated modes
   const playbackMode = playbackPos !== linePos || solved;
   const inPlay = rendered && !playbackMode && !solved;
@@ -56,6 +60,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     setSolved(false);
     if (puzzle) setFens([puzzle.FEN]);
     if (puzzle) setFen(puzzle.FEN);
+    startTimer();
     setPlaybackPos(0);
     setLinePos(0);
     setWrong(false);
@@ -96,7 +101,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
       const timeout = setTimeout(botMove, 400);
       return () => clearTimeout(timeout);
     }
-  });
+  }, [linePos, rendered]);
 
   // bot move
   function botMove() {
@@ -141,7 +146,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
 
   // player finished puzzle
   function finishedGame() {
+    stopTimer();
     if (submitPuzzle && !wrong) {
+      const elapsed = time;
       submitPuzzle(true, rating).then((r) => setRating(r));
     }
     setSolved(true);
@@ -158,7 +165,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
       else return correctMove(); // there's a timeout here so we should return it
       return;
     }
-  });
+  }, [linePos]);
 
   if (!puzzle) return <LoadingBoard />;
 
@@ -168,7 +175,9 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
       if (!wrong) {
         submitPuzzle(false, rating).then((r) => setRating(r));
       }
+      stopTimer();
       setWrong(true);
+      const elapsed = time;
       setSolved(true);
       setGaveUp(true);
 
@@ -218,7 +227,10 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
           }
         />
       </div>
-      <div className='control-panel'>
+      <div className='control-panel flex flex-col'>
+        <div className='bg-muted text-center p-2 rounded-md font-mono tracking-widest'>
+          {new Date(time).toISOString().substring(14, 19)}
+        </div>
         <div className='rating-container bg-card'>
           <RatingComponent rating={rating.rating} />
         </div>
