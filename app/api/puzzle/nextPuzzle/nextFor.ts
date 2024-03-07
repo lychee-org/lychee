@@ -15,14 +15,6 @@ import {
 } from '@/src/LeitnerIntance';
 import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
 import { assert } from 'console';
-import {
-  computeSimilarityCache,
-  findSimilarityInstance,
-  SimilarityInstance,
-  findSimilarUndoPuzzle,
-} from '@/src/similarityCache';
-import { SimilarityColl } from '@/models/SimilarityColl';
-import { findPuzzlebyId } from '@/src/similarityCache';
 
 const MAX_REPS: number = 20;
 const MAX_COMPROMISE: number = 3;
