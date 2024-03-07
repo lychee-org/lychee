@@ -94,8 +94,8 @@ export default function ThemesList({
             handleClick(theme);
           }}
         >
-          <CardContent className='flex items-stretch h-48 gap-4 p-6'>
-            <div className='flex justify-center items-center'>
+          <CardContent className='flex flex-col md:flex-row items-center md:items-stretch h-96 md:h-48 gap-4 p-6'>
+            <div className='md:flex justify-center items-center hidden'>
               <div className='w-20 aspect-square relative'>
                 <Image
                   src={`https://lichess1.org/assets/_SQ9ycq/images/puzzle-themes/${themeImage(theme)}.svg`}
@@ -105,7 +105,7 @@ export default function ThemesList({
                 />
               </div>
             </div>
-            <div className='flex flex-col items-center justify-center text-center w-48 gap-4'>
+            <div className='md:flex flex-col items-center justify-center text-center w-48 gap-4 hidden'>
               <h3 className='scroll-m-20 text-2xl font-semibold tracking-tight'>
                 {capitalize(theme)}
               </h3>
@@ -124,7 +124,38 @@ export default function ThemesList({
                 </div>
               </div>
             </div>
-            <div className='flex-1'>
+            <div className='flex gap-4 md:hidden'>
+              <div className='flex justify-center items-center'>
+                <div className='w-20 aspect-square relative'>
+                  <Image
+                    src={`https://lichess1.org/assets/_SQ9ycq/images/puzzle-themes/${themeImage(theme)}.svg`}
+                    fill
+                    className='object-cover'
+                    alt={theme}
+                  />
+                </div>
+              </div>
+              <div className='flex flex-col items-center justify-center text-center w-full gap-4'>
+                <h3 className='scroll-m-20 text-2xl font-semibold tracking-tight'>
+                  {capitalize(theme)}
+                </h3>
+                <div className='flex gap-8 font-bold text-left'>
+                  <div>
+                    <p className='text-xs text-muted-foreground tracking-tighter'>
+                      Rating
+                    </p>
+                    <p className='text-xl'>{Math.round(rating)}</p>
+                  </div>
+                  <div>
+                    <p className='text-xs text-muted-foreground tracking-tighter'>
+                      Delta
+                    </p>
+                    <Delta delta={delta} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className='flex-1 w-full'>
               <LineChartPeriod data={ratings} theme={theme} />
             </div>
           </CardContent>

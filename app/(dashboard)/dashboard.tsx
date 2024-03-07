@@ -18,8 +18,8 @@ export default async function DashboardWrapper({ user }: { user: User }) {
   const { ratings, rating, delta } = await ratingHistory(user);
   const groups = await getRecentGroups(user.username);
   return (
-    <div className='min-h-svh flex flex-col items-center py-12'>
-      <div className='flex flex-col max-w-3xl w-full items-stretch gap-8'>
+    <div className='min-h-svh flex flex-col items-center py-12 px-2'>
+      <div className='flex flex-col max-w-5xl w-full items-stretch gap-8'>
         <div className='space-y-2'>
           <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center'>
             Dashboard
@@ -29,7 +29,7 @@ export default async function DashboardWrapper({ user }: { user: User }) {
           </p>
         </div>
         <Card>
-          <CardContent className='flex items-stretch h-48 gap-4 p-6'>
+          <CardContent className='flex flex-col md:flex-row items-center md:items-stretch h-96 md:h-48 gap-4 p-6'>
             <div className='flex flex-col items-center justify-center text-center w-48 gap-4'>
               <h3 className='scroll-m-20 text-2xl font-semibold tracking-tight'>
                 Overall Rating
@@ -49,7 +49,7 @@ export default async function DashboardWrapper({ user }: { user: User }) {
                 </div>
               </div>
             </div>
-            <div className='flex-1'>
+            <div className='flex-1 w-full'>
               <LineChartPeriod data={ratings} theme={'overall'} />
             </div>
           </CardContent>

@@ -6,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { LineChart } from './line-chart';
 import { useDimensions } from '@/hooks/useDimensions';
 import { timeDay, timeHour, timeMonth, timeWeek, timeYear } from 'd3-time';
+import { extent } from 'd3';
 
 type Datapoint = { createdAt: Date; rating: number };
 type LineChartPeriodProps = {
@@ -38,6 +39,9 @@ function LineChartPeriod({ data, theme }: LineChartPeriodProps) {
         case '1y':
           d = timeYear.offset(d, -1);
           break;
+        case 'all':
+          d = extent(data, (d) => d.createdAt)[0] || d;
+          d = timeDay.floor(d);
       }
       return d;
     },
@@ -58,6 +62,7 @@ function LineChartPeriod({ data, theme }: LineChartPeriodProps) {
         <Chip text='1M' value='1m' theme={theme} />
         <Chip text='3M' value='3m' theme={theme} />
         <Chip text='1Y' value='1y' theme={theme} />
+        <Chip text='All' value='all' theme={theme} />
       </RadioGroup>
       <div ref={container} className='flex-1'>
         <LineChart width={width} height={height} data={data} offset={offset} />
