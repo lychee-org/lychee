@@ -1,25 +1,9 @@
 type Tag = string;
 
+const SENTINEL_DISTANCE = 1_000_000; // assumed to be > 2 * max distance
+
 const parseTags = (s: string): Tag[][] =>
   s.split('/').map((move) => move.split(' '));
-
-// export const tagDistance = (a: Tag, b: Tag): number => {
-//     if (a === b) {
-//         return 0;
-//     }
-//     const aSplit = a.split(":");
-//     const bSplit = b.split(":");
-//     if (aSplit.length === 0 && bSplit.length === 0) {
-//         return 0;
-//     }
-//     if (aSplit.length === 0 || bSplit.length === 0) {
-//         return 1;
-//     }
-//     if (aSplit[0] !== bSplit[0]) {
-//         return 1;
-//     }
-//     return tagDistance(aSplit.slice(1).join(":"), bSplit.slice(1).join(":")) / 2;
-// }
 
 export const tagDistance = (a: Tag, b: Tag): number => {
   const aSplit = a.split(':');
@@ -37,20 +21,6 @@ export const tagDistance = (a: Tag, b: Tag): number => {
   }
   return 1 / 2 ** count;
 };
-
-// const tagListDistance = (a: Tag[], b: Tag[]): number => {
-//     if (a.length === 0) {
-//         return b.length;
-//     }
-//     if (b.length === 0) {
-//         return a.length;
-//     }
-//     return Math.min(
-//         tagDistance(a[0], b[0]) + tagListDistance(a.slice(1), b.slice(1)),
-//         1 + tagListDistance(a.slice(1), b),
-//         1 + tagListDistance(a, b.slice(1))
-//     );
-// }
 
 export const tagListDistanceDP = (a: Tag[], b: Tag[]): number => {
   // Create a n x m DP table
@@ -87,23 +57,9 @@ export const tagListDistanceDP = (a: Tag[], b: Tag[]): number => {
 
 const unorderedDistance = (a: Tag[][], b: Tag[][]): number =>
   tagListDistanceDP(
-    Array.from(new Set(a.flat())).sort(),
-    Array.from(new Set(b.flat())).sort()
+    Array.from(new Set(a.flat())),
+    Array.from(new Set(b.flat()))
   );
-
-// const orderedDistance = (a: Tag[][], b: Tag[][]): number => {
-//     if (a.length === 0) {
-//         return b.flat().length;
-//     }
-//     if (b.length === 0) {
-//         return a.flat().length;
-//     }
-//     return Math.min(
-//         tagListDistance(a[0], b[0]) + orderedDistance(a.slice(1), b.slice(1)),
-//         a[0].length + orderedDistance(a.slice(1), b),
-//         b[0].length + orderedDistance(a, b.slice(1))
-//     );
-// }
 
 export const orderedDistanceDP = (a: Tag[][], b: Tag[][]): number => {
   // Create a n x m DP table
@@ -135,10 +91,14 @@ export const orderedDistanceDP = (a: Tag[][], b: Tag[][]): number => {
   return table[rows][columns];
 };
 
-const distanceTags = (a: Tag[][], b: Tag[][]): number =>
-  unorderedDistance(a, b) + orderedDistanceDP(a.slice(0, -1), b.slice(0, -1));
+const distanceTags = (a: Tag[][], b: Tag[][], min_distance?: number): number => {
+  const ud = unorderedDistance(a, b);
+  if (ud > (min_distance ?? SENTINEL_DISTANCE) / 2) return SENTINEL_DISTANCE;
+  return ud + orderedDistanceDP(a.slice(0, -1), b.slice(0, -1));
+}
 
-const similarity_distance = (s1: string, s2: string): number =>
-  distanceTags(parseTags(s1), parseTags(s2));
+
+const similarity_distance = (s1: string, s2: string, min_distance?: number): number =>
+  distanceTags(parseTags(s1), parseTags(s2), min_distance);
 
 export default similarity_distance;

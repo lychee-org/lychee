@@ -127,7 +127,7 @@ const similarBatchForCompromisedHelper = (
   candidates: Puzzle[]
 ): Puzzle => {
   const solvedSet = new Set(solvedArray);
-  let min_distance = Infinity,
+  let min_distance = 1_000_000,
   closest_puzzle = singlePuzzle;
   candidates.forEach((candidate) => {
     if (solvedSet.has(candidate.PuzzleId)) {
@@ -135,7 +135,8 @@ const similarBatchForCompromisedHelper = (
     }
     const distance = similarity_distance(
       singlePuzzle.hierarchy_tags,
-      candidate.hierarchy_tags
+      candidate.hierarchy_tags,
+      min_distance
     );
     if (distance < min_distance) {
       min_distance = distance;
