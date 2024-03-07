@@ -128,7 +128,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   /** HANDLE PLAYER MOVE VERIFICATION */
   function undoWrongMove() {
     if (submitPuzzle && !wrong) {
-      submitPuzzle(false, rating).then((r) => setRating(r));
+      submitPuzzle(false, rating, 0).then((r) => setRating(r));
       setWrong(true);
     }
     game.undo();
@@ -150,7 +150,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
     stopTimer();
     if (submitPuzzle && !wrong) {
       const elapsed = time;
-      submitPuzzle(true, rating).then((r) => setRating(r));
+      submitPuzzle(true, rating, elapsed).then((r) => setRating(r));
     }
     setSolved(true);
   }
@@ -174,7 +174,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({ puzzle, initialRating }) => {
   const viewSolution = () => {
     if (rendered && !solved) {
       if (!wrong) {
-        submitPuzzle(false, rating).then((r) => setRating(r));
+        submitPuzzle(false, rating, 0).then((r) => setRating(r));
       }
       stopTimer();
       setWrong(true);

@@ -29,7 +29,8 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
   // submit the puzzle success/failure to the server
   const submitNextPuzzle = (
     success: boolean,
-    prv: RatingHolder
+    prv: RatingHolder,
+    t: number
   ): Promise<RatingHolder> =>
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
@@ -38,6 +39,7 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
         success_: success,
         prv_: prv,
         themeGroupStr: group,
+        time_: t,
       }),
     })
       .then((response) => response.text())

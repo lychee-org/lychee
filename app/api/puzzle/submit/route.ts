@@ -17,6 +17,7 @@ import { RatingHistory } from '@/models/RatingHistory';
 import { ActivePuzzleColl } from '@/models/ActivePuzzle';
 import { updateLeitner, updateThemedLeitner } from '@/src/LeitnerIntance';
 import { toGroupId } from '@/lib/utils';
+import { TimeThemeColl } from '@/models/TimeThemeColl';
 
 const REVIEW_SCALING_FACTOR = 0.7;
 
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
   if (!user) {
     return new Response('Unauthorized', { status: 401 });
   }
-  const { puzzle_, success_, prv_, themeGroupStr } = await req.json();
+  const { puzzle_, success_, prv_, themeGroupStr, time } = await req.json();
 
   const puzzle = puzzle_ as Puzzle;
   const success = success_ as boolean;
@@ -51,6 +52,7 @@ export async function POST(req: NextRequest) {
   );
   const themeGroup = themeGroupStr as string[];
   const group = themeGroup.length > 0 ? toGroupId(themeGroup) : undefined;
+  const t = (time as number) / 1000;
 
   if (success) {
     new RatingCalculator().updateRatings(
@@ -147,6 +149,19 @@ export async function POST(req: NextRequest) {
       },
       { upsert: true } // Insert if not found.
     );
+
+    const moves = puzzle.Moves.split(' ').length / 2;
+    console.log(`\t\tTime per move : ${t / moves}`);
+
+    if (success) {
+      await TimeThemeColl.updateOne(
+        { username: user.username, theme: theme },
+        {
+          $set: { time: t / moves },
+        },
+        { upsert: true }
+      );
+    }
 
     await RatingHistory.create({
       username: user.username,
