@@ -19,7 +19,7 @@ import { assert } from 'console';
 const MAX_REPS: number = 20;
 const MAX_COMPROMISE: number = 3;
 
-const LEITNER_PROBABILITY: number = 0.8;
+const LEITNER_PROBABILITY: number = 0.2;
 const MIN_CANDIDATES: number = 10; // TODO: Increase this.
 
 export type PuzzleWithUserRating = {
@@ -89,7 +89,7 @@ const nextPuzzleForThemeAndRating = async (
 
 const nextPuzzleRepetitions = async (
   username: string,
-  rating: number,
+  userRating: number,
   reps: number,
   ratingMap: Map<string, Rating>,
   exceptions: any
@@ -97,12 +97,15 @@ const nextPuzzleRepetitions = async (
   if (reps == MAX_REPS) {
     throw new Error('Maximum repetitions reached during puzzle selection');
   }
+  let rating = userRating;
   let theme = frequentiallyRandomTheme();
   // If the theme is not in the rating map, let's try to use it.
   // Otherwise, let's run probabilistic SM2 on the rating map.
   const useSpacedRep = ratingMap.has(theme);
   if (useSpacedRep) {
     theme = await sm2RandomThemeFromRatingMap(username, ratingMap);
+    rating = ratingMap.get(theme)!.rating;
+    console.log(`Using rating: ${rating} for theme: ${theme}`);
   }
   const p = await nextPuzzleForThemeAndRating(theme, rating, exceptions);
   if (p) {
@@ -126,7 +129,8 @@ const nextPuzzleRepetitions = async (
 };
 
 const nextThemedPuzzlesForRepetitions = async (
-  rating: number,
+  userRating: number,
+  ratingMap: Map<string, Rating>,
   reps: number,
   themeGroup: string[],
   expceptions: any
@@ -134,14 +138,21 @@ const nextThemedPuzzlesForRepetitions = async (
   if (reps == MAX_REPS) {
     throw new Error('Maximum repetitions reached during puzzle selection');
   }
+
   const theme = themeGroup[Math.floor(Math.random() * themeGroup.length)];
+  // If theme is present in rating map, use its rating for adaptive difficulty
+  // selection. Otherwise, use user's rating.
+  const rating = ratingMap.get(theme)?.rating || userRating;
+  console.log(`Using rating: ${rating} for theme: ${theme}`);
+
   const p = await nextPuzzleForThemeAndRating(theme, rating, expceptions);
   if (p) {
     console.log(`Found grouped theme ${theme} after ${reps} reps.`);
     return p;
   }
   return await nextThemedPuzzlesForRepetitions(
-    rating,
+    userRating,
+    ratingMap,
     reps + 1,
     themeGroup,
     expceptions
@@ -242,9 +253,14 @@ const nextPuzzleFor = async (
       }
     }
 
+    // NB: The persisted rating map may contain irrelevant themes, but we don't
+    // want to include these for nextPuzzle / SM2, so we filter them out below.
+    const ratingMap = await getThemeRatings(user, true);
+
     if (group) {
       const puzzle = await nextThemedPuzzlesForRepetitions(
         rating.rating,
+        ratingMap,
         0,
         themeGroup,
         exceptions
@@ -269,9 +285,6 @@ const nextPuzzleFor = async (
       };
     }
 
-    // NB: The persisted rating map may contain irrelevant themes, but we don't
-    // want to include these for nextPuzzle / SM2, so we filter them out below.
-    const ratingMap = await getThemeRatings(user, true);
     const puzzle = await nextPuzzleRepetitions(
       user.username,
       rating.rating,
