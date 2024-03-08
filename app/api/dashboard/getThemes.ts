@@ -57,11 +57,13 @@ export const getThemes = async (
 
   // add themes that have no ratings after filtering fromm irrelevant themes
   const missed = allThemes
-    .filter(isIrrelevant)
-    .filter((theme) => !(theme in themeRatings) || !(theme in ratingHistories));
+    .filter(isRelevant)
+    .filter((theme) => !themeRatings.has(theme) || !(theme in ratingHistories));
 
   return [data, missed];
 };
+
+const isRelevant = (theme: string) => !isIrrelevant(theme);
 
 export const ratingHistory = async (user: User) => {
   const userRating = await getExistingUserRating(user);
