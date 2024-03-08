@@ -71,7 +71,11 @@ const updateIncorrect = (leitner: LeitnerInstance, puzzle: Puzzle): void => {
   leitner.boxB = filterOutPuzzle(leitner.boxB, puzzle).slice(0, BOX_LIMIT);
 };
 
-const updateCorrect = (leitner: LeitnerInstance, puzzle: Puzzle, time: number): void => {
+const updateCorrect = (
+  leitner: LeitnerInstance,
+  puzzle: Puzzle,
+  time: number
+): void => {
   if (boxContains(leitner.boxA, puzzle)) {
     // Remove from A.
     leitner.boxA = filterOutPuzzle(leitner.boxA, puzzle).slice(0, BOX_LIMIT);
