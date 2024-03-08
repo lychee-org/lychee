@@ -73,7 +73,7 @@ export default async function DashboardWrapper({ user }: { user: User }) {
                         <Card className='max-w-64 hover:bg-muted/30'>
                           <CardContent className='p-2'>
                             <p className='text-xs font-bold tracking-tighter text-center pb-1'>
-                              {themes.length} themes(s)
+                              {themes.length} theme(s)
                             </p>
                             <div className='flex gap-1 w-100 overflow-hidden'>
                               {themes.map((theme) => {

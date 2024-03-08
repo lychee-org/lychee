@@ -10,7 +10,9 @@ export function cn(...inputs: ClassValue[]) {
 export function capitalize(s: string) {
   // Capitalize the first letter of a string. And add spaces as word is camel case
   s = s.replace(/([A-Z])/g, ' $1');
-  s = s.replace(/([1-9])/g, ' $1');
+  if (s.includes('mate')) {
+    s = s.replace(/([1-9])/g, ' $1');
+  }
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
