@@ -106,9 +106,9 @@ export async function POST(req: NextRequest) {
     : puzzle;
 
   if (group) {
-    await updateThemedLeitner(user, reviewee, success, group);
+    await updateThemedLeitner(user, reviewee, success, group, t);
   } else {
-    await updateLeitner(user, reviewee, success);
+    await updateLeitner(user, reviewee, success, t);
   }
 
   // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
