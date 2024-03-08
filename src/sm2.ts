@@ -2,6 +2,13 @@ import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
 import { TimeThemeColl } from '@/models/TimeThemeColl';
 import Rating from '@/src/rating/GlickoV2Rating';
 
+const MAX_CORRECT_TIME: number = 45;
+const DELTA_SCALE_FACTOR: number = 6;
+const DEFAULT_TIME: number = 60;
+
+const scaleGlickoByTime = (r: number, t: number): number =>
+  (1 + (DEFAULT_TIME - t) / MAX_CORRECT_TIME / DELTA_SCALE_FACTOR) * r;
+
 type SmResponse = {
   interval: number;
   repetitions: number;
@@ -90,31 +97,28 @@ const sm2RandomThemeFromRatingMap = async (
   oldElos: Map<string, Rating>
 ): Promise<string> => {
   const result = new Map<string, RatingHolder>();
-  // console.log(usernname, oldElos);
   for (const [theme, v] of oldElos) {
-    // oldElos.forEach((v, theme) => {
     const entry = await TimeThemeColl.findOne({
       username: usernname,
       theme: theme,
     });
+
     if (entry) {
-      let t = entry.time;
-      console.log(theme, t);
-      t = Math.min(t, 45);
-      console.log(`old rating: ${v.rating}`);
-      v.rating = (1 + (45 - t) / 45 / 6) * v.rating;
-      console.log(`new rating: ${v.rating}`);
+      const t = Math.min(entry.time, MAX_CORRECT_TIME);
+      console.log(`Unscaled rating: ${v.rating} with time ${t}`);
+      v.rating = scaleGlickoByTime(v.rating, t);
+      console.log(`Scaled rating: ${v.rating}`);
     }
-    const ratingCopy = {
+
+    const holder = {
       rating: v.rating,
       ratingDeviation: v.ratingDeviation,
       volatility: v.volatility,
       numberOfResults: v.numberOfResults,
     };
-    // console.log(theme, v);
-    result.set(theme, ratingCopy);
+
+    result.set(theme, holder);
   }
-  console.log(result);
   return proportionallyRandomTheme(applySm2(result));
 };
 
