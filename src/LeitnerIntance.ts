@@ -7,6 +7,10 @@ import { User } from 'lucia';
 const BOX_A_PROB: number = 0.8;
 const BOX_LIMIT: number = 50;
 
+// If the user solves a puzzle in Box A in < 3 seconds, we can remove it
+// immediately from system (i.e. promote it twice).
+const TIME_THRESHOLD: number = 3;
+
 interface LeitnerInstance {
   boxA: Array<Puzzle>;
   boxB: Array<Puzzle>;
@@ -67,11 +71,14 @@ const updateIncorrect = (leitner: LeitnerInstance, puzzle: Puzzle): void => {
   leitner.boxB = filterOutPuzzle(leitner.boxB, puzzle).slice(0, BOX_LIMIT);
 };
 
-const updateCorrect = (leitner: LeitnerInstance, puzzle: Puzzle): void => {
+const updateCorrect = (leitner: LeitnerInstance, puzzle: Puzzle, time: number): void => {
   if (boxContains(leitner.boxA, puzzle)) {
-    // Promote to Box B.
+    // Remove from A.
     leitner.boxA = filterOutPuzzle(leitner.boxA, puzzle).slice(0, BOX_LIMIT);
-    leitner.boxB = [puzzle, ...leitner.boxB].slice(0, BOX_LIMIT);
+    if (time >= TIME_THRESHOLD) {
+      // Promote to B.
+      leitner.boxB = [puzzle, ...leitner.boxB].slice(0, BOX_LIMIT);
+    }
   } else if (boxContains(leitner.boxB, puzzle)) {
     // Remove from Leitner entirely.
     leitner.boxB = filterOutPuzzle(leitner.boxB, puzzle).slice(0, BOX_LIMIT);
@@ -102,7 +109,8 @@ export const nextThemedLeitnerReview = async (
 export const updateLeitner = async (
   user: User,
   puzzle: Puzzle,
-  correct: boolean
+  correct: boolean,
+  time: number
 ): Promise<void> => {
   const leitner = await findLeitner(user);
   if (!leitner) {
@@ -120,7 +128,7 @@ export const updateLeitner = async (
     `Before update: boxA = ${leitner.boxA.map((puzzle) => puzzle.PuzzleId)}, boxB = ${leitner.boxB.map((puzzle) => puzzle.PuzzleId)}`
   );
   if (correct) {
-    updateCorrect(leitner, puzzle);
+    updateCorrect(leitner, puzzle, time);
   } else {
     updateIncorrect(leitner, puzzle);
   }
@@ -134,7 +142,8 @@ export const updateThemedLeitner = async (
   user: User,
   puzzle: Puzzle,
   correct: boolean,
-  groupID: string
+  groupID: string,
+  time: number
 ): Promise<void> => {
   const leitner = await findThemedLeitner(user, groupID);
   if (!leitner) {
@@ -154,7 +163,7 @@ export const updateThemedLeitner = async (
     `Before update: boxA = ${leitner.boxA.map((puzzle) => puzzle.PuzzleId)}, boxB = ${leitner.boxB.map((puzzle) => puzzle.PuzzleId)}`
   );
   if (correct) {
-    updateCorrect(leitner, puzzle);
+    updateCorrect(leitner, puzzle, time);
   } else {
     updateIncorrect(leitner, puzzle);
   }
