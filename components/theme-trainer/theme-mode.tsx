@@ -40,7 +40,7 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
         success_: success,
         prv_: prv,
         themeGroupStr: group,
-        time_: t,
+        time: t,
       }),
     })
       .then((response) => response.text())
