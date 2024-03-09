@@ -79,7 +79,12 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
 
   return (
     <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-      <PuzzleBoard puzzle={puzzle} initialRating={rating} loading={loading} similar={similar} />
+      <PuzzleBoard
+        puzzle={puzzle}
+        initialRating={rating}
+        loading={loading}
+        similar={similar}
+      />
     </PuzzleContext.Provider>
   );
 };

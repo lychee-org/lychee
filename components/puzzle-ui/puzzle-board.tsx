@@ -278,14 +278,13 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
                 <Button size='sm'>Show</Button>
               </PopoverTrigger>
               <PopoverContent className={`p-2 ${!similar ? 'w-fit' : ''}`}>
-                {
-                  similar && similar.length > 0 ? (
-                    similar.map((p) => <StaticBoard key={p.PuzzleId} puzzle={p} />)
-                  ) :
-                  (
-                    <p className='text-center'>Non review puzzle</p>
-                  )
-                }
+                {similar && similar.length > 0 ? (
+                  similar.map((p) => (
+                    <StaticBoard key={p.PuzzleId} puzzle={p} />
+                  ))
+                ) : (
+                  <p className='text-center'>Non review puzzle</p>
+                )}
               </PopoverContent>
             </Popover>
           </div>
