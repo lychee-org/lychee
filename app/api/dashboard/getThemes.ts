@@ -1,10 +1,11 @@
-import { getExistingUserRating, getThemeRatings } from '@/src/rating/getRating';
+import { getExistingUserRating, getThemeRatings, toHolder } from '@/src/rating/getRating';
 import { User } from 'lucia';
 import { RatingHistory } from '@/models/RatingHistory';
 import * as d3 from 'd3';
 import { isIrrelevant } from '../puzzle/nextPuzzle/themeGenerator';
 import { allThemes } from '@/lib/utils';
 import { InitRatingColl } from '@/models/InitRatingColl';
+import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
 
 type RatingHistory = {
   rating: number;
@@ -14,7 +15,7 @@ type RatingHistory = {
 export type ThemeData = {
   theme: string;
   ratings: RatingHistory[];
-  rating: number;
+  rating: RatingHolder;
   delta: number;
   nb: number;
 };
@@ -48,7 +49,7 @@ export const getThemes = async (
       data.push({
         theme: k,
         ratings: ratingHistories[k],
-        rating: v.rating,
+        rating: toHolder(v),
         delta: streak,
         nb: v.numberOfResults,
       });
@@ -84,7 +85,7 @@ export const ratingHistory = async (user: User) => {
   });
   return {
     ratings: ratings,
-    rating: userRating.rating,
+    rating: toHolder(userRating),
     delta: calculateStreak(ratings),
   };
 };

@@ -10,6 +10,7 @@ import { getRecentGroups } from '../api/dashboard/recentGroups';
 import { capitalize, toGroup } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { ratingToString } from '@/src/rating/getRating';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +40,7 @@ export default async function DashboardWrapper({ user }: { user: User }) {
                   <p className='text-xs text-muted-foreground tracking-tighter'>
                     Rating
                   </p>
-                  <p className='text-xl'>{Math.round(rating) || 1500}</p>
+                  <p className='text-xl'>{ratingToString(rating) || '1500?'}</p>
                 </div>
                 <div>
                   <p className='text-xs text-muted-foreground tracking-tighter'>

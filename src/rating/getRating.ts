@@ -4,12 +4,23 @@ import { User } from 'lucia';
 import Rating from './GlickoV2Rating';
 import { UserThemeColl } from '@/models/UserThemeColl';
 import { isIrrelevant } from '@/app/api/puzzle/nextPuzzle/themeGenerator';
+import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
 
 const DEFAULT_VOLATILITY: number = 0.09;
+const PROV_DEVIATION: number = 110;
 
 // Default, provisional rating.
 export const getDefaultRating = () =>
   new Rating(1500, 350, DEFAULT_VOLATILITY, 0);
+
+const isProvisional = (rd: number) => rd >= PROV_DEVIATION;
+
+export const ratingToString = (holder: RatingHolder): string => {
+  if (isProvisional(holder.ratingDeviation)) {
+    return `${Math.round(holder.rating)}?`;
+  }
+  return Math.round(holder.rating).toString();
+}
 
 // Retrieve all data (execept volatility which isn't public) from Lichess API.
 export const fetchLichessRating = async (user: User): Promise<Rating> => {
@@ -64,6 +75,15 @@ export const getPuzzleRating = (puzzle: Puzzle): Rating =>
     DEFAULT_VOLATILITY, // Actual volatility not in Lichess' puzzle collection.
     puzzle.NbPlays
   );
+
+export const toHolder = (v: Rating): RatingHolder => {
+  return {
+    rating: v.rating,
+    ratingDeviation: v.ratingDeviation,
+    volatility: v.volatility,
+    numberOfResults: v.numberOfResults,
+  };
+};
 
 export const getThemeRatings = async (
   user: User,

@@ -10,11 +10,9 @@ import type { ThemeData } from '../api/dashboard/getThemes';
 import Delta from '@/components/ui/delta';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { set } from 'mongoose';
 import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { ratingToString } from '@/src/rating/getRating';
 
 type ThemesListProps = {
   themes: ThemeData[];
@@ -49,7 +47,7 @@ export default function ThemesList({
     );
 
     if (sortBy === 'rating') {
-      filteredThemes.sort((a, b) => a.rating - b.rating);
+      filteredThemes.sort((a, b) => a.rating.rating - b.rating.rating);
     } else if (sortBy === 'update') {
       filteredThemes.sort(
         (a, b) =>
@@ -114,7 +112,7 @@ export default function ThemesList({
                   <p className='text-xs text-muted-foreground tracking-tighter'>
                     Rating
                   </p>
-                  <p className='text-xl'>{Math.round(rating)}</p>
+                  <p className='text-xl'>{ratingToString(rating)}</p>
                 </div>
                 <div>
                   <p className='text-xs text-muted-foreground tracking-tighter'>
@@ -144,7 +142,7 @@ export default function ThemesList({
                     <p className='text-xs text-muted-foreground tracking-tighter'>
                       Rating
                     </p>
-                    <p className='text-xl'>{Math.round(rating)}</p>
+                    <p className='text-xl'>{ratingToString(rating)}</p>
                   </div>
                   <div>
                     <p className='text-xs text-muted-foreground tracking-tighter'>
