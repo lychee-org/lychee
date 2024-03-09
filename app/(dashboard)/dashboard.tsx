@@ -11,8 +11,6 @@ import { capitalize, toGroup } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
-
 export default async function DashboardWrapper({ user }: { user: User }) {
   const [themes, missing] = await getThemes(user);
   const { ratings, rating, delta } = await ratingHistory(user);

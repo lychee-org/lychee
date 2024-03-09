@@ -16,6 +16,9 @@ import RatingComponent from './controls/rating';
 import DisplayBox from './controls/display-box';
 import useTimer from '@/hooks/useTimer';
 import { cn } from '@/lib/utils';
+import { Button } from '../ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import StaticBoard from './static-board';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
@@ -264,6 +267,17 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
               side={side}
               viewSolution={viewSolution}
             />
+          </div>
+          <div className='flex bg-controller rounded-lg p-4 justify-between items-center'>
+            <p className='tracking-tighter'>Press for a training hint</p>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button>Show</Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <StaticBoard puzzle={puzzle} />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>
