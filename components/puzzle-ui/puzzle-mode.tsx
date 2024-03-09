@@ -1,6 +1,6 @@
 'use client';
 import { Puzzle } from '@/types/lichess-api';
-import React, { CSSProperties, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PuzzleBoard from './puzzle-board';
 import { PuzzleWithUserRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
 
@@ -11,16 +11,17 @@ export type RatingHolder = {
   numberOfResults: number;
 };
 
-export interface PuzzleModeProps {
+interface PuzzleModeProps {
   initialPuzzle: Puzzle;
   initialRating: RatingHolder;
+  group: string[];
 }
 
 export const PuzzleContext = React.createContext({
   submitNextPuzzle: (
     _success: boolean,
     _prv: RatingHolder,
-    t: number
+    _time: number
   ): Promise<RatingHolder> => {
     throw new Error();
   },
@@ -30,6 +31,7 @@ export const PuzzleContext = React.createContext({
 const PuzzleMode: React.FC<PuzzleModeProps> = ({
   initialPuzzle,
   initialRating,
+  group,
 }) => {
   /** PUZZLE CODE */
   const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
@@ -48,7 +50,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   const submitNextPuzzle = (
     success: boolean,
     prv: RatingHolder,
-    t: number
+    time: number
   ): Promise<RatingHolder> =>
     fetch(`/api/puzzle/submit`, {
       method: 'POST',
@@ -56,8 +58,8 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
         puzzle_: puzzle,
         success_: success,
         prv_: prv,
-        themeGroupStr: [],
-        time: t,
+        themeGroupStr: group,
+        time: time,
       }),
     })
       .then((response) => response.text())
@@ -68,7 +70,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
     setLoading(true);
     fetch(`/api/puzzle/nextPuzzle`, {
       method: 'POST',
-      body: JSON.stringify({ themeGroupStr: [] }),
+      body: JSON.stringify({ themeGroupStr: group }),
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as PuzzleWithUserRating)
