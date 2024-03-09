@@ -13,7 +13,7 @@ const DisplayBox = ({
   linePos,
   side,
   viewSolution,
-  puzzleId
+  puzzleId,
 }: {
   loading: boolean;
   gaveUp: boolean;
@@ -51,9 +51,7 @@ const DisplayBox = ({
         {loading ? 'Loading...' : 'Next Puzzle'}
       </Button>
       <Link href={`https://lichess.org/training/${puzzleId}`}>
-        <Button variant={'secondary'}>
-          View on Lichess
-        </Button>
+        <Button variant={'secondary'}>View on Lichess</Button>
       </Link>
     </div>
   );
@@ -73,9 +71,7 @@ const DisplayBox = ({
         {loading ? 'Loading...' : 'Next Puzzle'}
       </Button>
       <Link href={`https://lichess.org/training/${puzzleId}`}>
-        <Button variant={'secondary'}>
-          View on Lichess
-        </Button>
+        <Button variant={'secondary'}>View on Lichess</Button>
       </Link>
     </div>
   );
