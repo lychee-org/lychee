@@ -13,20 +13,10 @@ export type RatingHolder = {
 };
 
 const DEFAULT_VOLATILITY: number = 0.09;
-const PROV_DEVIATION: number = 110;
 
 // Default, provisional rating.
 export const getDefaultRating = () =>
   new Rating(1500, 350, DEFAULT_VOLATILITY, 0);
-
-const isProvisional = (rd: number) => rd >= PROV_DEVIATION;
-
-export const ratingToString = (holder: RatingHolder): string => {
-  if (isProvisional(holder.ratingDeviation)) {
-    return `${Math.round(holder.rating)}?`;
-  }
-  return Math.round(holder.rating).toString();
-};
 
 // Retrieve all data (execept volatility which isn't public) from Lichess API.
 export const fetchLichessRating = async (user: User): Promise<Rating> => {

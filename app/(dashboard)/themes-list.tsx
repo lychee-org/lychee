@@ -15,7 +15,17 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ratingToString } from '@/src/rating/getRating';
+
+const PROV_DEVIATION: number = 110;
+
+const isProvisional = (rd: number) => rd >= PROV_DEVIATION;
+
+const ratingToString = (holder: any): string => {
+  if (isProvisional(holder.ratingDeviation)) {
+    return `${Math.round(holder.rating)}?`;
+  }
+  return Math.round(holder.rating).toString();
+};
 
 type ThemesListProps = {
   themes: ThemeData[];

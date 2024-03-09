@@ -10,7 +10,17 @@ import { getRecentGroups } from '../api/dashboard/recentGroups';
 import { capitalize, toGroup } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { ratingToString } from '@/src/rating/getRating';
+
+const PROV_DEVIATION: number = 110;
+
+const isProvisional = (rd: number) => rd >= PROV_DEVIATION;
+
+const ratingToString = (holder: any): string => {
+  if (isProvisional(holder.ratingDeviation)) {
+    return `${Math.round(holder.rating)}?`;
+  }
+  return Math.round(holder.rating).toString();
+};
 
 export const dynamic = 'force-dynamic';
 
