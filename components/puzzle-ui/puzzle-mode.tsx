@@ -36,6 +36,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   /** PUZZLE CODE */
   const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
   const [rating, setRating] = useState<RatingHolder>(initialRating);
+  const [similar, setSimilar] = useState<Puzzle[] | undefined>([]);
   const [loading, setLoading] = useState(false);
 
   // TODO: Handle when no more puzzles!
@@ -77,13 +78,14 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
       .then((response) => {
         setPuzzle(response.puzzle);
         setRating(response.rating);
+        setSimilar(response.similar);
       })
       .finally(() => setLoading(false));
   };
 
   return (
     <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-      <PuzzleBoard puzzle={puzzle} initialRating={rating} loading={loading} />
+      <PuzzleBoard puzzle={puzzle} initialRating={rating} loading={loading} similar={similar} />
     </PuzzleContext.Provider>
   );
 };

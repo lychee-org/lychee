@@ -24,12 +24,14 @@ interface PuzzleBoardProps {
   puzzle?: Puzzle;
   initialRating: RatingHolder;
   loading: boolean;
+  similar?: Puzzle[];
 }
 // set its props to be the puzzle object
 const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
   puzzle,
   initialRating,
   loading,
+  similar,
 }) => {
   const { submitNextPuzzle: submitPuzzle, getNextPuzzle } =
     useContext(PuzzleContext);
@@ -268,14 +270,21 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
               viewSolution={viewSolution}
             />
           </div>
-          <div className='flex bg-controller rounded-lg p-4 justify-between items-center'>
-            <p className='tracking-tighter'>Press for a training hint</p>
+          <div className='flex bg-controller rounded-lg p-2 pl-4 justify-between items-center'>
+            <p className='text-sm'>Reveal a training hint</p>
             <Popover>
               <PopoverTrigger asChild>
-                <Button>Show</Button>
+                <Button size='sm'>Show</Button>
               </PopoverTrigger>
-              <PopoverContent>
-                <StaticBoard puzzle={puzzle} />
+              <PopoverContent className={`p-2 ${!similar ? 'w-fit' : ''}`}>
+                {
+                  similar && similar.length > 0 ? (
+                    similar.map((p) => <StaticBoard key={p.PuzzleId} puzzle={p} />)
+                  ) :
+                  (
+                    <p className='text-center'>Non review puzzle</p>
+                  )
+                }
               </PopoverContent>
             </Popover>
           </div>

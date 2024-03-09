@@ -25,6 +25,7 @@ const MIN_CANDIDATES: number = 10; // TODO: Increase this.
 export type PuzzleWithUserRating = {
   puzzle: Puzzle;
   rating: RatingHolder;
+  similar?: Puzzle[];
 };
 
 export const getUserSolvedPuzzleIDs = async (user: User): Promise<string[]> => {
@@ -248,6 +249,7 @@ const nextPuzzleFor = async (
         }
         return {
           puzzle: similarPuzzle,
+          similar: [puzzleToReview],
           rating: rating,
         };
       }
