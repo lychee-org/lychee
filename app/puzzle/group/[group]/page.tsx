@@ -17,6 +17,6 @@ export default async function Group({ params }: { params: { group: string } }) {
   addRecentGroup(user.username, params.group);
   const { puzzle, rating } = await nextPuzzleFor(user, false, group);
   return (
-    <PuzzleMode initialPuzzle={puzzle} initialRating={rating} group={group} />
+    <PuzzleMode initialPuzzle={puzzle} initialRating={rating} group={group} backendURI={process.env.BACKEND_HOST}/>
   );
 }

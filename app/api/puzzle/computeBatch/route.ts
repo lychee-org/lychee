@@ -5,12 +5,10 @@ import {
   SimilarityInstance,
   findSimilarityInstance,
   computeSimilarityCache,
-  findSimilarUndoPuzzle,
   findPuzzlebyId,
 } from '@/src/similarityCache';
 import { Puzzle } from '@/types/lichess-api';
 import { SimilarityColl } from '@/models/SimilarityColl';
-// import { ComputeBatch } from './computeBatchFor';
 
 export async function POST(req: NextRequest) {
   await dbConnect();

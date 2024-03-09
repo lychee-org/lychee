@@ -15,6 +15,7 @@ interface PuzzleModeProps {
   initialPuzzle: Puzzle;
   initialRating: RatingHolder;
   group: string[];
+  backendURI?: string;
 }
 
 export const PuzzleContext = React.createContext({
@@ -32,6 +33,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   initialPuzzle,
   initialRating,
   group,
+  backendURI
 }) => {
   /** PUZZLE CODE */
   const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
@@ -40,10 +42,11 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
 
   // TODO: Handle when no more puzzles!
   useEffect(() => {
-    fetch(`/api/puzzle/computeBatch`, {
+    fetch(`${backendURI || ''}/api/puzzle/computeBatch`, {
       method: 'POST',
       body: JSON.stringify({ puzzleId: puzzle.PuzzleId }),
-    }).then(() => console.log('Computed similarity cachee of last puzzle'));
+      credentials: 'include',
+    }).then(() => console.log('Computed similarity cache of last puzzle'));
   }, [puzzle]);
 
   // submit the puzzle success/failure to the server
@@ -61,6 +64,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
         themeGroupStr: group,
         time: time,
       }),
+      credentials: 'include',
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as RatingHolder);
@@ -68,9 +72,10 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   // get the next puzzle
   const getNextPuzzle = () => {
     setLoading(true);
-    fetch(`/api/puzzle/nextPuzzle`, {
+    fetch(`${backendURI || ''}/api/puzzle/nextPuzzle`, {
       method: 'POST',
       body: JSON.stringify({ themeGroupStr: group }),
+      credentials: 'include',
     })
       .then((response) => response.text())
       .then((s) => JSON.parse(s) as PuzzleWithUserRating)

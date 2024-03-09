@@ -10,6 +10,6 @@ export default async function TestBoard() {
   if (!user) return new Response('Unauthorized', { status: 401 });
   const { puzzle, rating } = await nextPuzzleFor(user);
   return (
-    <PuzzleMode initialPuzzle={puzzle} initialRating={rating} group={[]} />
+    <PuzzleMode initialPuzzle={puzzle} initialRating={rating} group={[]} backendURI={process.env.BACKEND_HOST}/>
   );
 }
