@@ -1,17 +1,16 @@
 'use client';
 
 import { Puzzle } from '@/types/lichess-api';
-import React, { CSSProperties, useState } from 'react';
+import React, { useState } from 'react';
 import PuzzleBoard from '../puzzle-ui/puzzle-board';
 import {
   PuzzleContext,
-  PuzzleModeProps,
   RatingHolder,
 } from '../puzzle-ui/puzzle-mode';
 import { PuzzleWithUserRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
 
 interface ThemeModeProps {
-  initialPuzzle: Puzzle;
+  initialPuzzle: Puzzle | undefined;
   initialRating: RatingHolder;
   group: string[];
 }
@@ -21,7 +20,7 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
   initialRating,
   group,
 }) => {
-  const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
+  const [puzzle, setPuzzle] = useState<Puzzle | undefined>(initialPuzzle);
   const [rating, setRating] = useState<RatingHolder>(initialRating);
   const [loading, setLoading] = useState(false);
 
@@ -63,9 +62,14 @@ const ThemeMode: React.FC<ThemeModeProps> = ({
   };
 
   return (
+    puzzle ? 
     <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
       <PuzzleBoard puzzle={puzzle} initialRating={rating} loading={loading} />
     </PuzzleContext.Provider>
+    :
+    <div>
+      No more puzzles in this group!
+    </div>
   );
 };
 

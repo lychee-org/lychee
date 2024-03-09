@@ -1,6 +1,6 @@
 'use client';
 import { Puzzle } from '@/types/lichess-api';
-import React, { CSSProperties, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PuzzleBoard from './puzzle-board';
 import { PuzzleWithUserRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
 
@@ -12,7 +12,7 @@ export type RatingHolder = {
 };
 
 export interface PuzzleModeProps {
-  initialPuzzle: Puzzle;
+  initialPuzzle: Puzzle | undefined;
   initialRating: RatingHolder;
 }
 
@@ -32,7 +32,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
   initialRating,
 }) => {
   /** PUZZLE CODE */
-  const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
+  const [puzzle, setPuzzle] = useState<Puzzle | undefined>(initialPuzzle);
   const [rating, setRating] = useState<RatingHolder>(initialRating);
   const [loading, setLoading] = useState(false);
 
