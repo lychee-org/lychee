@@ -3,6 +3,7 @@ import { useContext, useState } from 'react';
 import { PuzzleContext } from '../puzzle-mode';
 import './display-box.css';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const DisplayBox = ({
   loading,
@@ -12,6 +13,7 @@ const DisplayBox = ({
   linePos,
   side,
   viewSolution,
+  puzzleId
 }: {
   loading: boolean;
   gaveUp: boolean;
@@ -20,6 +22,7 @@ const DisplayBox = ({
   linePos: number;
   side: string;
   viewSolution: () => void;
+  puzzleId: string;
 }) => {
   let wrongIcon = <CrossCircledIcon className='radix-icon' />;
   let correctIcon = <CheckCircledIcon className='radix-icon' />;
@@ -47,6 +50,11 @@ const DisplayBox = ({
       <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>
         {loading ? 'Loading...' : 'Next Puzzle'}
       </Button>
+      <Link href={`https://lichess.org/training/${puzzleId}`}>
+        <Button variant={'secondary'}>
+          View on Lichess
+        </Button>
+      </Link>
     </div>
   );
   let sideInfo = (
@@ -64,6 +72,11 @@ const DisplayBox = ({
       <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>
         {loading ? 'Loading...' : 'Next Puzzle'}
       </Button>
+      <Link href={`https://lichess.org/training/${puzzleId}`}>
+        <Button variant={'secondary'}>
+          View on Lichess
+        </Button>
+      </Link>
     </div>
   );
 

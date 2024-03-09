@@ -263,6 +263,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
               linePos={linePos}
               side={side}
               viewSolution={viewSolution}
+              puzzleId={puzzle.PuzzleId}
             />
           </div>
         </div>
