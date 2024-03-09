@@ -6,6 +6,7 @@ import './(styles)/cg-board.css';
 import './(styles)/cg-pieces.css';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import NavbarWrapper from '@/components/ui/navbar-wrapper';
+import { redirect } from 'next/navigation';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const azeret_mono = Azeret_Mono({
@@ -23,6 +24,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  if (process.env.REDIRECT) return redirect(process.env.REDIRECT);
   return (
     <html lang='en'>
       <body className={`${inter.variable} ${azeret_mono.variable} font-sans`}>
