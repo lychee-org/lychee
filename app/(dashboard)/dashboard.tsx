@@ -22,8 +22,6 @@ const ratingToString = (holder: any): string => {
   return Math.round(holder.rating).toString();
 };
 
-export const dynamic = 'force-dynamic';
-
 export default async function DashboardWrapper({ user }: { user: User }) {
   const [themes, missing] = await getThemes(user);
   const { ratings, rating, delta } = await ratingHistory(user);
