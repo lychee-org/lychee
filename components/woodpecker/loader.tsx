@@ -1,12 +1,12 @@
 'use client';
 
 import { Puzzle } from '@/types/lichess-api';
-import { RatingHolder } from '../puzzle-ui/puzzle-mode';
 import { CSSProperties, useState } from 'react';
 import WoodPeckerMode from './woodpecker-mode';
 import WoodLoadingBoard from './loading';
 import './loader.css';
 import { cn } from '@/lib/utils';
+import { RatingHolder } from '@/src/rating/getRating';
 
 interface Props {
   rating: RatingHolder;
