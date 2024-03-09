@@ -9,5 +9,7 @@ export default async function TestBoard() {
   const { user } = await validateRequest();
   if (!user) return new Response('Unauthorized', { status: 401 });
   const { puzzle, rating } = await nextPuzzleFor(user);
-  return <PuzzleMode initialPuzzle={puzzle} initialRating={rating} />;
+  return (
+    <PuzzleMode initialPuzzle={puzzle} initialRating={rating} group={[]} />
+  );
 }

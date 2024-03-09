@@ -41,14 +41,6 @@ export const similarBatchForCompromised = async (
   persist: boolean = true,
   compromise: number = INITIAL_COMPROMISE
 ): Promise<Puzzle[]> => {
-  const candidates = await preprocessing(
-    username,
-    lastBatch,
-    clampedRating,
-    solvedArray,
-    minBatchFactor,
-    compromise
-  );
   const ret = await Promise.all(
     lastBatch.map(async (puzzle) => {
       let instance: SimilarityInstance | undefined =
@@ -67,6 +59,14 @@ export const similarBatchForCompromised = async (
       similarPuzzleId = await findSimilarUndoPuzzle(instance, username);
 
       if (similarPuzzleId == 'Whole cache has been solved.') {
+        const candidates = await preprocessing(
+          username,
+          lastBatch,
+          clampedRating,
+          solvedArray,
+          minBatchFactor,
+          compromise
+        );
         return similarBatchForCompromisedHelper(
           username,
           puzzle,

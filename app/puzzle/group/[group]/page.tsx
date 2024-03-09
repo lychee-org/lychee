@@ -1,6 +1,6 @@
 import { addRecentGroup } from '@/app/api/dashboard/recentGroups';
 import nextPuzzleFor from '@/app/api/puzzle/nextPuzzle/nextFor';
-import ThemeMode from '@/components/theme-trainer/theme-mode';
+import PuzzleMode from '@/components/puzzle-ui/puzzle-mode';
 import { validateRequest } from '@/lib/auth';
 import { toGroup } from '@/lib/utils';
 import { redirect } from 'next/navigation';
@@ -17,6 +17,6 @@ export default async function Group({ params }: { params: { group: string } }) {
   addRecentGroup(user.username, params.group);
   const { puzzle, rating } = await nextPuzzleFor(user, false, group);
   return (
-    <ThemeMode initialPuzzle={puzzle} initialRating={rating} group={group} />
+    <PuzzleMode initialPuzzle={puzzle} initialRating={rating} group={group} />
   );
 }
