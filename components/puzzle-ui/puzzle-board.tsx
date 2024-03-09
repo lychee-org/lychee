@@ -2,7 +2,7 @@
 
 import { Chess, Move, Square } from 'chess.js';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { PuzzleContext, RatingHolder } from './puzzle-mode';
+import { PuzzleContext } from './puzzle-mode';
 import LoadingBoard from './loading-board';
 import React from 'react';
 import ChessboardWrapped from './chessboard-wrapped';
@@ -16,6 +16,7 @@ import RatingComponent from './controls/rating';
 import DisplayBox from './controls/display-box';
 import useTimer from '@/hooks/useTimer';
 import { cn } from '@/lib/utils';
+import { RatingHolder } from '@/src/rating/getRating';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;

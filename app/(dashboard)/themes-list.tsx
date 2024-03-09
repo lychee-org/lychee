@@ -10,7 +10,10 @@ import type { ThemeData } from '../api/dashboard/getThemes';
 import Delta from '@/components/ui/delta';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { set } from 'mongoose';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ratingToString } from '@/src/rating/getRating';
 

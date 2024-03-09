@@ -1,11 +1,15 @@
-import { getExistingUserRating, getThemeRatings, toHolder } from '@/src/rating/getRating';
+import {
+  RatingHolder,
+  getExistingUserRating,
+  getThemeRatings,
+  toHolder,
+} from '@/src/rating/getRating';
 import { User } from 'lucia';
 import { RatingHistory } from '@/models/RatingHistory';
 import * as d3 from 'd3';
 import { isIrrelevant } from '../puzzle/nextPuzzle/themeGenerator';
 import { allThemes } from '@/lib/utils';
 import { InitRatingColl } from '@/models/InitRatingColl';
-import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
 
 type RatingHistory = {
   rating: number;

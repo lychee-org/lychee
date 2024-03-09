@@ -1,6 +1,9 @@
-import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
 import { AllRoundColl } from '@/models/AllRoundColl';
-import { getExistingUserRating, getThemeRatings } from '@/src/rating/getRating';
+import {
+  RatingHolder,
+  getExistingUserRating,
+  getThemeRatings,
+} from '@/src/rating/getRating';
 import { Puzzle } from '@/types/lichess-api';
 import { User } from 'lucia';
 import mongoose from 'mongoose';

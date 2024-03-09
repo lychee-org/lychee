@@ -4,7 +4,13 @@ import { User } from 'lucia';
 import Rating from './GlickoV2Rating';
 import { UserThemeColl } from '@/models/UserThemeColl';
 import { isIrrelevant } from '@/app/api/puzzle/nextPuzzle/themeGenerator';
-import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
+
+export type RatingHolder = {
+  rating: number;
+  ratingDeviation: number;
+  volatility: number;
+  numberOfResults: number;
+};
 
 const DEFAULT_VOLATILITY: number = 0.09;
 const PROV_DEVIATION: number = 110;
@@ -20,7 +26,7 @@ export const ratingToString = (holder: RatingHolder): string => {
     return `${Math.round(holder.rating)}?`;
   }
   return Math.round(holder.rating).toString();
-}
+};
 
 // Retrieve all data (execept volatility which isn't public) from Lichess API.
 export const fetchLichessRating = async (user: User): Promise<Rating> => {

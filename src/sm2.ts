@@ -1,7 +1,6 @@
-import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
 import { TimeThemeColl } from '@/models/TimeThemeColl';
 import Rating from '@/src/rating/GlickoV2Rating';
-import { toHolder } from './rating/getRating';
+import { RatingHolder, toHolder } from './rating/getRating';
 
 const MAX_CORRECT_TIME: number = 45;
 const DELTA_SCALE_FACTOR: number = 6;
