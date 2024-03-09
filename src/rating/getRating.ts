@@ -5,6 +5,13 @@ import Rating from './GlickoV2Rating';
 import { UserThemeColl } from '@/models/UserThemeColl';
 import { isIrrelevant } from '@/app/api/puzzle/nextPuzzle/themeGenerator';
 
+export type RatingHolder = {
+  rating: number;
+  ratingDeviation: number;
+  volatility: number;
+  numberOfResults: number;
+};
+
 const DEFAULT_VOLATILITY: number = 0.09;
 
 // Default, provisional rating.
@@ -64,6 +71,15 @@ export const getPuzzleRating = (puzzle: Puzzle): Rating =>
     DEFAULT_VOLATILITY, // Actual volatility not in Lichess' puzzle collection.
     puzzle.NbPlays
   );
+
+export const toHolder = (v: Rating): RatingHolder => {
+  return {
+    rating: v.rating,
+    ratingDeviation: v.ratingDeviation,
+    volatility: v.volatility,
+    numberOfResults: v.numberOfResults,
+  };
+};
 
 export const getThemeRatings = async (
   user: User,

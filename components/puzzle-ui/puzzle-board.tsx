@@ -2,7 +2,7 @@
 
 import { Chess, Move, Square } from 'chess.js';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { PuzzleContext, RatingHolder } from './puzzle-mode';
+import { PuzzleContext } from './puzzle-mode';
 import LoadingBoard from './loading-board';
 import React from 'react';
 import ChessboardWrapped from './chessboard-wrapped';
@@ -16,6 +16,7 @@ import RatingComponent from './controls/rating';
 import DisplayBox from './controls/display-box';
 import useTimer from '@/hooks/useTimer';
 import { cn } from '@/lib/utils';
+import { RatingHolder } from '@/src/rating/getRating';
 import { Button } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import StaticBoard from './static-board';
@@ -277,14 +278,13 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
                 <Button size='sm'>Show</Button>
               </PopoverTrigger>
               <PopoverContent className={`p-2 ${!similar ? 'w-fit' : ''}`}>
-                {
-                  similar && similar.length > 0 ? (
-                    similar.map((p) => <StaticBoard key={p.PuzzleId} puzzle={p} />)
-                  ) :
-                  (
-                    <p className='text-center'>Non review puzzle</p>
-                  )
-                }
+                {similar && similar.length > 0 ? (
+                  similar.map((p) => (
+                    <StaticBoard key={p.PuzzleId} puzzle={p} />
+                  ))
+                ) : (
+                  <p className='text-center'>Non review puzzle</p>
+                )}
               </PopoverContent>
             </Popover>
           </div>

@@ -1,6 +1,6 @@
-import { RatingHolder } from '@/components/puzzle-ui/puzzle-mode';
 import { TimeThemeColl } from '@/models/TimeThemeColl';
 import Rating from '@/src/rating/GlickoV2Rating';
+import { RatingHolder, toHolder } from './rating/getRating';
 
 const MAX_CORRECT_TIME: number = 45;
 const DELTA_SCALE_FACTOR: number = 6;
@@ -102,23 +102,15 @@ const sm2RandomThemeFromRatingMap = async (
       username: usernname,
       theme: theme,
     });
-
     if (entry) {
       const t = Math.min(entry.time, MAX_CORRECT_TIME);
       console.log(`Unscaled rating: ${v.rating} with time ${t}`);
       v.rating = scaleGlickoByTime(v.rating, t);
       console.log(`Scaled rating: ${v.rating}`);
     }
-
-    const holder = {
-      rating: v.rating,
-      ratingDeviation: v.ratingDeviation,
-      volatility: v.volatility,
-      numberOfResults: v.numberOfResults,
-    };
-
-    result.set(theme, holder);
+    result.set(theme, toHolder(v));
   }
+  console.log(result);
   return proportionallyRandomTheme(applySm2(result));
 };
 

@@ -3,13 +3,7 @@ import { Puzzle } from '@/types/lichess-api';
 import React, { useState, useEffect } from 'react';
 import PuzzleBoard from './puzzle-board';
 import { PuzzleWithUserRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
-
-export type RatingHolder = {
-  rating: number;
-  ratingDeviation: number;
-  volatility: number;
-  numberOfResults: number;
-};
+import { RatingHolder } from '@/src/rating/getRating';
 
 interface PuzzleModeProps {
   initialPuzzle: Puzzle;
@@ -85,7 +79,12 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
 
   return (
     <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
-      <PuzzleBoard puzzle={puzzle} initialRating={rating} loading={loading} similar={similar} />
+      <PuzzleBoard
+        puzzle={puzzle}
+        initialRating={rating}
+        loading={loading}
+        similar={similar}
+      />
     </PuzzleContext.Provider>
   );
 };

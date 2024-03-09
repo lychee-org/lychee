@@ -16,6 +16,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
+const PROV_DEVIATION: number = 110;
+
+const isProvisional = (rd: number) => rd >= PROV_DEVIATION;
+
+const ratingToString = (holder: any): string => {
+  if (isProvisional(holder.ratingDeviation)) {
+    return `${Math.round(holder.rating)}?`;
+  }
+  return Math.round(holder.rating).toString();
+};
+
 type ThemesListProps = {
   themes: ThemeData[];
   missing: string[];
@@ -49,7 +60,7 @@ export default function ThemesList({
     );
 
     if (sortBy === 'rating') {
-      filteredThemes.sort((a, b) => a.rating - b.rating);
+      filteredThemes.sort((a, b) => a.rating.rating - b.rating.rating);
     } else if (sortBy === 'update') {
       filteredThemes.sort(
         (a, b) =>
@@ -114,7 +125,7 @@ export default function ThemesList({
                   <p className='text-xs text-muted-foreground tracking-tighter'>
                     Rating
                   </p>
-                  <p className='text-xl'>{Math.round(rating)}</p>
+                  <p className='text-xl'>{ratingToString(rating)}</p>
                 </div>
                 <div>
                   <p className='text-xs text-muted-foreground tracking-tighter'>
@@ -144,7 +155,7 @@ export default function ThemesList({
                     <p className='text-xs text-muted-foreground tracking-tighter'>
                       Rating
                     </p>
-                    <p className='text-xl'>{Math.round(rating)}</p>
+                    <p className='text-xl'>{ratingToString(rating)}</p>
                   </div>
                   <div>
                     <p className='text-xs text-muted-foreground tracking-tighter'>

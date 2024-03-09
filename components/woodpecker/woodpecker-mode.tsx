@@ -3,7 +3,8 @@
 import { Puzzle } from '@/types/lichess-api';
 import React, { CSSProperties, useState } from 'react';
 import PuzzleBoard from '../puzzle-ui/puzzle-board';
-import { PuzzleContext, RatingHolder } from '../puzzle-ui/puzzle-mode';
+import { PuzzleContext } from '../puzzle-ui/puzzle-mode';
+import { RatingHolder } from '@/src/rating/getRating';
 
 interface WoodpeckerModeProps {
   initialPuzzles: Puzzle[];
