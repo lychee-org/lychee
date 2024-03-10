@@ -65,6 +65,7 @@ export const similarBatchForCompromised = async (
         while (i < solved.length && !cache.has(solved[i])) {
           i++;
         }
+        similarPuzzleId = solved[i];
         const newSolved = solved.slice(0, i).concat(solved.slice(i + 1));
         await AllRoundColl.updateOne(
           { username: username },
