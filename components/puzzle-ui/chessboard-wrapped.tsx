@@ -30,8 +30,9 @@ const SQUARE_STYLES = {
     borderRadius: '50%',
   },
   CHECKED_SQUARE: {
-    background: 'radial-gradient(circle, rgba(255,0,0,0.7) 0%, rgba(255,0,0,0.7) 10%, transparent 75%)',
-    borderRadius: '50%'
+    background:
+      'radial-gradient(circle, rgba(255,0,0,0.7) 0%, rgba(255,0,0,0.7) 10%, transparent 75%)',
+    borderRadius: '50%',
   },
 };
 
@@ -98,7 +99,11 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
   useEffect(() => {
     if (game.inCheck()) {
       for (let square of SQUARES) {
-        if (game.get(square) && game.get(square).type === 'k' && game.get(square).color === turn) {
+        if (
+          game.get(square) &&
+          game.get(square).type === 'k' &&
+          game.get(square).color === turn
+        ) {
           setCheckedSquares({ [square]: SQUARE_STYLES.CHECKED_SQUARE });
           return;
         }
@@ -358,7 +363,6 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
       setMoveFrom(square);
     else setMoveFrom(null);
   }
-
 
   /** RETURNS MOSTLY A WRAPPED VERSION OF REACT-CHESSBOARD */
   return (
