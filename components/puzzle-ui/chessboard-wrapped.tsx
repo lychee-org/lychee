@@ -11,7 +11,7 @@ import {
 } from 'react-chessboard/dist/chessboard/types';
 
 /** SQUARE STYLES */
-const SQUARE_STYLES = {
+export const SQUARE_STYLES = {
   // when cursor hovers over square selected piece can move to or piece hovers over square it can move to
   HOVERED_SQUARE: { background: 'rgba(255, 255, 0, 0.4)' },
   // to and from the last move made
