@@ -85,13 +85,16 @@ export default async function DashboardWrapper({ user }: { user: User }) {
                               {themes.length} theme(s)
                             </p>
                             <div className='flex gap-1 w-100 overflow-hidden'>
-                              {themes.map((theme) => {
-                                return (
-                                  <Badge key={theme} variant={'outline'}>
-                                    {capitalize(theme).toLowerCase()}
-                                  </Badge>
-                                );
-                              })}
+                              <ScrollArea>
+                                {themes.map((theme) => {
+                                  return (
+                                    <Badge key={theme} variant={'outline'}>
+                                      {capitalize(theme).toLowerCase()}
+                                    </Badge>
+                                  );
+                                })}
+                                <ScrollBar orientation='horizontal' />
+                              </ScrollArea>
                             </div>
                           </CardContent>
                         </Card>
