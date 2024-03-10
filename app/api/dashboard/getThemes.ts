@@ -74,18 +74,22 @@ export const ratingHistory = async (user: User) => {
   const userRating = await getExistingUserRating(user);
   const initRating =
     (await InitRatingColl.findOne({ username: user.username })) || 1500;
-  const ratings = await RatingHistory.find({
+  const ratings = (await RatingHistory.find({
     username: user.username,
     theme: 'overall',
+  })).map((doc) => {
+    let { _id: _, ...rest } = doc._doc as any;
+    return rest as any as RatingHistory;
   });
   const firstRating =
     initRating.rating || ratings[0]?.rating || userRating.rating;
+  const firstRatingTime = d3.timeMinute.offset(
+    ratings[0]?.createdAt || new Date(Date.now()),
+    -10
+  )
   ratings.unshift({
     rating: firstRating,
-    createdAt: d3.timeMinute.offset(
-      ratings[0]?.createdAt || new Date(Date.now()),
-      -10
-    ),
+    createdAt: firstRatingTime
   });
   return {
     ratings: ratings,
