@@ -11,7 +11,7 @@ import {
 } from 'react-chessboard/dist/chessboard/types';
 
 /** SQUARE STYLES */
-const SQUARE_STYLES = {
+export const SQUARE_STYLES = {
   // when cursor hovers over square selected piece can move to or piece hovers over square it can move to
   HOVERED_SQUARE: { background: 'rgba(255, 255, 0, 0.4)' },
   // to and from the last move made
@@ -30,8 +30,9 @@ const SQUARE_STYLES = {
     borderRadius: '50%',
   },
   CHECKED_SQUARE: {
-    background: 'radial-gradient(circle, rgba(255,0,0,0.4) 0%, rgba(255,0,0,0.4) 30%, transparent 75%)',
-    borderRadius: '50%'
+    background:
+      'radial-gradient(circle, rgba(255,0,0,0.4) 0%, rgba(255,0,0,0.4) 30%, transparent 75%)',
+    borderRadius: '50%',
   },
 };
 
@@ -98,7 +99,11 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
   useEffect(() => {
     if (game.inCheck()) {
       for (let square of SQUARES) {
-        if (game.get(square) && game.get(square).type === 'k' && game.get(square).color === turn) {
+        if (
+          game.get(square) &&
+          game.get(square).type === 'k' &&
+          game.get(square).color === turn
+        ) {
           setCheckedSquares({ [square]: SQUARE_STYLES.CHECKED_SQUARE });
           return;
         }
@@ -106,7 +111,7 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
     } else {
       setCheckedSquares({});
     }
-  }, [fen, game, turn]);
+  }, [fen]);
 
   /** MAKING SURE PARENT COMPONENT KNOWS WHEN INITIAL BOARD IS RENDERED */
   const timeouts: Array<NodeJS.Timeout> = [];
@@ -358,7 +363,6 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
       setMoveFrom(square);
     else setMoveFrom(null);
   }
-
 
   /** RETURNS MOSTLY A WRAPPED VERSION OF REACT-CHESSBOARD */
   return (
