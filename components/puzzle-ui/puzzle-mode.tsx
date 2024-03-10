@@ -33,8 +33,8 @@ const NoPuzzles = (
           <br />
           Wow, we have no puzzles left for you!
           <br />
-          We can&apos;t find a puzzle that matches your rating and selected theme
-          group.
+          We can&apos;t find a puzzle that matches your rating and selected
+          theme group.
           <br />
           Head back to the dashboard, and try again later.
         </p>
