@@ -106,7 +106,7 @@ const ChessboardWrapped: React.FC<ChessboardWrappedProps> = ({
     } else {
       setCheckedSquares({});
     }
-  }, [fen, game, turn]);
+  }, [fen]);
 
   /** MAKING SURE PARENT COMPONENT KNOWS WHEN INITIAL BOARD IS RENDERED */
   const timeouts: Array<NodeJS.Timeout> = [];

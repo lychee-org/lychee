@@ -1,5 +1,5 @@
 import { Puzzle } from '@/types/lichess-api';
-import { Chess, Square } from 'chess.js';
+import { Chess, SQUARES, Square } from 'chess.js';
 import React, { useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import {
@@ -30,6 +30,21 @@ function StaticBoard({ puzzle }: { puzzle: Puzzle }) {
   }, [game]);
   const [rightClickedSquares, setRightClickedSquares] =
     useState<CustomSquareStyles>({});
+
+  const checkSquare = useMemo(() => {
+    if (game.inCheck()) {
+      for (let square of SQUARES) {
+        if (
+          game.get(square) &&
+          game.get(square).type === 'k' &&
+          game.get(square).color === side
+        ) {
+          return { [square]: SQUARE_STYLES.CHECKED_SQUARE };
+        }
+      }
+    }
+    return {};
+  }, [game]);
 
   const pieces: Piece[] = [
     'wP',
@@ -91,6 +106,7 @@ function StaticBoard({ puzzle }: { puzzle: Puzzle }) {
       customSquareStyles={{
         ...lastMoveHighlight,
         ...rightClickedSquares,
+        ...checkSquare,
       }}
       onSquareRightClick={onSquareRightClick}
       onSquareClick={onSquareClick}
