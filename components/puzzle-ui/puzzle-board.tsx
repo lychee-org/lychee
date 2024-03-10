@@ -15,11 +15,11 @@ import './puzzle-board-ui.css';
 import RatingComponent from './controls/rating';
 import DisplayBox from './controls/display-box';
 import useTimer from '@/hooks/useTimer';
-import { cn } from '@/lib/utils';
 import { RatingHolder } from '@/src/rating/getRating';
 import { Button } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import StaticBoard from './static-board';
+import PuzzleHintBox from './controls/puzzle-hint';
 
 interface PuzzleBoardProps {
   puzzle?: Puzzle;
@@ -271,23 +271,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
               viewSolution={viewSolution}
             />
           </div>
-          <div className='flex bg-controller rounded-lg p-2 pl-4 justify-between items-center'>
-            <p className='text-sm'>Reveal a training hint</p>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button size='sm'>Show</Button>
-              </PopoverTrigger>
-              <PopoverContent className={`p-2 ${!similar ? 'w-fit' : ''}`}>
-                {similar && similar.length > 0 ? (
-                  similar.map((p) => (
-                    <StaticBoard key={p.PuzzleId} puzzle={p} />
-                  ))
-                ) : (
-                  <p className='text-center'>Non review puzzle</p>
-                )}
-              </PopoverContent>
-            </Popover>
-          </div>
+          <PuzzleHintBox similar={similar} puzzle={puzzle} solved={solved} />
         </div>
       </div>
     </div>
