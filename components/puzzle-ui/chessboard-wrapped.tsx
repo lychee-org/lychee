@@ -30,7 +30,7 @@ const SQUARE_STYLES = {
     borderRadius: '50%',
   },
   CHECKED_SQUARE: {
-    background: 'radial-gradient(circle, rgba(255,0,0,0.7) 0%, rgba(255,0,0,0.7) 10%, transparent 75%)',
+    background: 'radial-gradient(circle, rgba(255,0,0,0.4) 0%, rgba(255,0,0,0.4) 30%, transparent 75%)',
     borderRadius: '50%'
   },
 };
