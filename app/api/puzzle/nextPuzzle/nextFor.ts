@@ -194,10 +194,17 @@ const nextPuzzleFor = async (
           console.log('Deleting different active puzzle');
           await ActivePuzzleColl.deleteOne({ username: user.username });
         } else {
+          let similar: Puzzle[] = [];
+          if (activePuzzle.isReview) {
+            const reviewee = JSON.parse(activePuzzle.reviewee) as Puzzle;
+            similar = [reviewee];
+          }
+          console.log(similar);
           console.log('Found active puzzle');
           return {
             puzzle: JSON.parse(activePuzzle.puzzle) as Puzzle,
             rating: rating,
+            similar: similar,
           };
         }
       }
