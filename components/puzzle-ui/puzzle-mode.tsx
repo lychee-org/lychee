@@ -6,7 +6,7 @@ import { PuzzleWithUserRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
 import { RatingHolder } from '@/src/rating/getRating';
 
 interface PuzzleModeProps {
-  initialPuzzle: Puzzle;
+  initialPuzzle: Puzzle | undefined;
   initialRating: RatingHolder;
   group: string[];
 }
@@ -22,23 +22,46 @@ export const PuzzleContext = React.createContext({
   getNextPuzzle: () => {},
 });
 
+const NoPuzzles = (
+  <div className='min-h-svh flex flex-col items-center py-12 px-2'>
+    <div className='flex flex-col max-w-5xl w-full items-stretch gap-8'>
+      <div className='space-y-2'>
+        <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center'>
+          No Puzzles
+        </h1>
+        <p className='text-xl text-muted-foreground text-center'>
+          <br />
+          Wow, we have no puzzles left for you!
+          <br />
+          We can't find a puzzle that matches your rating and selected theme
+          group.
+          <br />
+          Head back to the dashboard, and try again later.
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
 const PuzzleMode: React.FC<PuzzleModeProps> = ({
   initialPuzzle,
   initialRating,
   group,
 }) => {
   /** PUZZLE CODE */
-  const [puzzle, setPuzzle] = useState<Puzzle>(initialPuzzle);
+  const [puzzle, setPuzzle] = useState<Puzzle | undefined>(initialPuzzle);
   const [rating, setRating] = useState<RatingHolder>(initialRating);
   const [similar, setSimilar] = useState<Puzzle[] | undefined>([]);
   const [loading, setLoading] = useState(false);
 
   // TODO: Handle when no more puzzles!
   useEffect(() => {
-    fetch(`/api/puzzle/computeBatch`, {
-      method: 'POST',
-      body: JSON.stringify({ puzzleId: puzzle.PuzzleId }),
-    }).then(() => console.log('Computed similarity cachee of last puzzle'));
+    if (puzzle) {
+      fetch(`/api/puzzle/computeBatch`, {
+        method: 'POST',
+        body: JSON.stringify({ puzzleId: puzzle.PuzzleId }),
+      }).then(() => console.log('Computed similarity cachee of last puzzle'));
+    }
   }, [puzzle]);
 
   // submit the puzzle success/failure to the server
@@ -77,7 +100,7 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
       .finally(() => setLoading(false));
   };
 
-  return (
+  return puzzle ? (
     <PuzzleContext.Provider value={{ submitNextPuzzle, getNextPuzzle }}>
       <PuzzleBoard
         puzzle={puzzle}
@@ -86,6 +109,8 @@ const PuzzleMode: React.FC<PuzzleModeProps> = ({
         similar={similar}
       />
     </PuzzleContext.Provider>
+  ) : (
+    NoPuzzles
   );
 };
 
