@@ -57,25 +57,15 @@ export const similarBatchForCompromised = async (
         instance = instanceCreated;
       }
 
-      let similarPuzzleId = await findSimilarUndoPuzzle(instance, username);
+      let similarPuzzleId = await findSimilarUndoPuzzle(instance, user);
       if (similarPuzzleId === 'Whole cache has been solved.') {
         const solved = await getUserSolvedPuzzleIDs(user);
-        const cache = instance.cache;
-        let minIndex = solved.length;
-        for (let i = 0; i < cache.length; ++i) {
-          const id = cache[i];
-          const index = solved.indexOf(id.toString());
-          if (index === -1) {
-            throw new Error('Cache not solved!');
-          }
-          if (index < minIndex) {
-            minIndex = index;
-            similarPuzzleId = id;
-          }
+        const cache = new Set(instance.cache);
+        let i = 0;
+        while (i < solved.length && !cache.has(solved[i])) {
+          i++;
         }
-        const newSolved = solved
-          .slice(0, minIndex)
-          .concat(solved.slice(minIndex + 1));
+        const newSolved = solved.slice(0, i).concat(solved.slice(i + 1));
         await AllRoundColl.updateOne(
           { username: username },
           { $set: { solved: newSolved } }

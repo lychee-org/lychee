@@ -5,7 +5,11 @@ import similarity_distance from '../src/similarity';
 import { SimilarityColl } from '../models/SimilarityColl';
 import { AllRoundColl } from '@/models/AllRoundColl';
 import { getExistingUserRatingByName } from './rating/getRating';
-import { clampRating } from '@/app/api/puzzle/nextPuzzle/nextFor';
+import {
+  clampRating,
+  getUserSolvedPuzzleIDs,
+} from '@/app/api/puzzle/nextPuzzle/nextFor';
+import { User } from 'lucia';
 
 const cache_size = 30;
 
@@ -82,14 +86,13 @@ export const computeSimilarityCache = async (
 
 export const findSimilarUndoPuzzle = async (
   instance: SimilarityInstance,
-  userName: String
+  user: User
 ): Promise<String> => {
   const cache = instance.cache;
-  const curUser = await AllRoundColl.findOne({ username: userName });
-  const solved = curUser.solved;
+  const solved = new Set(await getUserSolvedPuzzleIDs(user));
   for (let i = 0; i < cache.length; i++) {
     const curPuzzleId = cache[i];
-    if (solved.includes(curPuzzleId)) {
+    if (solved.has(curPuzzleId.toString())) {
       continue;
     } else {
       return curPuzzleId;
