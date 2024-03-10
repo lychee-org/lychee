@@ -216,7 +216,7 @@ const nextPuzzleFor = async (
           `Worked! Puzzle Id: ${puzzleToReview.PuzzleId} from Leitner, tags: ${puzzleToReview.hierarchy_tags}`
         );
         const [similarPuzzle] = await similarBatchForCompromised(
-          user.username,
+          user,
           [puzzleToReview],
           clampRating(rating.rating),
           exceptions,
@@ -227,7 +227,7 @@ const nextPuzzleFor = async (
         console.log(
           `Got similar puzzle with tags ${similarPuzzle.hierarchy_tags} and line ${similarPuzzle.Moves}`
         );
-        // TODO: If puzzle === similar puzzle so no similar puzzle?
+
         if (group) {
           await ActivePuzzleColl.updateOne(
             { username: user.username },

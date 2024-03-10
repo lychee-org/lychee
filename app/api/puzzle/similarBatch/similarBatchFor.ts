@@ -33,7 +33,7 @@ const INITIAL_COMPROMISE = 2;
 const MAX_COMPROMISE = 4;
 
 export const similarBatchForCompromised = async (
-  username: string,
+  user: User,
   lastBatch: Puzzle[],
   clampedRating: number,
   solvedArray: string[],
@@ -41,11 +41,11 @@ export const similarBatchForCompromised = async (
   persist: boolean = true,
   compromise: number = INITIAL_COMPROMISE
 ): Promise<Puzzle[]> => {
+  const username = user.username;
   const ret = await Promise.all(
     lastBatch.map(async (puzzle) => {
       let instance: SimilarityInstance | undefined =
         await findSimilarityInstance(puzzle.PuzzleId);
-      let similarPuzzleId: String;
 
       if (!instance) {
         const similarPuzzles = await computeSimilarityCache(puzzle);
@@ -56,26 +56,24 @@ export const similarBatchForCompromised = async (
         await SimilarityColl.create(instanceCreated);
         instance = instanceCreated;
       }
-      similarPuzzleId = await findSimilarUndoPuzzle(instance, username);
 
-      if (similarPuzzleId == 'Whole cache has been solved.') {
-        const candidates = await preprocessing(
-          username,
-          lastBatch,
-          clampedRating,
-          solvedArray,
-          minBatchFactor,
-          compromise
+      let similarPuzzleId = await findSimilarUndoPuzzle(instance, user);
+      if (similarPuzzleId === 'Whole cache has been solved.') {
+        const solved = await getUserSolvedPuzzleIDs(user);
+        const cache = new Set(instance.cache);
+        let i = 0;
+        while (i < solved.length && !cache.has(solved[i])) {
+          i++;
+        }
+        similarPuzzleId = solved[i];
+        const newSolved = solved.slice(0, i).concat(solved.slice(i + 1));
+        await AllRoundColl.updateOne(
+          { username: username },
+          { $set: { solved: newSolved } }
         );
-        return similarBatchForCompromisedHelper(
-          username,
-          puzzle,
-          solvedArray,
-          candidates
-        );
-      } else {
-        return (await findPuzzlebyId(similarPuzzleId)) as Puzzle;
       }
+
+      return (await findPuzzlebyId(similarPuzzleId)) as Puzzle;
     })
   );
 
@@ -187,7 +185,7 @@ const similarBatchFor = async (user: User): Promise<Puzzle[]> => {
   const { rating } = await getExistingUserRating(user);
   const solvedArray = await getUserSolvedPuzzleIDs(user);
   return await similarBatchForCompromised(
-    user.username,
+    user,
     lastBatch,
     clampRating(rating),
     solvedArray
