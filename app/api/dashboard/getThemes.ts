@@ -68,7 +68,7 @@ export const getThemes = async (
   return [data, missed];
 };
 
-const isRelevant = (theme: string) => !isIrrelevant(theme);
+export const isRelevant = (theme: string) => !isIrrelevant(theme);
 
 export const ratingHistory = async (user: User) => {
   const userRating = await getExistingUserRating(user);

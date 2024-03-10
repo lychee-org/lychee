@@ -44,7 +44,7 @@ const DisplayBox = ({
     <div className='icon-container'>
       <div className='icon-wrapper text-green-500'>{correctIcon}</div>
       <div className='text-wrapper'>Amazing! You solved it</div>
-      <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>
+      <Button variant={'default'} onClick={getNextPuzzle} disabled={loading}>
         {loading ? 'Loading...' : 'Next Puzzle'}
       </Button>
     </div>
@@ -61,7 +61,7 @@ const DisplayBox = ({
     <div className='icon-container'>
       <div className='icon-wrapper text-yellow-500'>{wrongIcon}</div>
       <div className='text-wrapper'>Here is the correct solution</div>
-      <Button variant={'secondary'} onClick={getNextPuzzle} disabled={loading}>
+      <Button variant={'default'} onClick={getNextPuzzle} disabled={loading}>
         {loading ? 'Loading...' : 'Next Puzzle'}
       </Button>
     </div>

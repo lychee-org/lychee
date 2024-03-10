@@ -3,24 +3,48 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover';
 import React from 'react';
 import StaticBoard from '../static-board';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { capitalize } from '@/lib/utils';
+import { isRelevant } from '@/app/api/puzzle/nextPuzzle/themeGenerator';
 
-const hintMode = (similar: Puzzle[]) => {
+const hintMode = (similar: Puzzle[] | undefined, themes: string[]) => {
   return (
-    <React.Fragment>
-      <p className='text-sm'>View a similar puzzle:</p>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button size='sm'>Show</Button>
-        </PopoverTrigger>
-        <PopoverContent className={`p-2 ${!similar ? 'w-fit' : ''}`}>
-          {similar && similar.length > 0 ? (
-            similar.map((p) => <StaticBoard key={p.PuzzleId} puzzle={p} />)
-          ) : (
-            <p className='text-center'>Non review puzzle</p>
-          )}
-        </PopoverContent>
-      </Popover>
-    </React.Fragment>
+    <div className='space-y-2'>
+      {similar && similar.length > 0 && (
+        <div className='flex justify-between items-center'>
+          <p className='text-sm'>View similar puzzle</p>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button size='sm'>Show</Button>
+            </PopoverTrigger>
+            <PopoverContent className={`p-2 ${!similar ? 'w-fit' : ''}`}>
+              {similar && similar.length > 0 ? (
+                similar.map((p) => <StaticBoard key={p.PuzzleId} puzzle={p} />)
+              ) : (
+                <p className='text-center'>Non review puzzle</p>
+              )}
+            </PopoverContent>
+          </Popover>
+        </div>
+      )}
+      <div className='flex justify-between items-center'>
+        <p className='text-sm'>View themes</p>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button size='sm'>Show</Button>
+          </PopoverTrigger>
+          <PopoverContent className={`p-2 max-w-72 w-fit`}>
+            <div className='flex gap-1 flex-wrap justify-center'>
+              {themes.map((t) => (
+                <Badge key={t} variant={'outline'}>
+                  {capitalize(t).toLowerCase()}
+                </Badge>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
   );
 };
 
@@ -31,20 +55,16 @@ const noHintMode = () => (
 );
 
 const solvedMode = (puzzle: Puzzle) => {
-  const openAnalysisBoard = () => {
-    // window.open(
-    //   `https://lichess.org/analysis/${puzzle.FEN}`,
-    //   '_blank'
-    // )
-    window.open(`https://lichess.org/training/${puzzle.PuzzleId}`, '_blank');
-  };
   return (
-    <React.Fragment>
-      <p className='text-sm'>View in Lichess:</p>
-      <Button size='sm' onClick={openAnalysisBoard}>
-        Analyse
-      </Button>
-    </React.Fragment>
+    <div className='flex items-center gap-4 justify-between'>
+      <div className='flex grow gap-1 flex-wrap justify-center'>
+        {puzzle.Themes.split(' ').map((t) => (
+          <Badge key={t} variant={'secondary'}>
+            {capitalize(t).toLowerCase()}
+          </Badge>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -58,17 +78,34 @@ const PuzzleHintBox = ({
   solved: boolean;
 }) => {
   const mode = () => {
-    if (similar && similar.length > 0) {
-      return hintMode(similar);
-    } else if (solved) {
+    if (solved) {
       return solvedMode(puzzle);
     }
-    return noHintMode();
+    return hintMode(similar, puzzle.Themes.split(' '));
   };
+
+  const openAnalysisBoard = () => {
+    // window.open(
+    //   `https://lichess.org/analysis/${puzzle.FEN}`,
+    //   '_blank'
+    // )
+    window.open(`https://lichess.org/training/${puzzle.PuzzleId}`, '_blank');
+  };
+
   return (
-    <div className='flex bg-controller rounded-lg p-2 pl-4 justify-between items-center'>
-      {mode()}
-    </div>
+    <>
+      <div className='bg-controller rounded-lg p-2 pl-4'>{mode()}</div>
+      {solved && (
+        <Button
+          size='sm'
+          variant={'secondary'}
+          className='w-full'
+          onClick={openAnalysisBoard}
+        >
+          Analyse in Lichess
+        </Button>
+      )}
+    </>
   );
 };
 
