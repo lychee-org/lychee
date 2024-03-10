@@ -181,7 +181,7 @@ export default function ThemesList({
       {missing.length > 0 && (
         <>
           <Separator />
-          <div className='grid grid-cols-2 gap-8'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
             {missing.map((theme) => (
               <Card
                 key={theme}

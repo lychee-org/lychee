@@ -50,7 +50,7 @@ export default function Filter({ updateFilter }: FilterProps) {
   }, [sortBy, order, filter]);
 
   return (
-    <div className='flex gap-4 items-center'>
+    <div className='flex flex-wrap justify-center gap-4 items-center'>
       <Group options={sortByOpts} value={sortBy} onValueChange={setSortBy} />
       <Group options={directionsOpts} value={order} onValueChange={setOrder} />
       <form className='grow'>
