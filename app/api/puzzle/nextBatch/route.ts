@@ -20,8 +20,10 @@ export async function POST(req: NextRequest) {
     // We shouldn't mark as active, since then whole batch will be the same.
     // TODO: Same batch on refresh?
     const { puzzle } = await nextPuzzleFor(user, true);
-    await addRound(user, puzzle);
-    puzzles.push(puzzle);
+    if (puzzle) {
+      await addRound(user, puzzle);
+      puzzles.push(puzzle);
+    }
   }
 
   // Persist this batch in LastBatchColl.

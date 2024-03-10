@@ -19,14 +19,14 @@ import {
 import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
 import { assert } from 'console';
 
-const MAX_REPS: number = 20;
+const MAX_REPS: number = 12;
 const MAX_COMPROMISE: number = 3;
 
 const LEITNER_PROBABILITY: number = 0.2;
 const MIN_CANDIDATES: number = 10; // TODO: Increase this.
 
 export type PuzzleWithUserRating = {
-  puzzle: Puzzle;
+  puzzle: Puzzle | undefined;
   rating: RatingHolder;
   similar?: Puzzle[];
 };
@@ -97,9 +97,10 @@ const nextPuzzleRepetitions = async (
   reps: number,
   ratingMap: Map<string, Rating>,
   exceptions: any
-): Promise<Puzzle> => {
+): Promise<Puzzle | undefined> => {
   if (reps == MAX_REPS) {
-    throw new Error('Maximum repetitions reached during puzzle selection');
+    // throw new Error('Maximum repetitions reached during puzzle selection');
+    return undefined;
   }
   let rating = userRating;
   let theme = frequentiallyRandomTheme();
@@ -138,9 +139,10 @@ const nextThemedPuzzlesForRepetitions = async (
   reps: number,
   themeGroup: string[],
   expceptions: any
-): Promise<Puzzle> => {
+): Promise<Puzzle | undefined> => {
   if (reps == MAX_REPS) {
-    throw new Error('Maximum repetitions reached during puzzle selection');
+    // throw new Error('Maximum repetitions reached during puzzle selection');
+    return undefined;
   }
 
   const theme = themeGroup[Math.floor(Math.random() * themeGroup.length)];
@@ -225,7 +227,7 @@ const nextPuzzleFor = async (
         console.log(
           `Got similar puzzle with tags ${similarPuzzle.hierarchy_tags} and line ${similarPuzzle.Moves}`
         );
-        // TODO: If puzzle == similar puzzle or no similar puzzle?
+        // TODO: If puzzle === similar puzzle so no similar puzzle?
         if (group) {
           await ActivePuzzleColl.updateOne(
             { username: user.username },
@@ -270,20 +272,22 @@ const nextPuzzleFor = async (
         themeGroup,
         exceptions
       );
-      console.log(
-        `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
-      );
-      assert(!woodpecker);
-      await ActivePuzzleColl.updateOne(
-        { username: user.username },
-        {
-          username: user.username,
-          puzzle: JSON.stringify(puzzle),
-          isReview: false,
-          groupID: group,
-        },
-        { upsert: true }
-      );
+      if (puzzle) {
+        console.log(
+          `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
+        );
+        assert(!woodpecker);
+        await ActivePuzzleColl.updateOne(
+          { username: user.username },
+          {
+            username: user.username,
+            puzzle: JSON.stringify(puzzle),
+            isReview: false,
+            groupID: group,
+          },
+          { upsert: true }
+        );
+      }
       return {
         puzzle: puzzle,
         rating: rating,
@@ -297,20 +301,23 @@ const nextPuzzleFor = async (
       ratingMap,
       exceptions
     );
-    console.log(
-      `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
-    );
 
-    if (!woodpecker) {
-      await ActivePuzzleColl.updateOne(
-        { username: user.username },
-        {
-          username: user.username,
-          puzzle: JSON.stringify(puzzle),
-          isReview: false,
-        },
-        { upsert: true }
+    if (puzzle) {
+      console.log(
+        `Got puzzle with themes ${puzzle.Themes} and rating ${puzzle.Rating} and line ${puzzle.Moves}`
       );
+
+      if (!woodpecker) {
+        await ActivePuzzleColl.updateOne(
+          { username: user.username },
+          {
+            username: user.username,
+            puzzle: JSON.stringify(puzzle),
+            isReview: false,
+          },
+          { upsert: true }
+        );
+      }
     }
 
     return {
