@@ -22,7 +22,7 @@ import { assert } from 'console';
 const MAX_REPS: number = 12;
 const MAX_COMPROMISE: number = 3;
 
-const LEITNER_PROBABILITY: number = 0.2;
+const LEITNER_PROBABILITY: number = 1;
 const MIN_CANDIDATES: number = 10; // TODO: Increase this.
 
 export type PuzzleWithUserRating = {
@@ -199,6 +199,7 @@ const nextPuzzleFor = async (
             const reviewee = JSON.parse(activePuzzle.reviewee) as Puzzle;
             similar = [reviewee];
           }
+          console.log(similar);
           console.log('Found active puzzle');
           return {
             puzzle: JSON.parse(activePuzzle.puzzle) as Puzzle,

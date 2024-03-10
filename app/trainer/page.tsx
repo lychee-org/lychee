@@ -11,8 +11,13 @@ export default async function TestBoard() {
   if (!user) {
     return redirect('/');
   }
-  const { puzzle, rating } = await nextPuzzleFor(user);
+  const { puzzle, rating, similar } = await nextPuzzleFor(user);
   return (
-    <PuzzleMode initialPuzzle={puzzle} initialRating={rating} group={[]} />
+    <PuzzleMode
+      initialPuzzle={puzzle}
+      initialRating={rating}
+      initialSimilar={similar}
+      group={[]}
+    />
   );
 }

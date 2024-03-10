@@ -8,6 +8,7 @@ import { RatingHolder } from '@/src/rating/getRating';
 interface PuzzleModeProps {
   initialPuzzle: Puzzle | undefined;
   initialRating: RatingHolder;
+  initialSimilar: Puzzle[] | undefined;
   group: string[];
 }
 
@@ -46,12 +47,13 @@ const NoPuzzles = (
 const PuzzleMode: React.FC<PuzzleModeProps> = ({
   initialPuzzle,
   initialRating,
+  initialSimilar,
   group,
 }) => {
   /** PUZZLE CODE */
   const [puzzle, setPuzzle] = useState<Puzzle | undefined>(initialPuzzle);
   const [rating, setRating] = useState<RatingHolder>(initialRating);
-  const [similar, setSimilar] = useState<Puzzle[] | undefined>([]);
+  const [similar, setSimilar] = useState<Puzzle[] | undefined>(initialSimilar);
   const [loading, setLoading] = useState(false);
 
   // TODO: Handle when no more puzzles!
