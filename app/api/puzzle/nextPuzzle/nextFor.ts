@@ -18,11 +18,12 @@ import {
 } from '@/src/LeitnerIntance';
 import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
 import { assert } from 'console';
+import { CountColl } from '@/models/CountColl';
 
 const MAX_REPS: number = 12;
 const MAX_COMPROMISE: number = 3;
 
-const LEITNER_PROBABILITY: number = 0.2;
+const LEITNER_PROBABILITY: number = 0;
 const MIN_CANDIDATES: number = 10; // TODO: Increase this.
 
 export type PuzzleWithUserRating = {
@@ -165,6 +166,8 @@ const nextThemedPuzzlesForRepetitions = async (
   );
 };
 
+const ids: string[] = ['0nwgQ', '04wpi', '00RYH', '0CgCr', '1NMt7'];
+
 const nextPuzzleFor = async (
   user: User,
   woodpecker: boolean = false,
@@ -178,6 +181,60 @@ const nextPuzzleFor = async (
       numberOfResults: userRating.numberOfResults,
     };
     const group = themeGroup.length > 0 ? toGroupId(themeGroup) : undefined;
+    const cnt = (await CountColl.findOne({ username: user.username }))?.count;
+    let counter = cnt || 0;
+    if (!cnt) {
+      await CountColl.create({ username: user.username, count: 0 });
+    }
+    
+    if (counter < ids.length) {
+      const puz = puzzleFromDocument(
+        await mongoose.connection
+          .collection('testPuzzles')
+          .findOne({ PuzzleId: ids[counter] })
+      );
+      if (ids[counter] === '1NMt7') { // Should have similar being first one.
+        const opt = puzzleFromDocument(
+          await mongoose.connection
+            .collection('testPuzzles')
+            .findOne({ PuzzleId: ids[0] })
+        );
+        if (opt) {
+          await ActivePuzzleColl.updateOne(
+            { username: user.username },
+            {
+              username: user.username,
+              puzzle: JSON.stringify(puz),
+              isReview: true,
+              reviewee: JSON.stringify(opt),
+              groupID: group,
+            },
+            { upsert: true }
+          );
+          return {
+            puzzle: puz,
+            rating: rating,
+            similar: [opt],
+          };
+        }
+      }
+      if (puz) {
+        await ActivePuzzleColl.updateOne(
+          { username: user.username },
+          {
+            username: user.username,
+            puzzle: JSON.stringify(puz),
+            isReview: false,
+          },
+          { upsert: true }
+        );
+        return {
+          puzzle: puz,
+          rating: rating,
+        };
+      }
+      throw new Error('Fuck');
+    }
 
     if (!woodpecker) {
       const activePuzzle = await ActivePuzzleColl.findOne({
@@ -298,6 +355,7 @@ const nextPuzzleFor = async (
       return {
         puzzle: puzzle,
         rating: rating,
+        similar: [] as Puzzle[],
       };
     }
 

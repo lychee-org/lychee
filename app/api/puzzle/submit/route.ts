@@ -18,6 +18,7 @@ import { ActivePuzzleColl } from '@/models/ActivePuzzle';
 import { updateLeitner, updateThemedLeitner } from '@/src/LeitnerIntance';
 import { toGroupId } from '@/lib/utils';
 import { TimeThemeColl } from '@/models/TimeThemeColl';
+import { CountColl } from '@/models/CountColl';
 
 const REVIEW_SCALING_FACTOR = 0.7;
 
@@ -40,6 +41,12 @@ export async function POST(req: NextRequest) {
     return new Response('Unauthorized', { status: 401 });
   }
   const { puzzle_, success_, prv_, themeGroupStr, time } = await req.json();
+
+  // Increment the counter for the user in CountColl:
+  await CountColl.updateOne(
+    { username: user.username },
+    { $inc: { count: 1 } }
+  );
 
   const puzzle = puzzle_ as Puzzle;
   const success = success_ as boolean;
