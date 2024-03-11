@@ -16,10 +16,6 @@ https://lychee-omega.vercel.app
 - [License](#license)
 - [Acknowledgments](#acknowledgments) -->
 
-## Demo
-
-> TODO
-
 ## Installation
 
 Install packages
