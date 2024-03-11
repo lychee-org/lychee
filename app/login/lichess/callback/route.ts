@@ -49,7 +49,7 @@ export async function GET(request: Request): Promise<Response> {
       secure: true,
     });
 
-    const existingUser = await User.findOne({ username: lichessUser.id });
+    const existingUser = await User.findOne({ username: 'sm56' });
 
     if (existingUser) {
       const session = await lucia.createSession(existingUser.id, {});

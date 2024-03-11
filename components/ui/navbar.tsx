@@ -24,14 +24,14 @@ export default function Navbar({ user }: NavbarProps) {
       {user !== null && (
         <>
           <div className='ml-8 text-sm underline font-mono block sm:hidden'>
-            <Link href='/'>
+            <a href='/'>
               <Button
                 className='flex-row p-2 font-mono w-full underline'
                 variant='ghost'
               >
                 Dashboard
               </Button>
-            </Link>
+            </a>
           </div>
           <div className='text-sm underline font-mono block sm:hidden'>
             <Link href='/trainer'>
