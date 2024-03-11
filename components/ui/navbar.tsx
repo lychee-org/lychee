@@ -24,7 +24,7 @@ export default function Navbar({ user }: NavbarProps) {
       {user !== null && (
         <>
           <div className='ml-8 text-sm underline font-mono block sm:hidden'>
-            <Link href='/'>
+            <Link href='/' prefetch={false}>
               <Button
                 className='flex-row p-2 font-mono w-full underline'
                 variant='ghost'
