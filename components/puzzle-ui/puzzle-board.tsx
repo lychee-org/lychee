@@ -246,15 +246,18 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
           </div>
           <RatingComponent rating={rating.rating} />
           <div className='move-viewer-container rounded-lg overflow-hidden'>
-            <div className='fromGameHeader bg-controller hover:bg-controller-light'>
+            <div className='font-sans fromGameHeader bg-controller hover:bg-controller-light'>
               <div className='grid grid-cols-2 gap-6'>
-                <p className='text-right'>Puzzle #{puzzle.PuzzleId}</p>
+                <p className='text-right font-sans'>
+                  Puzzle #{puzzle.PuzzleId}
+                </p>
                 {solved ? (
-                  <span className='text-primary/60 text-left'>
-                    Rating {puzzle.Rating}
+                  <span className='text-primary/60 text-left font-sans'>
+                    Rating{' '}
+                    <span className='font-sans font-bold'>{puzzle.Rating}</span>
                   </span>
                 ) : (
-                  <span className='text-primary/40 text-left'>
+                  <span className='text-primary/40 text-left font-sans'>
                     Rating hidden
                   </span>
                 )}
