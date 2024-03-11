@@ -17,21 +17,21 @@ export default function Navbar({ user }: NavbarProps) {
   return (
     <nav className='z-50 flex max-h-14 w-full min-w-max flex-row items-center justify-start gap-3 border-b bg-background/95 p-4 md:pl-4'>
       <div>
-        <Link href='/' className='font-bold text-xl'>
+        <a href='/' className='font-bold text-xl'>
           Lychee_
-        </Link>
+        </a>
       </div>
       {user !== null && (
         <>
           <div className='ml-8 text-sm underline font-mono block sm:hidden'>
-            <Link href='/' prefetch={false}>
+            <a href='/'>
               <Button
                 className='flex-row p-2 font-mono w-full underline'
                 variant='ghost'
               >
                 Dashboard
               </Button>
-            </Link>
+            </a>
           </div>
           <div className='text-sm underline font-mono block sm:hidden'>
             <Link href='/trainer'>
