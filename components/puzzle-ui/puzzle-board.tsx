@@ -247,7 +247,18 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
           <RatingComponent rating={rating.rating} />
           <div className='move-viewer-container rounded-lg overflow-hidden'>
             <div className='fromGameHeader bg-controller hover:bg-controller-light'>
-              Puzzle #{puzzle.PuzzleId}
+              <div className='grid grid-cols-2 gap-6'>
+                <p className='text-right'>Puzzle #{puzzle.PuzzleId}</p>
+                {solved ? (
+                  <span className='text-primary/60 text-left'>
+                    Rating {puzzle.Rating}
+                  </span>
+                ) : (
+                  <span className='text-primary/40 text-left'>
+                    Rating hidden
+                  </span>
+                )}
+              </div>
             </div>
             <MoveNavigationContext.Provider
               value={{ currentIndex: playbackPos, moves: game.history(), side }}
