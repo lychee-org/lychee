@@ -28,9 +28,5 @@ export default async function TestBoard() {
   // ]).toArray();
 
   const rating = await getExistingUserRating(user);
-  return (
-    <WoodpeckerLoader
-      rating={rating}
-    />
-  );
+  return <WoodpeckerLoader rating={rating} />;
 }

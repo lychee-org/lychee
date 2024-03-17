@@ -43,10 +43,7 @@ export async function POST(req: NextRequest) {
   updateAndScaleRatings(userRating, puzzle, success, activePuzzle.isReview);
 
   // Update user's rating.
-  await RatingColl.updateOne(
-    { username: user.username },
-    { $set: userRating }
-  );
+  await RatingColl.updateOne({ username: user.username }, { $set: userRating });
   await RatingHistory.create({
     username: user.username,
     theme: 'overall',

@@ -1,4 +1,4 @@
-import { DEFAULT_RATING } from "./getRating";
+import { DEFAULT_RATING } from './getRating';
 
 const MULTIPLIER: number = 173.7178;
 
