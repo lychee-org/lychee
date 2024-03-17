@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { successStr, themeGroupStr, timeStr } = await req.json();
-  const puzzle = JSON.parse(activePuzzle.puzzle) as Puzzle
+  const puzzle = JSON.parse(activePuzzle.puzzle) as Puzzle;
   const success = successStr as boolean;
   const themeGroup = themeGroupStr as string[];
   const group = themeGroup.length > 0 ? toGroupId(themeGroup) : undefined;
