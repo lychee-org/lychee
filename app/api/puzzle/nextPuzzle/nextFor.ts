@@ -164,7 +164,6 @@ const nextPuzzleFor = async (
   themeGroup: string[] = []
 ): Promise<PuzzleWithUserRating> =>
   getExistingUserRating(user).then(async (rating) => {
-    const themeTrainer = themeGroup.length > 0;
     const groupId = toGroupId(themeGroup);
 
     if (!woodpecker) {
@@ -222,7 +221,7 @@ const nextPuzzleFor = async (
       // want to include these for nextPuzzle / SM2, so we filter them out below.
       const ratingMap = await getThemeRatings(user, true);
       return {
-        puzzle: themeTrainer
+        puzzle: groupId
           ? await nextThemedPuzzlesForRepetitions(
               rating.rating,
               ratingMap,
@@ -244,6 +243,7 @@ const nextPuzzleFor = async (
       console.log(
         `Got puzzle with themes ${result.puzzle.Themes} and rating ${result.puzzle.Rating} and line ${result.puzzle.Moves}`
       );
+      // Persist selection as active puzzle.
       if (!woodpecker) {
         await ActivePuzzleColl.updateOne(
           { username: user.username },
