@@ -13,7 +13,7 @@ import { UserThemeColl } from '@/models/UserThemeColl';
 import addRound from './addRound';
 import { RatingHistory } from '@/models/RatingHistory';
 import { ActivePuzzleColl } from '@/models/ActivePuzzle';
-import { updateLeitner, updateThemedLeitner } from '@/src/LeitnerIntance';
+import { updateLeitner } from '@/src/LeitnerIntance';
 import { toGroupId } from '@/lib/utils';
 import { TimeThemeColl } from '@/models/TimeThemeColl';
 import updateAndScaleRatings from '@/src/rating/RatingCalculator';
@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
   const userRating = await getExistingUserRating(user);
   const moves = puzzle.Moves.split(' ').length / 2;
   const timePerMove = totalTime / moves;
+  console.log(`Group: ${group}`);
   console.log(`Time per move : ${timePerMove}`);
 
   updateAndScaleRatings(userRating, puzzle, success, activePuzzle.isReview);
@@ -62,11 +63,7 @@ export async function POST(req: NextRequest) {
     ? (JSON.parse(activePuzzle.reviewee) as Puzzle)
     : puzzle;
 
-  if (group) {
-    await updateThemedLeitner(user, reviewee, success, group, timePerMove);
-  } else {
-    await updateLeitner(user, reviewee, success, timePerMove);
-  }
+  await updateLeitner(user, reviewee, success, group || "", timePerMove);
 
   // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
   // persist in the DB, as this information is useful for dashboard analysitcs.

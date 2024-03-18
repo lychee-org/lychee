@@ -13,7 +13,6 @@ import { ActivePuzzleColl } from '@/models/ActivePuzzle';
 import { booleanWithProbability, toGroupId } from '@/lib/utils';
 import {
   nextLeitnerReview,
-  nextThemedLeitnerReview,
 } from '@/src/LeitnerIntance';
 import { similarBatchForCompromised } from '../similarBatch/similarBatchFor';
 import { assert } from 'console';
@@ -208,9 +207,7 @@ const nextPuzzleFor = async (
 
     if (!woodpecker && booleanWithProbability(LEITNER_PROBABILITY)) {
       console.log('Trying to use Leitner...');
-      const puzzleToReview = group
-        ? await nextThemedLeitnerReview(user, group)
-        : await nextLeitnerReview(user);
+      const puzzleToReview = await nextLeitnerReview(user, group || "")
       if (puzzleToReview) {
         console.log(
           `Worked! Puzzle Id: ${puzzleToReview.PuzzleId} from Leitner, tags: ${puzzleToReview.hierarchy_tags}`
