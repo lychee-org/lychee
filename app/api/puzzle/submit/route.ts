@@ -39,15 +39,14 @@ export async function POST(req: NextRequest) {
   const puzzle = JSON.parse(activePuzzle.puzzle) as Puzzle;
   const success = successStr as boolean;
   const themeGroup = themeGroupStr as string[];
-  const group = themeGroup.length > 0 ? toGroupId(themeGroup) : undefined;
+  const group = toGroupId(themeGroup);
   const totalTime = (timeStr as number) / MILLISECONDS_IN_SECOND;
   const userRating = await getExistingUserRating(user);
   const moves = puzzle.Moves.split(' ').length / 2;
   const timePerMove = totalTime / moves;
-  console.log(`Group: ${group}`);
-  console.log(`Time per move : ${timePerMove}`);
+  const isReview = !!activePuzzle.reviewee;
 
-  updateAndScaleRatings(userRating, puzzle, success, activePuzzle.isReview);
+  updateAndScaleRatings(userRating, puzzle, success, isReview);
 
   // Update user's rating.
   await RatingColl.updateOne({ username: user.username }, { $set: userRating });
@@ -59,11 +58,11 @@ export async function POST(req: NextRequest) {
 
   await addRound(user, puzzle);
 
-  const reviewee = activePuzzle.isReview
+  const reviewee = isReview
     ? (JSON.parse(activePuzzle.reviewee) as Puzzle)
     : puzzle;
 
-  await updateLeitner(user, reviewee, success, group || "", timePerMove);
+  await updateLeitner(user, reviewee, success, group, timePerMove);
 
   // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
   // persist in the DB, as this information is useful for dashboard analysitcs.
@@ -73,7 +72,7 @@ export async function POST(req: NextRequest) {
   const themes = puzzle.Themes.split(' ');
   themes.forEach(async (theme) => {
     const themeRating: Rating = ratingMap.get(theme) || DEFAULT_RATING;
-    updateAndScaleRatings(themeRating, puzzle, success, activePuzzle.isReview);
+    updateAndScaleRatings(themeRating, puzzle, success, isReview);
     await UserThemeColl.updateOne(
       { username: user.username, theme: theme },
       { $set: themeRating },
