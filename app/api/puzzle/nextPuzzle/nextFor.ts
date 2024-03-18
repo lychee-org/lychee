@@ -94,7 +94,7 @@ const nextPuzzleRepetitions = async (
   exceptions: any
 ): Promise<Puzzle | undefined> => {
   if (reps == MAX_REPS) {
-    // throw new Error('Maximum repetitions reached during puzzle selection');
+    console.log('Maximum repetitions reached during puzzle selection');
     return undefined;
   }
   let rating = userRating;
@@ -136,16 +136,14 @@ const nextThemedPuzzlesForRepetitions = async (
   expceptions: any
 ): Promise<Puzzle | undefined> => {
   if (reps == MAX_REPS) {
-    // throw new Error('Maximum repetitions reached during puzzle selection');
+    console.log('Maximum repetitions reached during puzzle selection');
     return undefined;
   }
-
   const theme = themeGroup[Math.floor(Math.random() * themeGroup.length)];
   // If theme is present in rating map, use its rating for adaptive difficulty
   // selection. Otherwise, use user's rating.
   const rating = ratingMap.get(theme)?.rating || userRating;
   console.log(`Using rating: ${rating} for theme: ${theme}`);
-
   const p = await nextPuzzleForThemeAndRating(theme, rating, expceptions);
   if (p) {
     console.log(`Found grouped theme ${theme} after ${reps} reps.`);
