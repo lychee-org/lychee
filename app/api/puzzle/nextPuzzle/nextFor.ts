@@ -18,7 +18,7 @@ const MAX_REPS: number = 12;
 const MAX_COMPROMISE: number = 3;
 
 const LEITNER_PROBABILITY: number = 0.2;
-const MIN_CANDIDATES: number = 10; // TODO: Increase this.
+const MIN_CANDIDATES: number = 10;
 
 export type PuzzleWithUserRating = {
   puzzle: Puzzle | undefined;
@@ -172,10 +172,8 @@ const nextPuzzleFor = async (
       });
       if (activePuzzle) {
         if (groupId !== activePuzzle.groupID) {
-          // TODO: Maybe preserve previous active puzzle? But we need to be
-          // careful in case this mode solves that puzzle, then back in
-          // normal mode user solves puzzle again - then errors!
-          console.log('Deleting different active puzzle');
+          // NB: Preserving active puzzles per-modes is tricky. We can't permit this mode solving that puzzle,
+          // then back in previous mode user solving it again.
           await ActivePuzzleColl.deleteOne({ username: user.username });
         } else {
           console.log('Found active puzzle');
