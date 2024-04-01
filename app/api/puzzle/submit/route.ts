@@ -6,7 +6,6 @@ import { RatingColl } from '../../../../models/RatingColl';
 import {
   DEFAULT_RATING,
   Rating,
-  getExistingUserRating,
   getThemeRatings,
 } from '@/src/rating/getRating';
 import { UserThemeColl } from '@/models/UserThemeColl';
@@ -18,14 +17,21 @@ import { toGroupId } from '@/lib/utils';
 import { TimeThemeColl } from '@/models/TimeThemeColl';
 import updateAndScaleRatings from '@/src/rating/RatingCalculator';
 
-const MILLISECONDS_IN_SECOND = 1000;
-
 export async function POST(req: NextRequest) {
   await dbConnect();
   const { user } = await validateRequest();
   if (!user) {
     return new Response('Unauthorized', { status: 401 });
   }
+
+  // TODO: Remove these things!
+  const { puzzle_, success_, prv_, themeGroupStr, time } = await req.json();
+  const puzzle = puzzle_ as Puzzle;
+  const success = success_ as boolean;
+  const userRating = prv_ as Rating;
+  const themeGroup = themeGroupStr as string[];
+  const group = themeGroup.length > 0 ? toGroupId(themeGroup) : undefined;
+  const t = (time as number) / 1000;
 
   // Delete active puzzle, as it is solved.
   const activePuzzle = await ActivePuzzleColl.findOneAndDelete({
@@ -34,18 +40,6 @@ export async function POST(req: NextRequest) {
   if (!activePuzzle) {
     throw new Error('No active puzzle found - something is wrong!');
   }
-
-  const { successStr, themeGroupStr, timeStr } = await req.json();
-  const puzzle = JSON.parse(activePuzzle.puzzle) as Puzzle;
-  const success = successStr as boolean;
-  const themeGroup = themeGroupStr as string[];
-  const group = themeGroup.length > 0 ? toGroupId(themeGroup) : undefined;
-  const totalTime = (timeStr as number) / MILLISECONDS_IN_SECOND;
-  const userRating = await getExistingUserRating(user);
-  const moves = puzzle.Moves.split(' ').length / 2;
-  const timePerMove = totalTime / moves;
-  console.log(`Time per move : ${timePerMove}`);
-
   updateAndScaleRatings(userRating, puzzle, success, activePuzzle.isReview);
 
   // Update user's rating.
@@ -63,9 +57,9 @@ export async function POST(req: NextRequest) {
     : puzzle;
 
   if (group) {
-    await updateThemedLeitner(user, reviewee, success, group, timePerMove);
+    await updateThemedLeitner(user, reviewee, success, group, t);
   } else {
-    await updateLeitner(user, reviewee, success, timePerMove);
+    await updateLeitner(user, reviewee, success, t);
   }
 
   // NB: We don't filter out irrelevant themes here. Even if theme is irrelevant, we compute ratings and
@@ -82,11 +76,13 @@ export async function POST(req: NextRequest) {
       { $set: themeRating },
       { upsert: true } // Insert if not found.
     );
+    const moves = puzzle.Moves.split(' ').length / 2;
+    console.log(`\t\tTime per move : ${t / moves}`);
     if (success) {
       await TimeThemeColl.updateOne(
         { username: user.username, theme: theme },
         {
-          $set: { time: timePerMove },
+          $set: { time: t / moves },
         },
         { upsert: true }
       );

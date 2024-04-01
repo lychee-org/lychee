@@ -16,6 +16,9 @@ import RatingComponent from './controls/rating';
 import DisplayBox from './controls/display-box';
 import useTimer from '@/hooks/useTimer';
 import { Rating } from '@/src/rating/getRating';
+import { Button } from '../ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import StaticBoard from './static-board';
 import PuzzleHintBox from './controls/puzzle-hint';
 
 interface PuzzleBoardProps {
@@ -136,7 +139,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
   /** HANDLE PLAYER MOVE VERIFICATION */
   function undoWrongMove() {
     if (submitPuzzle && !wrong) {
-      submitPuzzle(false, 0).then((r) => setRating(r));
+      submitPuzzle(false, rating, 0).then((r) => setRating(r));
       setWrong(true);
     }
     game.undo();
@@ -158,7 +161,7 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
     stopTimer();
     if (submitPuzzle && !wrong) {
       const elapsed = time;
-      submitPuzzle(true, elapsed).then((r) => setRating(r));
+      submitPuzzle(true, rating, elapsed).then((r) => setRating(r));
     }
     setSolved(true);
   }
@@ -182,10 +185,11 @@ const PuzzleBoard: React.FC<PuzzleBoardProps> = ({
   const viewSolution = () => {
     if (rendered && !solved) {
       if (!wrong) {
-        submitPuzzle(false, 0).then((r) => setRating(r));
+        submitPuzzle(false, rating, 0).then((r) => setRating(r));
       }
       stopTimer();
       setWrong(true);
+      const elapsed = time;
       setSolved(true);
       setGaveUp(true);
 
