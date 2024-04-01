@@ -102,7 +102,10 @@ const sm2RandomThemeFromRatingMap = async (
       theme: theme,
     });
     if (entry) {
-      v.rating = scaleGlickoByTime(v.rating, Math.min(entry.time, MAX_CORRECT_TIME));
+      v.rating = scaleGlickoByTime(
+        v.rating,
+        Math.min(entry.time, MAX_CORRECT_TIME)
+      );
     }
     result.set(theme, v);
   }
